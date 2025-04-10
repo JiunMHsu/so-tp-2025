@@ -40,6 +40,7 @@ void iniciar_servidor()
 
 static void *escuchar_cpu_dispatch(void *fd_escucha)
 {
+    printf("Escuchando CPU Dispatch en el socket %d ...\n", *((int32_t *)fd_escucha));
     while (1)
         esperar_cliente(*((int32_t *)fd_escucha), &atender_cpu_dispatch);
 
@@ -48,6 +49,7 @@ static void *escuchar_cpu_dispatch(void *fd_escucha)
 
 static void *escuchar_cpu_interrupt(void *fd_escucha)
 {
+    printf("Escuchando CPU Interrupt en el socket %d ...\n", *((int32_t *)fd_escucha));
     while (1)
         esperar_cliente(*((int32_t *)fd_escucha), &atender_cpu_interrupt);
 
@@ -56,6 +58,7 @@ static void *escuchar_cpu_interrupt(void *fd_escucha)
 
 void *escuchar_io(void *fd_escucha)
 {
+    printf("Escuchando IO en el socket %d ...\n", *((int32_t *)fd_escucha));
     while (1)
         esperar_cliente(*((int32_t *)fd_escucha), &atender_io);
 
