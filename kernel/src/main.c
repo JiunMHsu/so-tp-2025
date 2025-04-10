@@ -9,9 +9,11 @@ int main(int argc, char *argv[])
 {
     int32_t fd_escucha = crear_servidor("8001");
 
-    pthread_t hilo_escucha;
-    pthread_create(&hilo_escucha, NULL, &escuchar_conexiones, &fd_escucha);
-    pthread_detach(hilo_escucha);
+    // pthread_t hilo_escucha;
+    // pthread_create(&hilo_escucha, NULL, &escuchar_conexiones, &fd_escucha);
+    // pthread_detach(hilo_escucha);
+
+    escuchar_conexiones(&fd_escucha);
 
     finalizar_servidor(fd_escucha);
     return EXIT_SUCCESS;
@@ -20,7 +22,7 @@ int main(int argc, char *argv[])
 void *escuchar_conexiones(void *fd_escucha)
 {
     while (1)
-        esperar_cliente(*((int32_t *)fd_escucha), &atender_io);
+        esperar_cliente(*((int32_t *)fd_escucha), &atender_io); // bloqueante
 
     return NULL;
 }
