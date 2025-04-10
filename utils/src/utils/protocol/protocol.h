@@ -38,6 +38,14 @@ void *recibir_buffer(int32_t *tamanio, int32_t fd_conexion);
 t_list *recibir_paquete(int32_t fd_conexion);
 
 void enviar_mensaje(char *mensaje, int32_t fd_conexion);
+
+/**
+ * @brief Lee un mensaje del socket y lo devuelve como un puntero a char.
+ * @attention Aloca memoria para el mensaje recibido.
+ *
+ * @param fd_conexion
+ * @return char*
+ */
 char *recibir_mensaje(int32_t fd_conexion);
 
 #endif // UTILS_PROTOCOL_H
