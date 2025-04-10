@@ -22,9 +22,17 @@ typedef enum
 
 int32_t crear_servidor(char *puerto);
 int8_t esperar_cliente(int32_t fd_escucha, void *(*atender_cliente)(void *));
-t_cliente recibir_cliente(int32_t fd_conexion);
+
+/**
+ * @brief Recibe y responde al handshake del cliente que intenta conectarse.
+ *
+ * @param fd_conexion
+ * @param cliente_esperado
+ * @return int8_t 0 si el cliente es el esperado, -1 en caso contrario.
+ */
+int8_t recibir_cliente(int32_t fd_conexion, t_cliente cliente_esperado);
 int32_t crear_conexion(char *ip, char *puerto);
-int32_t handshake(int32_t fd_conexion, int32_t id_modulo);
-void liberar_conexion(int32_t socket_cliente);
+int32_t handshake(int32_t fd_conexion, t_cliente id_cliente);
+void cerrar_conexion(int32_t socket_cliente);
 
 #endif // UTILS_SOCKETS_H

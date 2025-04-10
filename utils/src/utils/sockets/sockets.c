@@ -35,7 +35,7 @@ int8_t esperar_cliente(int32_t fd_escucha, void *(*atender_cliente)(void *))
     return 0;
 }
 
-t_cliente recibir_cliente(int32_t fd_conexion)
+int8_t recibir_cliente(int32_t fd_conexion, t_cliente cliente_esperado)
 {
     int32_t id_cliente;
     int32_t resultOk = 0;
@@ -43,7 +43,7 @@ t_cliente recibir_cliente(int32_t fd_conexion)
 
     recv(fd_conexion, &id_cliente, sizeof(int32_t), MSG_WAITALL);
 
-    if (id_cliente < 0 || id_cliente > 4) // se escapa de los clientes posibles
+    if (id_cliente != cliente_esperado)
     {
         perror("Error cliente inválido");
         send(fd_conexion, &resultError, sizeof(int32_t), 0);
@@ -51,7 +51,7 @@ t_cliente recibir_cliente(int32_t fd_conexion)
     }
 
     send(fd_conexion, &resultOk, sizeof(int32_t), 0);
-    return (t_cliente)id_cliente;
+    return 0;
 }
 
 int32_t crear_conexion(char *ip, char *puerto)
@@ -93,13 +93,13 @@ int32_t crear_conexion(char *ip, char *puerto)
     return socket_cliente;
 }
 
-int32_t handshake(int32_t fd_conexion, int32_t id_modulo)
+int32_t handshake(int32_t fd_conexion, t_cliente id_cliente)
 {
     int32_t resultado;
 
-    if (send(fd_conexion, &id_modulo, sizeof(int32_t), 0) == -1)
+    if (send(fd_conexion, &id_cliente, sizeof(int32_t), 0) == -1)
     {
-        perror("Error al enviar el ID del modulo");
+        perror("Error al enviar el ID del cliente");
         return -1;
     }
 
@@ -112,7 +112,7 @@ int32_t handshake(int32_t fd_conexion, int32_t id_modulo)
     return resultado;
 }
 
-void liberar_conexion(int32_t socket_cliente)
+void cerrar_conexion(int32_t socket_cliente)
 {
     close(socket_cliente);
 }
