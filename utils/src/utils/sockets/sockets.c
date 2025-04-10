@@ -35,22 +35,23 @@ int8_t esperar_cliente(int32_t fd_escucha, void *(*atender_cliente)(void *))
     return 0;
 }
 
-int32_t recibir_cliente(int32_t fd_conexion)
+t_cliente recibir_cliente(int32_t fd_conexion)
 {
-    int32_t id_modulo;
+    int32_t id_cliente;
     int32_t resultOk = 0;
     int32_t resultError = -1;
 
-    recv(fd_conexion, &id_modulo, sizeof(int32_t), MSG_WAITALL);
+    recv(fd_conexion, &id_cliente, sizeof(int32_t), MSG_WAITALL);
 
-    if (id_modulo < 0 || id_modulo > 3) // se escapa de los modulos
+    if (id_cliente < 0 || id_cliente > 4) // se escapa de los clientes posibles
     {
+        perror("Error cliente inválido");
         send(fd_conexion, &resultError, sizeof(int32_t), 0);
         return -1;
     }
 
     send(fd_conexion, &resultOk, sizeof(int32_t), 0);
-    return id_modulo;
+    return (t_cliente)id_cliente;
 }
 
 int32_t crear_conexion(char *ip, char *puerto)
