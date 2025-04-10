@@ -45,6 +45,7 @@ void *atender_io(void *fd_ptr)
     {
         char *mensaje = recibir_mensaje(fd_conexion);
         printf("Mensaje recibido: %s\n", mensaje);
+        free(mensaje);
     }
 }
 
