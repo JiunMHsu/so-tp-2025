@@ -1,17 +1,23 @@
-#include <semaphore.h>
+#include <signal.h>
 #include "servidor/servidor.h"
+
+void sigint_handler(int);
 
 int main(int argc, char *argv[])
 {
-    sem_t fin_de_proceso; // temporal para bloquear el hilo principal
-    sem_init(&fin_de_proceso, 0, 0);
-
+    signal(SIGINT, &sigint_handler);
     // conectar con memoria
 
     iniciar_servidor();
 
     // planificador
 
-    sem_wait(&fin_de_proceso);
+    pause(); // temporal para bloquear el hilo principal
+
     return EXIT_SUCCESS;
+}
+
+void sigint_handler(int _)
+{
+    finalizar_servidor();
 }

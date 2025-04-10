@@ -40,7 +40,9 @@ void iniciar_servidor()
 
 static void *escuchar_cpu_dispatch(void *fd_escucha)
 {
+    // TODO: Reemplazar por logger
     printf("Escuchando CPU Dispatch en el socket %d ...\n", *((int32_t *)fd_escucha));
+
     while (1)
         esperar_cliente(*((int32_t *)fd_escucha), &atender_cpu_dispatch);
 
@@ -49,7 +51,9 @@ static void *escuchar_cpu_dispatch(void *fd_escucha)
 
 static void *escuchar_cpu_interrupt(void *fd_escucha)
 {
+    // TODO: Reemplazar por logger
     printf("Escuchando CPU Interrupt en el socket %d ...\n", *((int32_t *)fd_escucha));
+
     while (1)
         esperar_cliente(*((int32_t *)fd_escucha), &atender_cpu_interrupt);
 
@@ -58,7 +62,9 @@ static void *escuchar_cpu_interrupt(void *fd_escucha)
 
 void *escuchar_io(void *fd_escucha)
 {
+    // TODO: Reemplazar por logger
     printf("Escuchando IO en el socket %d ...\n", *((int32_t *)fd_escucha));
+
     while (1)
         esperar_cliente(*((int32_t *)fd_escucha), &atender_io);
 
@@ -67,10 +73,10 @@ void *escuchar_io(void *fd_escucha)
 
 static void *atender_cpu_dispatch(void *fd_ptr)
 {
-    int32_t fd_conexion = *((int32_t *)fd_ptr);
+    int32_t fd_cpu_dispatch = *((int32_t *)fd_ptr);
     free(fd_ptr);
 
-    if (recibir_cliente(fd_conexion, CPU_DISPATCH))
+    if (recibir_cliente(fd_cpu_dispatch, CPU_DISPATCH))
     {
         // TODO: Reemplazar por logger
         perror("Error cliente inválido");
@@ -78,16 +84,21 @@ static void *atender_cpu_dispatch(void *fd_ptr)
     }
 
     // TODO: Lógica de atención
+    while (1)
+    {
+        enviar_mensaje("mensaje desde kernel", fd_cpu_dispatch);
+        sleep(2);
+    }
 
     return NULL;
 }
 
 static void *atender_cpu_interrupt(void *fd_ptr)
 {
-    int32_t fd_conexion = *((int32_t *)fd_ptr);
+    int32_t fd_cpu_interrupt = *((int32_t *)fd_ptr);
     free(fd_ptr);
 
-    if (recibir_cliente(fd_conexion, CPU_INTERRUPT))
+    if (recibir_cliente(fd_cpu_interrupt, CPU_INTERRUPT))
     {
         // TODO: Reemplazar por logger
         perror("Error cliente inválido");
@@ -95,16 +106,21 @@ static void *atender_cpu_interrupt(void *fd_ptr)
     }
 
     // TODO: Lógica de atención
+    while (1)
+    {
+        enviar_mensaje("mensaje desde kernel", fd_cpu_interrupt);
+        sleep(2);
+    }
 
     return NULL;
 }
 
 static void *atender_io(void *fd_ptr)
 {
-    int32_t fd_conexion = *((int32_t *)fd_ptr);
+    int32_t fd_io = *((int32_t *)fd_ptr);
     free(fd_ptr);
 
-    if (recibir_cliente(fd_conexion, IO))
+    if (recibir_cliente(fd_io, IO))
     {
         // TODO: Reemplazar por logger
         perror("Error cliente inválido");
@@ -112,13 +128,22 @@ static void *atender_io(void *fd_ptr)
     }
 
     // TODO: Lógica de atención
+    while (1)
+    {
+        enviar_mensaje("mensaje desde kernel", fd_io);
+        sleep(2);
+    }
 
     return NULL;
 }
 
 void finalizar_servidor()
 {
+    printf("Finalizando servidor...\n");
+
     cerrar_conexion(fd_dispatch);
     cerrar_conexion(fd_interrupt);
     cerrar_conexion(fd_io);
+
+    printf("Servidor finalizado.\n");
 }
