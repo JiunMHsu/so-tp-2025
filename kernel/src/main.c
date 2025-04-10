@@ -1,55 +1,23 @@
-#include <utils/sockets/sockets.h>
-#include <utils/protocol/protocol.h>
+#include <signal.h>
+#include "servidor/servidor.h"
 
-void *escuchar_conexiones(void *fd_escucha);
-void *atender_io(void *fd_ptr);
-void finalizar_servidor(int32_t fd_escucha);
+void sigint_handler(int);
 
 int main(int argc, char *argv[])
 {
-    int32_t fd_escucha = crear_servidor("8001");
+    signal(SIGINT, &sigint_handler);
+    // conectar con memoria
 
-    // pthread_t hilo_escucha;
-    // pthread_create(&hilo_escucha, NULL, &escuchar_conexiones, &fd_escucha);
-    // pthread_detach(hilo_escucha);
+    iniciar_servidor();
 
-    escuchar_conexiones(&fd_escucha);
+    // planificador
 
-    finalizar_servidor(fd_escucha);
+    pause(); // temporal para bloquear el hilo principal
+
     return EXIT_SUCCESS;
 }
 
-void *escuchar_conexiones(void *fd_escucha)
+void sigint_handler(int _)
 {
-    while (1)
-        esperar_cliente(*((int32_t *)fd_escucha), &atender_io); // bloqueante
-
-    return NULL;
-}
-
-void *atender_io(void *fd_ptr)
-{
-    int32_t fd_conexion = *((int32_t *)fd_ptr);
-    // free(fd_ptr);
-
-    // recibir el handshake
-    uint32_t modulo_cliente = recibir_cliente(fd_conexion);
-
-    if (modulo_cliente != IO)
-    {
-        printf("Error de Cliente \n");
-        return NULL;
-    }
-
-    while (1)
-    {
-        char *mensaje = recibir_mensaje(fd_conexion);
-        printf("Mensaje recibido: %s\n", mensaje);
-        free(mensaje);
-    }
-}
-
-void finalizar_servidor(int32_t fd_escucha)
-{
-    close(fd_escucha);
+    finalizar_servidor();
 }
