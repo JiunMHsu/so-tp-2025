@@ -19,6 +19,9 @@ typedef t_operacion_acceso t_accion;
 void iniciar_logger(t_log_level log_level);
 void destruir_logger(void);
 
+void log_evento(char *evento);
+void log_mensaje_error(char *error);
+
 void log_conexion_kernel(int32_t socket_kernel);
 void log_creacion_proceso(u_int32_t pid, u_int32_t tamanio);
 void log_destruccion_proceso(u_int32_t pid); // tiene más argumentos que de momento no entiendo y no se cómo tiparlos
