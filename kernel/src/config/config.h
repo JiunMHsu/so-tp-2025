@@ -5,7 +5,6 @@
 #include <string.h>
 #include <commons/config.h>
 #include <commons/log.h>
-#include <commons/collections/dictionary.h>
 
 #define CONFIG_FILE "kernel.config"
 
@@ -65,6 +64,13 @@ char *get_puerto_escucha(puerto_escucha puerto);
 mem_address get_memoria_config(void);
 algoritmo_planificacion get_alg_plani_corto_plazo(void);
 algoritmo_planificacion get_alg_plani_largo_plazo(void);
+
+/**
+ * @brief Tiempo en milisegundos que se debe esperar
+ * antes de mover un proceso al estado SUSP. BLOCKED.
+ *
+ * @return u_int32_t (milisegundos)
+ */
 u_int32_t get_tiempo_suspension(void);
 t_log_level get_log_level(void);
 
