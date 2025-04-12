@@ -47,17 +47,7 @@ typedef enum
      * o cuando un proceso deja la CPU.
      *
      */
-    SRT
-} algoritmo_planificacion_corto_plazo;
-
-typedef enum
-{
-    /**
-     * @brief (FIFO) First In First Out.
-     * No hay nada que explicar aca.
-     *
-     */
-    FIFO,
+    SRT,
 
     /**
      * @brief (SPF) Smallest Process First.
@@ -66,18 +56,15 @@ typedef enum
      *
      */
     SPF
-} algoritmo_planificacion_largo_plazo;
-
-typedef algoritmo_planificacion_corto_plazo plani_corto_plazo;
-typedef algoritmo_planificacion_largo_plazo plani_largo_plazo;
+} algoritmo_planificacion;
 
 void iniciar_config(void);
 void destruir_config(void);
 
 char *get_puerto_escucha(puerto_escucha puerto);
 mem_address get_memoria_config(void);
-plani_corto_plazo get_alg_plani_corto_plazo(void);
-plani_largo_plazo get_alg_plani_largo_plazo(void);
+algoritmo_planificacion get_alg_plani_corto_plazo(void);
+algoritmo_planificacion get_alg_plani_largo_plazo(void);
 u_int32_t get_tiempo_suspension(void);
 t_log_level get_log_level(void);
 
