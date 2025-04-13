@@ -9,7 +9,7 @@
 #include <utils/protocol/protocol.h>
 
 #include "config/config.h"
-// #include "logger/logger.h"
+#include "logger/logger.h"
 // #include "planificador/planificador.h"
 
 void iniciar_servidor(void);
