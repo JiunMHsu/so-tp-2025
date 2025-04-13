@@ -37,9 +37,7 @@ void iniciar_servidor()
 
 static void *escuchar_cpu_dispatch(void *fd_escucha)
 {
-    // TODO: Reemplazar por logger
-    printf("Escuchando CPU Dispatch en el socket %d ...\n", *((int32_t *)fd_escucha));
-
+    log_evento("Escuchando CPU Dispatch...");
     while (1)
         esperar_cliente(*((int32_t *)fd_escucha), &atender_cpu_dispatch);
 
@@ -48,9 +46,7 @@ static void *escuchar_cpu_dispatch(void *fd_escucha)
 
 static void *escuchar_cpu_interrupt(void *fd_escucha)
 {
-    // TODO: Reemplazar por logger
-    printf("Escuchando CPU Interrupt en el socket %d ...\n", *((int32_t *)fd_escucha));
-
+    log_evento("Escuchando CPU Interrupt...");
     while (1)
         esperar_cliente(*((int32_t *)fd_escucha), &atender_cpu_interrupt);
 
@@ -59,9 +55,7 @@ static void *escuchar_cpu_interrupt(void *fd_escucha)
 
 void *escuchar_io(void *fd_escucha)
 {
-    // TODO: Reemplazar por logger
-    printf("Escuchando IO en el socket %d ...\n", *((int32_t *)fd_escucha));
-
+    log_evento("Escuchando IO...");
     while (1)
         esperar_cliente(*((int32_t *)fd_escucha), &atender_io);
 
@@ -75,8 +69,7 @@ static void *atender_cpu_dispatch(void *fd_ptr)
 
     if (recibir_cliente(fd_cpu_dispatch, CPU_DISPATCH))
     {
-        // TODO: Reemplazar por logger
-        perror("Error cliente inválido");
+        log_mensaje_error("Error cliente inválido");
         return NULL;
     }
 
@@ -97,8 +90,7 @@ static void *atender_cpu_interrupt(void *fd_ptr)
 
     if (recibir_cliente(fd_cpu_interrupt, CPU_INTERRUPT))
     {
-        // TODO: Reemplazar por logger
-        perror("Error cliente inválido");
+        log_mensaje_error("Error cliente inválido");
         return NULL;
     }
 
@@ -119,8 +111,7 @@ static void *atender_io(void *fd_ptr)
 
     if (recibir_cliente(fd_io, IO))
     {
-        // TODO: Reemplazar por logger
-        perror("Error cliente inválido");
+        log_mensaje_error("Error cliente inválido");
         return NULL;
     }
 
@@ -136,11 +127,11 @@ static void *atender_io(void *fd_ptr)
 
 void finalizar_servidor()
 {
-    printf("Finalizando servidor...\n");
+    log_evento("Finalizando servidor...");
 
     cerrar_conexion(fd_dispatch);
     cerrar_conexion(fd_interrupt);
     cerrar_conexion(fd_io);
 
-    printf("Servidor finalizado.\n");
+    log_evento("Servidor finalizado.");
 }
