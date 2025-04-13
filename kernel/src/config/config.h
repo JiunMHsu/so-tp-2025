@@ -10,9 +10,9 @@
 
 typedef enum
 {
-    CPU_DISPATCH,
-    CPU_INTERRUPT,
-    IO
+    ESCUCHA_CPU_DISPATCH,
+    ESCUCHA_CPU_INTERRUPT,
+    ESCUCHA_IO
 } puerto_escucha;
 
 typedef struct

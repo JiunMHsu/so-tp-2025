@@ -2,7 +2,6 @@
 
 int32_t fd_dispatch;
 int32_t fd_interrupt;
-
 int32_t fd_io;
 
 static void *escuchar_cpu_dispatch(void *fd_escucha);
@@ -15,14 +14,12 @@ static void *atender_io(void *fd_ptr);
 
 void iniciar_servidor()
 {
-    char *puerto_escucha_dispatch = "8001";  // get_puerto_escucha_dispatch();
-    char *puerto_escucha_interrupt = "8002"; // get_puerto_escucha_interrupt();
-
-    char *puerto_escucha_io = "8003"; // get_puerto_escucha_io();
+    char *puerto_escucha_dispatch = get_puerto_escucha(ESCUCHA_CPU_DISPATCH);
+    char *puerto_escucha_interrupt = get_puerto_escucha(ESCUCHA_CPU_INTERRUPT);
+    char *puerto_escucha_io = get_puerto_escucha(ESCUCHA_IO);
 
     fd_dispatch = crear_servidor(puerto_escucha_dispatch);
     fd_interrupt = crear_servidor(puerto_escucha_interrupt);
-
     fd_io = crear_servidor(puerto_escucha_io);
 
     pthread_t hilo_escucha_dispatch;

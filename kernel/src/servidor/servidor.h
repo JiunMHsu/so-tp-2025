@@ -8,8 +8,8 @@
 #include <utils/sockets/sockets.h>
 #include <utils/protocol/protocol.h>
 
+#include "config/config.h"
 // #include "logger/logger.h"
-// #include "config/config.h"
 // #include "planificador/planificador.h"
 
 void iniciar_servidor(void);

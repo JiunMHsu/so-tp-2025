@@ -17,13 +17,13 @@ char *get_puerto_escucha(puerto_escucha puerto)
     char *key = NULL;
     switch (puerto)
     {
-    case CPU_DISPATCH:
+    case ESCUCHA_CPU_DISPATCH:
         key = "PUERTO_ESCUCHA_DISPATCH";
         break;
-    case CPU_INTERRUPT:
+    case ESCUCHA_CPU_INTERRUPT:
         key = "PUERTO_ESCUCHA_INTERRUPT";
         break;
-    case IO:
+    case ESCUCHA_IO:
         key = "PUERTO_ESCUCHA_IO";
         break;
     }
