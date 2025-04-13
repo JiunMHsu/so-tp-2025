@@ -2,8 +2,6 @@
 
 int main(int argc, char *argv[])
 {
-    iniciar_config();
-
     iniciar_cliente();
 
     return 0;
