@@ -22,5 +22,6 @@ typedef struct
 void iniciar_config(void);
 void destruir_config(void);
 kernel_address get_kernel_address();
+mem_address get_memoria_address();
 
 #endif
