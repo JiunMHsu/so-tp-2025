@@ -50,7 +50,30 @@ void *atender_kernel_interrupt(void *fd_ptr)
             return NULL;
         }
 
-        printf("Mensaje enviado por interrupt: %s", mensaje);
+        printf("Mensaje enviado por interrupt: %s \n", mensaje);
+        free(mensaje);
+    }
+
+    return NULL;
+}
+
+void *atender_kernel_dispatch(void *fd_ptr)
+{
+    int32_t fd_conexion_dispatch = *((int32_t *)fd_ptr);
+
+    // Escucha de dispatch
+    while (1)
+    {
+        char *mensaje = recibir_mensaje(fd_conexion_dispatch);
+
+        if (mensaje == NULL)
+        {
+            cerrar_conexion(fd_conexion_dispatch);
+            return NULL;
+        }
+
+        printf("Mensaje por dispatch: %s \n", mensaje);
+        free(mensaje);
     }
 
     return NULL;
