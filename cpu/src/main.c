@@ -1,4 +1,38 @@
+#include "cliente/kernel.h"
+#include <stdlib.h>
+
 int main(int argc, char *argv[])
 {
-    return 0;
+    iniciar_config();
+
+    int32_t fd_conexion_dispatch = conectar_kernel_dispatch();
+
+    if (fd_conexion_dispatch == -1)
+    {
+        return EXIT_FAILURE;
+    }
+
+    int32_t fd_conexion_interrupt = conectar_kernel_interrupt();
+
+    if (fd_conexion_interrupt == -1)
+    {
+        return EXIT_FAILURE;
+    }
+
+    // Implementar conexion con memoria
+
+    // Hilo para la escucha de interrupciones
+    pthread_t hilo_interrupt;
+
+    pthread_create(&hilo_interrupt, NULL, &atender_kernel_interrupt, &fd_conexion_interrupt);
+    pthread_detach(hilo_interrupt);
+
+    pthread_t hilo_dispatch;
+
+    pthread_create(&hilo_dispatch, NULL, &atender_kernel_dispatch, &fd_conexion_dispatch);
+    pthread_detach(hilo_dispatch);
+
+    pause();
+
+    return EXIT_SUCCESS;
 }
