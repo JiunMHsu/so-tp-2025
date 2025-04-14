@@ -1,4 +1,5 @@
 #include "cliente/kernel.h"
+#include "cliente/memoria.h"
 #include <stdlib.h>
 
 int main(int argc, char *argv[])
