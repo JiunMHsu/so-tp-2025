@@ -5,12 +5,6 @@ t_config *cpu_config;
 void iniciar_config()
 {
     cpu_config = config_create(CONFIG_FILE);
-
-    if (cpu_config == NULL)
-    {
-        perror("No se encotro el archivo de configuracion del cpu.");
-        abort();
-    }
 }
 
 void destruir_config()

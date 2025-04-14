@@ -38,20 +38,20 @@ int32_t conectar_kernel_interrupt(void)
 
 void *atender_kernel_interrupt(void *fd_ptr)
 {
-    int32_t fd_interrupt = *((int32_t *)fd_ptr);
+    int32_t fd_conexion_interrupt = *((int32_t *)fd_ptr);
 
     while (1)
     {
-        char *mensaje = recibir_mensaje(fd_interrupt);
+        char *mensaje = recibir_mensaje(fd_conexion_interrupt);
 
         if (mensaje == NULL)
         {
-            cerrar_conexion(fd_interrupt);
+            cerrar_conexion(fd_conexion_interrupt);
             return NULL;
         }
 
-        printf("Mensaje enviado por interrupt: " + mensaje);
+        printf("Mensaje enviado por interrupt: %s", mensaje);
     }
 
-    return NULL; // Revisar
+    return NULL;
 }

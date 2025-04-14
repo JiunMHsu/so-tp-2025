@@ -1,6 +1,7 @@
 #ifndef CPU_CONFIG_H
 #define CPU_CONFIG_H
 
+#include <errno.h>
 #include <commons/config.h>
 
 #define CONFIG_FILE "cpu.config"
@@ -18,8 +19,8 @@ typedef struct
     char *puerto;
 } mem_address;
 
-char *iniciar_config();
-char *destruir_config();
+void iniciar_config(void);
+void destruir_config(void);
 kernel_address get_kernel_address();
 
 #endif
