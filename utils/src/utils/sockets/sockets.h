@@ -16,6 +16,7 @@ typedef enum
     KERNEL,
     CPU_DISPATCH,
     CPU_INTERRUPT,
+    CPU,
     MEMORIA,
     IO,
 } t_cliente;

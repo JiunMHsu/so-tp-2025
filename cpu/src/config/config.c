@@ -22,3 +22,13 @@ kernel_address get_kernel_address()
 
     return kernel_addrs;
 }
+
+mem_address get_memoria_address()
+{
+    mem_address memoria_addrs;
+
+    memoria_addrs.ip = config_get_string_value(cpu_config, "IP_MEMORIA");
+    memoria_addrs.puerto = config_get_string_value(cpu_config, "PUERTO_MEMORIA");
+
+    return memoria_addrs;
+}
