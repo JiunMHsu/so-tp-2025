@@ -52,3 +52,8 @@ char *get_ip_server(ip_server ip)
 
     return config_get_string_value(cpu_config, key);
 }
+
+// TODO
+kernel_address get_kernel_address()
+{
+}

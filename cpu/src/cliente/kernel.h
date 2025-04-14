@@ -1,5 +1,5 @@
-#ifndef CPU_CLIENTE_H
-#define CPU_CLIENTE_H
+#ifndef CLIENTE_KERNEL_H
+#define CLIENTE_KERNEL_H
 
 #include <stdlib.h>
 #include <commons/string.h>
@@ -8,7 +8,7 @@
 #include <utils/protocol/protocol.h>
 #include "config/config.h"
 
-void iniciar_cliente(void);
+uint32_t iniciar_conexion_kernel(void);
 void finalizar_cliente(void);
 
 #endif
