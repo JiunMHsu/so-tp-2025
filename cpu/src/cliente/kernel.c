@@ -1,42 +1,57 @@
 #include "kernel.h"
 
-//conectar_kernel_dispatch
-//conectar_kernel_interrupt
-//retornan fd de conexion
-//TODO
-int32_t iniciar_conexion_kernel(void)
+int32_t conectar_kernel_dispatch(void)
 {
-    // Inicia la conexion
-    char *puerto_kernel_dispatch = get_puerto_server(PUERTO_KERNEL_DISPATCH);
-    char *puerto_kernel_interrupt = get_puerto_server(PUERTO_KERNEL_INTERRUPT);
+    kernel_address datos_kernel = get_kernel_address();
 
-    char *ip_kernel = get_ip_server(IP_KERNEL);
+    int32_t fd_conexion_dispatch = crear_conexion(datos_kernel.ip, datos_kernel.puerto_dispatch);
 
-    uint32_t fd_conexion_dispatch = crear_conexion(ip_kernel, puerto_kernel_dispatch;
-    uint32_t fd_conexion_interrupt = crear_conexion(ip_kernel, puerto_kernel_interrupt);
+    int32_t respuesta_conexion_dispatch = handshake(fd_conexion_dispatch, CPU_DISPATCH);
 
-    //Concreta la conexion
-    uint32_t respuesta_conexion_dispatch = handshake(fd_conexion_dispatch, CPU_DISPATCH);
-
-    if(respuesta_conexion_dispatch == -1)
+    if (respuesta_conexion_dispatch == -1)
     {
-        perror("No se puedo establecer la conexion con el dispatch");
+        perror("No se puedo establecer la conexion con el servicio de dispatch.");
         cerrar_conexion(fd_conexion_dispatch);
         return -1;
     }
 
-    uint32_t respuesta_interrupt = handshake(fd_conexion_interrupt, CPU_INTERRUPT);
+    return fd_conexion_dispatch;
+}
 
-    if(respuesta_interrupt == -1)
+int32_t conectar_kernel_interrupt(void)
+{
+    kernel_address datos_kernel = get_kernel_address();
+
+    int32_t fd_conexion_interrupt = crear_conexion(datos_kernel.ip, datos_kernel.puerto_interrupt);
+
+    int32_t respuesta_conexion_interrupt = handshake(fd_conexion_interrupt, CPU_INTERRUPT);
+
+    if (respuesta_conexion_interrupt == -1)
     {
-        perror("No se puedo establecer la conexion con el interrupt");
+        perror("No se puedo establecer la conexion con el servicio de interrupcion.");
         cerrar_conexion(fd_conexion_interrupt);
         return -1;
     }
 
-    return ;
+    return fd_conexion_interrupt;
 }
 
-void finalizar_cliente()
+void *atender_kernel_interrupt(void *fd_ptr)
 {
+    int32_t fd_interrupt = *((int32_t *)fd_ptr);
+
+    while (1)
+    {
+        char *mensaje = recibir_mensaje(fd_interrupt);
+
+        if (mensaje == NULL)
+        {
+            cerrar_conexion(fd_interrupt);
+            return NULL;
+        }
+
+        printf("Mensaje enviado por interrupt: " + mensaje);
+    }
+
+    return NULL; // Revisar
 }

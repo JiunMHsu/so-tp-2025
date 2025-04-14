@@ -5,18 +5,6 @@
 
 #define CONFIG_FILE "cpu.config"
 
-typedef enum
-{
-    PUERTO_KERNEL_DISPATCH,
-    PUERTO_KERNEL_INTERRUPT
-} puerto_server;
-
-typedef enum
-{
-    IP_KERNEL,
-    IP_MEMORIA
-} ip_server;
-
 typedef struct
 {
     char *ip;
@@ -32,7 +20,6 @@ typedef struct
 
 char *iniciar_config();
 char *destruir_config();
-char *get_puerto_server(puerto_server puerto);
-char *get_ip_server(ip_server ip);
+kernel_address get_kernel_address();
 
 #endif

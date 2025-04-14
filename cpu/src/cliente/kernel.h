@@ -8,7 +8,8 @@
 #include <utils/protocol/protocol.h>
 #include "config/config.h"
 
-uint32_t iniciar_conexion_kernel(void);
-void finalizar_cliente(void);
+int32_t conectar_kernel_dispatch(void);
+int32_t conectar_kernel_interrupt(void);
+void *atender_kernel_interrupt(void *);
 
 #endif
