@@ -2,7 +2,7 @@
 
 t_config *io_config;
 
-void iniciar_config(void)
+void iniciar_config()
 {
     io_config = config_create("io.config");
     if (io_config == NULL)
@@ -12,12 +12,12 @@ void iniciar_config(void)
     }
 }
 
-void destruir_config(void)
+void destruir_config()
 {
     config_destroy(io_config);
 }
 
-kernel_address get_kernel_address(void)
+kernel_address get_kernel_address()
 {
     kernel_address address;
     address.ip = config_get_string_value(io_config, "IP_KERNEL");
@@ -26,7 +26,7 @@ kernel_address get_kernel_address(void)
     return address;
 }
 
-t_log_level get_log_level(void)
+t_log_level get_log_level()
 {
     char *log_level_str = config_get_string_value(io_config, "LOG_LEVEL");
     return log_level_from_string(log_level_str);
