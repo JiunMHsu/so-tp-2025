@@ -11,7 +11,8 @@
 typedef enum
 {
     PACKET,
-    MESSAGE
+    MESSAGE,
+    SIGNAL,
 } op_code;
 
 typedef struct
@@ -36,6 +37,9 @@ void eliminar_paquete(t_packet *paquete);
 int32_t recibir_operacion(int32_t fd_conexion);
 void *recibir_buffer(int32_t *tamanio, int32_t fd_conexion);
 t_list *recibir_paquete(int32_t fd_conexion);
+
+void enviar_senial(int32_t signal, int32_t fd_conexion);
+int32_t recibir_senial(int32_t fd_conexion);
 
 void enviar_mensaje(char *mensaje, int32_t fd_conexion);
 
