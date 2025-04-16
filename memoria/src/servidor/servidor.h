@@ -1,0 +1,16 @@
+#ifndef MEMORIA_SERVIDOR_H
+#define MEMORIA_SERVIDOR_H
+
+#include <stdlib.h>
+#include <pthread.h>
+#include <commons/string.h>
+#include <utils/sockets/sockets.h>
+#include <utils/protocol/protocol.h>
+
+#include "logger/logger.h"
+#include "config/config.h"
+
+int32_t iniciar_servidor(void);
+void finalizar_servidor(void);
+
+#endif // MEMORIA_SERVIDOR_H
