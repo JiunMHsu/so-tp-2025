@@ -3,6 +3,7 @@
 
 #include <errno.h>
 #include <commons/config.h>
+#include <commons/log.h>
 
 #define CONFIG_FILE "cpu.config"
 
@@ -23,5 +24,6 @@ void iniciar_config(void);
 void destruir_config(void);
 kernel_address get_kernel_address();
 mem_address get_memoria_address();
+t_log_level get_log_level();
 
 #endif
