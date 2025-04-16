@@ -29,4 +29,4 @@ void log_obtencion_instruccion(u_int32_t pid, u_int32_t program_counter, char *i
 void log_acceso_espacio_usuario(u_int32_t pid, t_accion accion, u_int32_t direccion_fisica, u_int32_t tamanio);
 void log_memory_dump(u_int32_t pid);
 
-#endif /* MEMORIA_LOGGER_H */
+#endif // MEMORIA_LOGGER_H

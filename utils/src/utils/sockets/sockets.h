@@ -14,8 +14,6 @@
 typedef enum
 {
     KERNEL,
-    CPU_DISPATCH,
-    CPU_INTERRUPT,
     CPU,
     MEMORIA,
     IO,
@@ -31,7 +29,7 @@ int8_t esperar_cliente(int32_t fd_escucha, void *(*atender_cliente)(void *));
  * @param cliente_esperado
  * @return int8_t 0 si el cliente es el esperado, -1 en caso contrario.
  */
-int8_t recibir_cliente(int32_t fd_conexion, t_cliente cliente_esperado);
+int8_t recibir_cliente(int32_t fd_conexion);
 int32_t crear_conexion(char *ip, char *puerto);
 int32_t handshake(int32_t fd_conexion, t_cliente id_cliente);
 void cerrar_conexion(int32_t socket_cliente);
