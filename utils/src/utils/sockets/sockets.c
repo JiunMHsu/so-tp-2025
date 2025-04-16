@@ -51,7 +51,7 @@ int8_t recibir_cliente(int32_t fd_conexion)
     }
 
     send(fd_conexion, &resultOk, sizeof(int32_t), 0);
-    return 0;
+    return id_cliente;
 }
 
 int32_t crear_conexion(char *ip, char *puerto)

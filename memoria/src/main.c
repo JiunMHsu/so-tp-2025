@@ -38,7 +38,7 @@ void *atender_cliente(void *fd_ptr)
             char *mensaje = recibir_mensaje(fd_conexion);
             if (mensaje == NULL)
             {
-                perror("Cliente desconectado.\n");
+                log_mensaje_error("Cliente desconectado.\n");
                 return NULL;
             }
             printf("Mensaje recibido de Kernel: %s\n", mensaje);
@@ -52,7 +52,7 @@ void *atender_cliente(void *fd_ptr)
             char *mensaje = recibir_mensaje(fd_conexion);
             if (mensaje == NULL)
             {
-                perror("Cliente desconectado.\n");
+                log_mensaje_error("Cliente desconectado.\n");
                 return NULL;
             }
             printf("Mensaje recibido de CPU: %s\n", mensaje);

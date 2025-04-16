@@ -12,7 +12,7 @@ int main(int argc, char *argv[])
 {
     if (argc != 2)
     {
-        fprintf(stderr, "Debes ingresarlo de la siguiente manera: %s <nombre_interfaz>\n", argv[0]);
+        printf("Debes ingresarlo de la siguiente manera: %s <nombre_interfaz>\n", argv[0]);
         return EXIT_FAILURE;
     }
 

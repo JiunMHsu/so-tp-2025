@@ -50,7 +50,7 @@ void *atender_kernel_interrupt(void *fd_ptr)
             return NULL;
         }
 
-        printf("Mensaje enviado por interrupt: %s \n", mensaje);
+        printf("Mensaje recibido por interrupt: %s \n", mensaje);
         free(mensaje);
     }
 
@@ -72,7 +72,7 @@ void *atender_kernel_dispatch(void *fd_ptr)
             return NULL;
         }
 
-        printf("Mensaje por dispatch: %s \n", mensaje);
+        printf("Mensaje recibido por dispatch: %s \n", mensaje);
         free(mensaje);
     }
 

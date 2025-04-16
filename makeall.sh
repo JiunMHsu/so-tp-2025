@@ -22,6 +22,6 @@ cd utils/ && clean_and_make "utils"
 cd kernel/ && clean_and_make "kernel"
 cd cpu/ && clean_and_make "cpu"
 cd memoria/ && clean_and_make "memoria"
-cd entradasalida/ && clean_and_make "entradasalida"
+cd io/ && clean_and_make "io"
 
 echo "All modules compiled successfully"
