@@ -10,7 +10,7 @@
 #include "logger/logger.h"
 #include "config/config.h"
 
-void iniciar_servidor(void);
+int32_t iniciar_servidor(void);
 void finalizar_servidor(void);
 
 #endif // MEMORIA_SERVIDOR_H

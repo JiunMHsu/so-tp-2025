@@ -2,18 +2,14 @@
 
 int32_t fd_memoria;
 
-void iniciar_servidor()
+int32_t iniciar_servidor()
 {
-    char* puerto_escucha_cpu = config_get_string_value(config, "PUERTO_ESCUCHA");
-    fd_memoria = crear_servidor(&puerto_escucha_cpu);
-
-    pthread_t hilo_escucha_cpu;
-    pthread_create(&hilo_escucha_cpu, NULL, &escuchar_cpu, &fd_memoria);
-    pthread_detach(hilo_escucha_cpu);
-
+    char *puerto_escucha = get_puerto_escucha();
+    fd_memoria = crear_servidor(puerto_escucha);
+    return fd_memoria;
 }
 
-void finalizar_servidor(void) 
+void finalizar_servidor(void)
 {
     log_evento("Finalizando servidor...");
 
