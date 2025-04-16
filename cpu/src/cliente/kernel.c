@@ -6,7 +6,7 @@ int32_t conectar_kernel_dispatch(void)
 
     int32_t fd_conexion_dispatch = crear_conexion(datos_kernel.ip, datos_kernel.puerto_dispatch);
 
-    int32_t respuesta_conexion_dispatch = handshake(fd_conexion_dispatch, CPU_DISPATCH);
+    int32_t respuesta_conexion_dispatch = handshake(fd_conexion_dispatch, CPU);
 
     if (respuesta_conexion_dispatch == -1)
     {
@@ -24,7 +24,7 @@ int32_t conectar_kernel_interrupt(void)
 
     int32_t fd_conexion_interrupt = crear_conexion(datos_kernel.ip, datos_kernel.puerto_interrupt);
 
-    int32_t respuesta_conexion_interrupt = handshake(fd_conexion_interrupt, CPU_INTERRUPT);
+    int32_t respuesta_conexion_interrupt = handshake(fd_conexion_interrupt, CPU);
 
     if (respuesta_conexion_interrupt == -1)
     {

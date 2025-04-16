@@ -1,5 +1,6 @@
 #include <utils/sockets/sockets.h>
 #include <utils/protocol/protocol.h>
+
 #include "logger/logger.h"
 #include "config/config.h"
 
@@ -26,7 +27,6 @@ int main(int argc, char *argv[])
     log_info(logger, "PUERTO_KERNELL: %d", PUERTO_KERNELL);
     log_info(logger, "LOG_LEVEL: %s", LOG_LEVEL_STR); */
 
-    // Creo conexion hacia kernell (aca quede)
     int8_t resultado = conectar_con_kernel(nombre_interfaz);
     if (resultado == -1)
         return EXIT_FAILURE;
@@ -59,7 +59,6 @@ int8_t conectar_con_kernel(char *nombre_interfaz)
         cerrar_conexion(fd_kernel);
         return -1;
     }
-    enviar_mensaje(nombre_interfaz, fd_kernel);
 
     return 0;
 }

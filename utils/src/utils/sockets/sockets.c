@@ -35,7 +35,7 @@ int8_t esperar_cliente(int32_t fd_escucha, void *(*atender_cliente)(void *))
     return 0;
 }
 
-int8_t recibir_cliente(int32_t fd_conexion, t_cliente cliente_esperado)
+int8_t recibir_cliente(int32_t fd_conexion)
 {
     int32_t id_cliente;
     int32_t resultOk = 0;
@@ -43,7 +43,7 @@ int8_t recibir_cliente(int32_t fd_conexion, t_cliente cliente_esperado)
 
     recv(fd_conexion, &id_cliente, sizeof(int32_t), MSG_WAITALL);
 
-    if (id_cliente != cliente_esperado)
+    if (id_cliente < 0 || id_cliente > 3)
     {
         perror("Error cliente inválido");
         send(fd_conexion, &resultError, sizeof(int32_t), 0);

@@ -67,7 +67,7 @@ static void *atender_cpu_dispatch(void *fd_ptr)
     int32_t fd_cpu_dispatch = *((int32_t *)fd_ptr);
     free(fd_ptr);
 
-    if (recibir_cliente(fd_cpu_dispatch, CPU_DISPATCH))
+    if (recibir_cliente(fd_cpu_dispatch) != CPU)
     {
         log_mensaje_error("Error cliente inválido");
         return NULL;
@@ -88,7 +88,7 @@ static void *atender_cpu_interrupt(void *fd_ptr)
     int32_t fd_cpu_interrupt = *((int32_t *)fd_ptr);
     free(fd_ptr);
 
-    if (recibir_cliente(fd_cpu_interrupt, CPU_INTERRUPT))
+    if (recibir_cliente(fd_cpu_interrupt) != CPU)
     {
         log_mensaje_error("Error cliente inválido");
         return NULL;
@@ -109,7 +109,7 @@ static void *atender_io(void *fd_ptr)
     int32_t fd_io = *((int32_t *)fd_ptr);
     free(fd_ptr);
 
-    if (recibir_cliente(fd_io, IO))
+    if (recibir_cliente(fd_io) != IO)
     {
         log_mensaje_error("Error cliente inválido");
         return NULL;
