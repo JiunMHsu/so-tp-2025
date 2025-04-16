@@ -1,38 +1,25 @@
 #include <utils/sockets/sockets.h>
 #include <utils/protocol/protocol.h>
-#include <commons/log.h>
-#include <commons/config.h>
+#include "logger/logger.h"
+#include "config/config.h"
 
 int32_t fd_kernel;
 
-t_log* logger;
-t_config* config;
-
-char* IP_KERNELL;
-uint16_t PUERTO_KERNELL;
-t_log_level LOG_LEVEL;
-
-t_log* iniciar_logger(void);
-t_config* iniciar_config(void);
 int8_t conectar_con_kernel(char *nombre_interfaz);
 
-int main(int argc, char *argv[]) 
+int main(int argc, char *argv[])
 {
-    if(argc != 2){
+    if (argc != 2)
+    {
         fprintf(stderr, "Debes ingresarlo de la siguiente manera: %s <nombre_interfaz>\n", argv[0]);
         return EXIT_FAILURE;
     }
 
-    char* nombre_interfaz = argv[1];
+    char *nombre_interfaz = argv[1];
 
-    config = iniciar_config();
-    
-    IP_KERNELL = config_get_string_value(config, "IP_KERNELL");
-    PUERTO_KERNELL = (uint16_t) config_get_int_value(config, "PUERTO_KERNELL");
-    char* LOG_LEVEL_STR = config_get_string_value(config, "LOG_LEVEL");
-    LOG_LEVEL = log_level_from_string(LOG_LEVEL_STR);
+    iniciar_config();
 
-    logger = iniciar_logger();
+    iniciar_logger(get_log_level());
 
     /* Loggeo el valor de config para confirmar los valores
     log_info(logger, "IP_KERNELL: %s", IP_KERNELL);
@@ -61,31 +48,10 @@ int main(int argc, char *argv[])
     return EXIT_SUCCESS;
 }
 
-t_log* iniciar_logger(void)
-{
-	t_log* nuevo_logger = log_create("io.log", "Modulo IO", 0, LOG_LEVEL);
-	if(nuevo_logger == NULL){
-		perror("Ocurrio un error. No se pudo crear el archivo");
-		exit(EXIT_FAILURE);
-	}
-
-	return nuevo_logger;
-}
-
-t_config* iniciar_config(void)
-{
-	t_config* nuevo_config = config_create("io.config");
-	if(nuevo_config == NULL){
-		perror("Ocurrio un error. No se pudo encontrar el archivo en el path especificado");
-		exit(EXIT_FAILURE);
-	}
-
-	return nuevo_config;
-}
-
 int8_t conectar_con_kernel(char *nombre_interfaz)
 {
-    fd_kernel = crear_conexion(IP_KERNELL, PUERTO_KERNELL);
+    kernel_address address = get_kernel_address();
+    fd_kernel = crear_conexion(address.ip, address.puerto);
     int32_t response = handshake(fd_kernel, IO);
 
     if (response == -1)
@@ -93,7 +59,7 @@ int8_t conectar_con_kernel(char *nombre_interfaz)
         cerrar_conexion(fd_kernel);
         return -1;
     }
-    enviar_mensaje(nombre_interfaz,fd_kernel);
+    enviar_mensaje(nombre_interfaz, fd_kernel);
 
     return 0;
 }
