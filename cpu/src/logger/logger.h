@@ -15,17 +15,17 @@ typedef enum
 void iniciar_logger();
 void destruir_logger();
 
-void log_error();
+void log_error(char *error);
 
-void log_fetch_instruccion();
-void log_interrupcion_recibida(u_int32_t pid, u_int32_t pc);
-void log_instruccion_ejecutada(u_int32_t pid); // faltan params que no se definir
-void log_operacion_acceso_memoria();
-void log_obtener_marco();
-void log_TLB_hit();
-void log_TLB_miss();
-void log_pagina_encontrada_cache();
-void log_pagina_ingresada_cache();
-void log_pagina_actualizada_cache_memoria();
+void log_fetch_instruccion(u_int32_t pid, u_int32_t pc);
+void log_interrupcion_recibida();
+void log_instruccion_ejecutada(u_int32_t pid, char *instruccion, char *parametros); // parametros podria cambiar
+void log_operacion_acceso_memoria(u_int32_t pid, t_operacion_acceso accion);        // faltan parametros que no se como definirlos => direccion fisica, valor
+void log_obtener_marco(u_int32_t pid, u_int32_t numero_pagina, u_int32_t numero_marco);
+void log_TLB_hit(u_int32_t pid, u_int32_t numero_pagina);
+void log_TLB_miss(u_int32_t pid, u_int32_t numero_pagina);
+void log_pagina_encontrada_cache(u_int32_t pid, u_int32_t numero_pagina);
+void log_pagina_ingresada_cache(u_int32_t pid, u_int32_t numero_pagina);
+void log_pagina_actualizada_cache_memoria(u_int32_t pid, u_int32_t numero_pagina); // falta definir parametros => frame
 
 #endif
