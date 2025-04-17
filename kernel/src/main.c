@@ -14,8 +14,8 @@ int main(int argc, char *argv[])
     iniciar_config();
     iniciar_logger(get_log_level());
 
-    
-    if(conectar_memoria()) return EXIT_FAILURE;
+    if (conectar_memoria())
+        return EXIT_FAILURE;
 
     iniciar_servidor();
     // planificador

@@ -13,4 +13,4 @@
 int32_t conectar_memoria(void);
 void *atender_memoria(void *);
 
-#endif
+#endif // CONEXION_MEMORIA_H
