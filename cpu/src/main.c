@@ -5,6 +5,7 @@
 int main(int argc, char *argv[])
 {
     iniciar_config();
+    iniciar_logger();
 
     int32_t fd_conexion_dispatch = conectar_kernel_dispatch();
 

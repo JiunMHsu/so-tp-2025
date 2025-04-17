@@ -9,6 +9,7 @@
 #include <utils/protocol/protocol.h>
 
 #include "config/config.h"
+#include "logger/logger.h"
 
 int32_t conectar_memoria(void);
 void *atender_memoria(void *);

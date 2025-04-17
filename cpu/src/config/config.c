@@ -32,3 +32,10 @@ mem_address get_memoria_address()
 
     return memoria_addrs;
 }
+
+t_log_level get_log_level()
+{
+    char *log_level_str = config_get_string_value(cpu_config, "LOG_LEVEL");
+
+    return log_level_from_string(log_level_str);
+}
