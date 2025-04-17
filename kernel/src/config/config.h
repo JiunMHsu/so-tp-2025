@@ -61,7 +61,7 @@ void iniciar_config(void);
 void destruir_config(void);
 
 char *get_puerto_escucha(puerto_escucha puerto);
-mem_address get_mem_adress(void);
+mem_address get_mem_address(void);
 algoritmo_planificacion get_alg_plani_corto_plazo(void);
 algoritmo_planificacion get_alg_plani_largo_plazo(void);
 

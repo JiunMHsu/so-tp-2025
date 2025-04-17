@@ -31,7 +31,7 @@ char *get_puerto_escucha(puerto_escucha puerto)
     return config_get_string_value(kernel_config, key);
 }
 
-mem_address get_mem_adress()
+mem_address get_mem_address()
 {
     mem_address mem_addr;
 
