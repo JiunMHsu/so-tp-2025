@@ -32,13 +32,13 @@ void log_instruccion_ejecutada(u_int32_t pid, char *instruccion, char *parametro
     log_trace(cpu_logger, "## PID: %d - Ejecutando: %s - %s", pid, instruccion, parametros);
 }
 
-void log_operacion_acceso_memoria(u_int32_t pid, t_operacion_acceso accion) // faltan parametros que no se como definirlos => direccion fisica, valor
+void log_operacion_acceso_memoria(u_int32_t pid, t_operacion_acceso accion, u_int32_t direccion_fisica, char *valor)
 {
     char *accion_str = NULL;
 
     switch (accion)
     {
-    case LEER:
+    case LECTURA:
         accion_str = "LEER";
         break;
     case ESCRITURA:
@@ -46,7 +46,7 @@ void log_operacion_acceso_memoria(u_int32_t pid, t_operacion_acceso accion) // f
         break;
     }
 
-    log_trace(cpu_logger, "PID : %d - Acción : %s - Dirección Física : <DIRECCION_FISICA> - Valor : <VALOR LEIDO / ESCRITO>", pid, accion_str);
+    log_trace(cpu_logger, "PID : %d - Acción : %s - Dirección Física : %d - Valor : %s", pid, accion_str, direccion_fisica, valor);
 }
 
 void log_obtener_marco(u_int32_t pid, u_int32_t numero_pagina, u_int32_t numero_marco) // revisar parametros
@@ -54,14 +54,14 @@ void log_obtener_marco(u_int32_t pid, u_int32_t numero_pagina, u_int32_t numero_
     log_trace(cpu_logger, "PID: %d - OBTENER MARCO - Página: %d- Marco: %d", pid, numero_pagina, numero_pagina);
 }
 
-void log_TLB_hit(u_int32_t pid, u_int32_t numero_pagina) // revisar parametros
+void log_tlb_hit(u_int32_t pid, u_int32_t numero_pagina) // revisar parametros
 {
     log_trace(cpu_logger, "PID: %d - TLB HIT - Pagina: %d", pid, numero_pagina);
 }
 
-void log_TLB_miss(u_int32_t pid, u_int32_t numero_pagina)
+void log_tlb_miss(u_int32_t pid, u_int32_t numero_pagina)
 {
-    log_trace(cpu_logger, "PID: %d - TLB MISS - Pagina: %d", pid);
+    log_trace(cpu_logger, "PID: %d - TLB MISS - Pagina: %d", pid, numero_pagina);
 }
 
 void log_pagina_encontrada_cache(u_int32_t pid, u_int32_t numero_pagina)
@@ -74,7 +74,7 @@ void log_pagina_ingresada_cache(u_int32_t pid, u_int32_t numero_pagina)
     log_trace(cpu_logger, "PID: %d - Cache Add - Pagina: %d", pid, numero_pagina);
 }
 
-void log_pagina_actualizada_cache_memoria(u_int32_t pid, u_int32_t numero_pagina) // falta parametro que no se como definir => frame
+void log_pagina_actualizada_cache_memoria(u_int32_t pid, u_int32_t numero_pagina, u_int32_t frame_memoria_principal)
 {
-    log_trace(cpu_logger, "PID: %d - Memory Update - Página: %d - Frame: <FRAME_EN_MEMORIA_PRINCIPAL>", pid, numero_pagina);
+    log_trace(cpu_logger, "PID: %d - Memory Update - Página: %d - Frame: %d", pid, numero_pagina, frame_memoria_principal);
 }

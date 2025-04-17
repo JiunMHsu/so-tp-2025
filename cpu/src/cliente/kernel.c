@@ -10,7 +10,7 @@ int32_t conectar_kernel_dispatch(void)
 
     if (respuesta_conexion_dispatch == -1)
     {
-        perror("No se puedo establecer la conexion con el servicio de dispatch.");
+        log_mensaje_error("No se puedo establecer la conexion con el servicio de dispatch.");
         cerrar_conexion(fd_conexion_dispatch);
         return -1;
     }
@@ -28,7 +28,7 @@ int32_t conectar_kernel_interrupt(void)
 
     if (respuesta_conexion_interrupt == -1)
     {
-        perror("No se puedo establecer la conexion con el servicio de interrupcion.");
+        log_mensaje_error("No se puedo establecer la conexion con el servicio de interrupcion.");
         cerrar_conexion(fd_conexion_interrupt);
         return -1;
     }

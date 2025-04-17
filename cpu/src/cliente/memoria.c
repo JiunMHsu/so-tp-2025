@@ -10,7 +10,7 @@ int32_t conectar_memoria(void)
 
     if (respuesta_conexion_memoria == -1)
     {
-        perror("No se puedo establecer la conexion con la memoria");
+        log_mensaje_error("No se puedo establecer la conexion con la memoria");
         cerrar_conexion(fd_conexion_memoria);
         return -1;
     }

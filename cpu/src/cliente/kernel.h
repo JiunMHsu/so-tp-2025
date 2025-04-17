@@ -9,6 +9,7 @@
 #include <utils/protocol/protocol.h>
 
 #include "config/config.h"
+#include "logger/logger.h"
 
 int32_t conectar_kernel_dispatch(void);
 int32_t conectar_kernel_interrupt(void);
