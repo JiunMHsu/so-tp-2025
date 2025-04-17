@@ -33,6 +33,8 @@ void *atender_cliente(void *fd_ptr)
     switch (modulo_cliente)
     {
     case KERNEL:
+        log_evento("Kernel conectado.");
+
         while (1)
         {
             char *mensaje = recibir_mensaje(fd_conexion);
@@ -47,6 +49,7 @@ void *atender_cliente(void *fd_ptr)
         break;
 
     case CPU:
+        log_evento("CPU conectado.");
         while (1)
         {
             char *mensaje = recibir_mensaje(fd_conexion);
