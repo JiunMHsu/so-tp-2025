@@ -3,6 +3,7 @@
 
 #include <stdlib.h>
 #include <stdio.h>
+#include <string.h>
 #include <commons/collections/dictionary.h>
 
 typedef enum
@@ -15,22 +16,6 @@ typedef enum
     SUSPENDED_READY,
     EXIT
 } t_state;
-
-typedef enum
-{
-    NONE,
-    SCHEDULER_INT,
-    SYSCALL,
-} motivo_desalojo;
-
-// typedef enum
-// {
-//     SUCCESS,
-//     INVALID_RESOURCE,
-//     INVALID_INTERFACE,
-//     INTERRUPTED_BY_USER,
-//     OUT_OF_MEMORY
-// } motivo_finalizacion;
 
 typedef struct
 {
@@ -45,9 +30,6 @@ typedef struct
     char *ejecutable;
 
     t_state estado;
-
-    motivo_desalojo motivo_desalojo;
-    char *syscall;
 
     /**
      * @brief Cantidad de veces que el proceso estuvo en cada estado.
@@ -75,9 +57,10 @@ typedef struct
 t_pcb *crear_pcb(u_int32_t pid, u_int32_t tamanio, char *ejecutable);
 void destruir_pcb(t_pcb *pcb);
 
-void actualizar_pcb(t_pcb *pcb, t_pcb *nuevo_pcb);
 void set_estado_pcb(t_pcb *pcb, t_state estado);
-void set_motivo_desalojo(t_pcb *pcb, motivo_desalojo motivo);
+void set_program_counter_pcb(t_pcb *pcb, u_int32_t program_counter);
+
+// stters para actualizar metricas
 
 void debug_pcb(t_pcb *pcb);
 
