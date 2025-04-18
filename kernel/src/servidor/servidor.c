@@ -31,6 +31,13 @@ static void *escuchar_cpu(void *_)
     while (1)
     {
         int32_t fd_dispatch = esperar_cliente(fd_escucha_dispatch, NULL);
+        if (fd_dispatch < 0)
+        {
+            perror("Error al aceptar cliente");
+            finalizar_servidor();
+            exit(EXIT_FAILURE);
+        }
+
         if (recibir_cliente(fd_dispatch) != CPU)
         {
             log_mensaje_error("Error cliente inválido, cerrando conexión");
@@ -74,11 +81,18 @@ static void *escuchar_io(void *_)
     while (1)
     {
         int32_t fd_io = esperar_cliente(fd_escucha_io, NULL);
+        if (fd_io < 0)
+        {
+            perror("Error al aceptar cliente");
+            finalizar_servidor();
+            exit(EXIT_FAILURE);
+        }
+
         if (recibir_cliente(fd_io) != IO)
         {
             log_mensaje_error("Error cliente inválido");
             cerrar_conexion(fd_io);
-            return NULL;
+            continue;
         }
 
         char *nombre_io = recibir_mensaje(fd_io);
