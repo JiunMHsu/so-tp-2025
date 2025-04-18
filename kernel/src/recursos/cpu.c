@@ -2,7 +2,7 @@
 
 // colección global de CPUs
 
-void iniciar_cpu()
+void inicializar_cpu()
 {
     // TODO: inicializar estructura de datos para manejar CPUs
 }

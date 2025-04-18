@@ -2,7 +2,7 @@
 
 // colección global de IOs
 
-void iniciar_io()
+void inicializar_io()
 {
     // TODO: inicializar estructura de datos para manejar IOs
 }
