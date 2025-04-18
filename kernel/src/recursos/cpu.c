@@ -30,7 +30,6 @@ void conectar_cpu(char *id_cpu, int32_t fd_dispatch, int32_t fd_interrupt)
 
     cpu = crear_cpu(id_cpu, fd_dispatch, fd_interrupt);
     list_add(cpus, cpu);
-    printf("CPU %s conectada\n", id_cpu);
 }
 
 // La dinámica de ejecución no es óptima, ya que se crean y se destruyen hilos

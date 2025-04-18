@@ -4,8 +4,8 @@ int32_t fd_escucha_dispatch;
 int32_t fd_escucha_interrupt;
 int32_t fd_escucha_io;
 
-static void *escuchar_io(void *fd_escucha);
 static void *escuchar_cpu(void *_);
+static void *escuchar_io(void *_);
 
 void iniciar_servidor()
 {
@@ -13,11 +13,8 @@ void iniciar_servidor()
     pthread_create(&hilo_escucha_cpu, NULL, &escuchar_cpu, NULL);
     pthread_detach(hilo_escucha_cpu);
 
-    char *puerto_escucha_io = get_puerto_escucha(ESCUCHA_IO);
-    fd_escucha_io = crear_servidor(puerto_escucha_io);
-
     pthread_t hilo_escucha_io;
-    pthread_create(&hilo_escucha_io, NULL, &escuchar_io, &fd_escucha_io);
+    pthread_create(&hilo_escucha_io, NULL, &escuchar_io, NULL);
     pthread_detach(hilo_escucha_io);
 }
 
@@ -60,16 +57,42 @@ static void *escuchar_cpu(void *_)
         }
 
         conectar_cpu(id_cpu, fd_dispatch, fd_interrupt);
+        printf("CPU %s conectada\n", id_cpu);
+        free(id_cpu);
     }
 
     return NULL;
 }
 
-void *escuchar_io(void *fd_escucha)
+static void *escuchar_io(void *_)
 {
+    char *puerto_escucha_io = get_puerto_escucha(ESCUCHA_IO);
+    fd_escucha_io = crear_servidor(puerto_escucha_io);
+
     log_evento("Escuchando IO...");
+
     while (1)
-        esperar_cliente(*((int32_t *)fd_escucha), &manejar_conexion_io);
+    {
+        int32_t fd_io = esperar_cliente(fd_escucha_io, NULL);
+        if (recibir_cliente(fd_io) != IO)
+        {
+            log_mensaje_error("Error cliente inválido");
+            cerrar_conexion(fd_io);
+            return NULL;
+        }
+
+        char *nombre_io = recibir_mensaje(fd_io);
+        if (nombre_io == NULL)
+        {
+            log_mensaje_error("Error al recibir nombre de IO, cerrando conexión");
+            cerrar_conexion(fd_io);
+            continue;
+        }
+
+        conectar_io(nombre_io, fd_io);
+        printf("IO %s conectado\n", nombre_io);
+        free(nombre_io);
+    }
 
     return NULL;
 }
