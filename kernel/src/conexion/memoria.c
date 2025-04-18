@@ -34,12 +34,12 @@ int32_t solicitar_creacion_proceso(u_int32_t pid, u_int32_t tamanio, char *ruta_
     // operación: INICIAR_PROCESO
     // { operacion, pid, tamanio, ruta_codigo } (definida en utils)
 
-    // conectar a memoria
+    int32_t fd_memoria = conectar_memoria();
     // enviar la mem_request (definida en utils)
     // destruir la mem_request (definida en utils)
 
     // recibir mem_response (definida en utils)
-    // desconectar de memoria
+    desconectar_memoria(fd_memoria);
 
     // retornar la respuesta
     return -1;
@@ -53,11 +53,12 @@ int32_t solicitar_finalizacion_proceso(u_int32_t pid)
     // { operacion, pid } (definida en utils)
 
     // conectar a memoria
+    int32_t fd_memoria = conectar_memoria();
     // enviar la mem_request (definida en utils)
     // destruir la mem_request (definida en utils)
 
     // recibir mem_response (definida en utils)
-    // desconectar de memoria
+    desconectar_memoria(fd_memoria);
 
     // retornar la respuesta
     return -1;
