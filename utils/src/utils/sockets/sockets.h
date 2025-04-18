@@ -21,10 +21,11 @@ typedef enum
 int32_t crear_servidor(char *puerto);
 
 /**
- * @brief Espera una nueva conexion de un cliente
- * y lo atiende ejecutando el handler especificado.
+ * @brief Espera una nueva conexion de un cliente y
+ * lo atiende ejecutando el handler especificado en un nuevo hilo.
  *
- * Si no se especifica el handler (NULL), devuelve el socket de la nueva conexion.
+ * Si no se especifica el handler (NULL), no se crea ningún hilo
+ * y devuelve directamente el socket de la nueva conexion.
  *
  * @param fd_escucha
  * @param atender_cliente
