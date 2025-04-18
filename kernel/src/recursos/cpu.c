@@ -2,6 +2,11 @@
 
 // colección global de CPUs
 
+void iniciar_cpu()
+{
+    // TODO: inicializar estructura de datos para manejar CPUs
+}
+
 void *manejar_conexion_dispatch(void *fd_cpu)
 {
     int32_t fd_dispatch = *((int32_t *)fd_cpu);
