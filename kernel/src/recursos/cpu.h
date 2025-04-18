@@ -9,6 +9,20 @@
 #include "config/config.h"
 #include "logger/logger.h"
 
+typedef enum
+{
+    SCHEDULER_INT,
+    SYSCALL,
+} motivo_desalojo;
+
+typedef struct
+{
+    u_int32_t pid;
+    u_int32_t program_counter;
+    motivo_desalojo motivo;
+    char *syscall;
+} t_desalojo;
+
 /**
  * @brief Inicializa la colección global para manejar las CPUs.
  *
