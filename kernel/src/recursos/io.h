@@ -1,5 +1,5 @@
-#ifndef RECURSOS_CPU_H
-#define RECURSOS_CPU_H
+#ifndef RECURSOS_IO_H
+#define RECURSOS_IO_H
 
 #include <stdlib.h>
 #include <pthread.h>
@@ -9,7 +9,6 @@
 #include "config/config.h"
 #include "logger/logger.h"
 
-void *manejar_conexion_dispatch(void *fd_cpu);
-void *manejar_conexion_interrupt(void *fd_cpu);
+void *manejar_conexion_io(void *fd_ptr);
 
-#endif // RECURSOS_CPU_H
+#endif // RECURSOS_IO_H

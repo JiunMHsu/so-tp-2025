@@ -17,7 +17,6 @@ int main(int argc, char *argv[])
     // planificador
 
     pause(); // temporal para bloquear el hilo principal
-
     return EXIT_SUCCESS;
 }
 
