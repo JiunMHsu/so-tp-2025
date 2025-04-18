@@ -43,7 +43,7 @@ mem_address get_mem_address()
 
 algoritmo_planificacion get_alg_plani_corto_plazo()
 {
-    char *algoritmo = config_get_string_value(kernel_config, "ALGORITMO_PLANIFICACION");
+    char *algoritmo = config_get_string_value(kernel_config, "ALGORITMO_CORTO_PLAZO");
 
     if (strcmp(algoritmo, "FIFO") == 0)
         return FIFO;
@@ -57,13 +57,22 @@ algoritmo_planificacion get_alg_plani_corto_plazo()
     return -1;
 }
 
-// TODO: Implementar
-// Deberían ser únicamente FIFO y SPF
-// Esta pendiente de implementación dado que no se especifica
-// la clave de la configuración en el TP.
-algoritmo_planificacion get_alg_plani_largo_plazo()
+algoritmo_planificacion get_alg_ingreso_a_ready()
 {
+    char *algoritmo = config_get_string_value(kernel_config, "ALGORITMO_INGRESO_A_READY");
+
+    if (strcmp(algoritmo, "FIFO") == 0)
+        return FIFO;
+
+    if (strcmp(algoritmo, "PMCP") == 0)
+        return PMCP;
+
     return -1;
+}
+
+double get_alfa_estimacion()
+{
+    return config_get_double_value(kernel_config, "ALFA");
 }
 
 u_int32_t get_tiempo_suspension()
@@ -74,5 +83,5 @@ u_int32_t get_tiempo_suspension()
 t_log_level get_log_level()
 {
     char *log_level_str = config_get_string_value(kernel_config, "LOG_LEVEL");
-    return  log_level_from_string(log_level_str);
+    return log_level_from_string(log_level_str);
 }
