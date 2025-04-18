@@ -69,3 +69,9 @@ void finalizar_servidor()
 
     log_evento("Servidor finalizado.");
 }
+
+void finalizar_servidor_por_sigint(int _)
+{
+    finalizar_servidor();
+    exit(EXIT_SUCCESS);
+}
