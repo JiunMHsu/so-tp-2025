@@ -33,6 +33,11 @@ void conectar_cpu(char *id_cpu, int32_t fd_dispatch, int32_t fd_interrupt)
     printf("CPU %s conectada\n", id_cpu);
 }
 
+// La dinámica de ejecución no es óptima, ya que se crean y se destruyen hilos
+// cada vez que pone un proceso en ejecución.
+//
+// Se podría crear una única rutina por CPU (hilo por CPU) y sincronizar por semáforos.
+// La rutina se crearía en `conectar_cpu`, y cada una esperaría por procesos a ejecutar.
 int8_t ejecutar(u_int32_t pid, u_int32_t program_counter)
 {
     t_cpu *cpu_libre = buscar_libre();
@@ -56,6 +61,7 @@ int8_t ejecutar(u_int32_t pid, u_int32_t program_counter)
     return 0;
 }
 
+// TODO: implementar
 static void *_ejecutar(void *_args)
 {
     args_ejecucion args = *((args_ejecucion *)_args);
@@ -73,18 +79,18 @@ static void *_ejecutar(void *_args)
     return NULL;
 }
 
-// TODO
+// TODO: implementar
 void enviar_interrupcion(u_int32_t pid)
 {
 }
 
-// TODO
+// TODO: implementar
 t_desalojo *get_desalojo(void)
 {
     return NULL;
 }
 
-// TODO
+// TODO: implementar
 void destruir_desalojo(t_desalojo *desalojado)
 {
 }

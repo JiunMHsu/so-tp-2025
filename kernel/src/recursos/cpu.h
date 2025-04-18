@@ -26,6 +26,8 @@ typedef struct
      *
      */
     int32_t executing;
+
+    // capaz necesita algunos semaforos para sincro
 } t_cpu;
 
 typedef struct
@@ -55,8 +57,7 @@ typedef struct
  */
 void inicializar_cpu(void);
 // void destruir_cpu(void);
-void *manejar_conexion_dispatch(void *fd_cpu);
-void *manejar_conexion_interrupt(void *fd_cpu);
+
 void conectar_cpu(char *id_cpu, int32_t fd_dispatch, int32_t fd_interrupt);
 
 /**
