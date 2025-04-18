@@ -49,12 +49,10 @@ typedef enum
     SRT,
 
     /**
-     * @brief (SPF) Smallest Process First.
-     * Nombre inventado, en la consigna se enuncia como
-     * "Proceso más chico primero".
+     * @brief (PMCP) Proceso Más Chico Primero.
      *
      */
-    SPF
+    PMCP
 } algoritmo_planificacion;
 
 void iniciar_config(void);
@@ -63,7 +61,8 @@ void destruir_config(void);
 char *get_puerto_escucha(puerto_escucha puerto);
 mem_address get_mem_address(void);
 algoritmo_planificacion get_alg_plani_corto_plazo(void);
-algoritmo_planificacion get_alg_plani_largo_plazo(void);
+algoritmo_planificacion get_alg_ingreso_a_ready(void);
+double get_alfa_estimacion(void);
 
 /**
  * @brief Tiempo en milisegundos que se debe esperar
