@@ -105,12 +105,11 @@ static void finalizar_consumo_para(t_pcb *proceso, motivo_fin_io motivo)
     queue_push(finalizados, fin_de_io);
 }
 
+// TODO: implementar
 /**
  * @brief Función ideada para que la rutina de consumo llame en caso de
  * escuchar un -1 por el socket. Simplemente mueve los procesos a la cola
  * de finalizados y libera las estructuras, no cancela el hilo de ejecución.
- *
- * TODO: implementar
  *
  * @param nombre_io
  *
