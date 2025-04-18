@@ -22,7 +22,7 @@ void log_fetch_instruccion(u_int32_t pid, u_int32_t pc)
     log_trace(cpu_logger, "##PID : %d - FETCH - Program Counter : %d", pid, pc);
 }
 
-void log_instruccion_recibida()
+void log_interrupcion_recibida()
 {
     log_trace(cpu_logger, "## Llega interrupción al puerto Interrupt");
 }
