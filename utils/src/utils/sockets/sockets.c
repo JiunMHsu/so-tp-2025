@@ -22,8 +22,11 @@ int32_t crear_servidor(char *puerto)
     return socket_servidor;
 }
 
-int8_t esperar_cliente(int32_t fd_escucha, void *(*atender_cliente)(void *))
+int32_t esperar_cliente(int32_t fd_escucha, void *(*atender_cliente)(void *))
 {
+    if (atender_cliente == NULL)
+        return accept(fd_escucha, NULL, NULL);
+
     pthread_t thread;
 
     int32_t *fd_conexion_ptr = malloc(sizeof(int32_t));
@@ -32,7 +35,7 @@ int8_t esperar_cliente(int32_t fd_escucha, void *(*atender_cliente)(void *))
     pthread_create(&thread, NULL, atender_cliente, fd_conexion_ptr);
     pthread_detach(thread);
 
-    return 0;
+    return *fd_conexion_ptr;
 }
 
 int8_t recibir_cliente(int32_t fd_conexion)

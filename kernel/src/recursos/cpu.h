@@ -57,6 +57,7 @@ void inicializar_cpu(void);
 // void destruir_cpu(void);
 void *manejar_conexion_dispatch(void *fd_cpu);
 void *manejar_conexion_interrupt(void *fd_cpu);
+void conectar_cpu(char *id_cpu, int32_t fd_dispatch, int32_t fd_interrupt);
 
 /**
  * @brief Indica la ejecución de un proceso sobre una CPU.
@@ -70,7 +71,7 @@ void *manejar_conexion_interrupt(void *fd_cpu);
  * @note Asume que hay al menos una CPU disponible.
  *
  */
-int8_t ejecutar_proceso(u_int32_t pid, u_int32_t program_counter);
+int8_t ejecutar(u_int32_t pid, u_int32_t program_counter);
 
 /**
  * @brief Envía una interrupción a la CPU que se encuentra

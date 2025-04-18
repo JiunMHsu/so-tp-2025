@@ -1,4 +1,3 @@
-
 #ifndef UTILS_SOCKETS_H
 #define UTILS_SOCKETS_H
 
@@ -20,7 +19,18 @@ typedef enum
 } t_cliente;
 
 int32_t crear_servidor(char *puerto);
-int8_t esperar_cliente(int32_t fd_escucha, void *(*atender_cliente)(void *));
+
+/**
+ * @brief Espera una nueva conexion de un cliente
+ * y lo atiende ejecutando el handler especificado.
+ *
+ * Si no se especifica el handler (NULL), devuelve el socket de la nueva conexion.
+ *
+ * @param fd_escucha
+ * @param atender_cliente
+ * @return int32_t
+ */
+int32_t esperar_cliente(int32_t fd_escucha, void *(*atender_cliente)(void *));
 
 /**
  * @brief Recibe y responde al handshake del cliente que intenta conectarse.
