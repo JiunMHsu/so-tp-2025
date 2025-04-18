@@ -33,7 +33,7 @@ static void *escuchar_cpu(void *_)
         int32_t fd_dispatch = esperar_cliente(fd_escucha_dispatch, NULL);
         if (fd_dispatch < 0)
         {
-            perror("Error al aceptar cliente");
+            log_mensaje_error("Error al aceptar cliente");
             finalizar_servidor();
             exit(EXIT_FAILURE);
         }
@@ -83,7 +83,7 @@ static void *escuchar_io(void *_)
         int32_t fd_io = esperar_cliente(fd_escucha_io, NULL);
         if (fd_io < 0)
         {
-            perror("Error al aceptar cliente");
+            log_mensaje_error("Error al aceptar cliente");
             finalizar_servidor();
             exit(EXIT_FAILURE);
         }

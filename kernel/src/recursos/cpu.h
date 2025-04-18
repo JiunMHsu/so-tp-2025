@@ -89,7 +89,7 @@ void enviar_interrupcion(u_int32_t pid);
  * @return t_desalojo*
  *
  * @note Es bloqueante.
- * @note Se debe liberar la estructura retornada.
+ * @note Se debe liberar la estructura retornada con `destruir_desalojo`.
  */
 t_desalojo *get_desalojo(void);
 
