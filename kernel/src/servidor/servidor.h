@@ -4,7 +4,6 @@
 
 #include <stdlib.h>
 #include <pthread.h>
-#include <commons/string.h>
 #include <utils/sockets/sockets.h>
 #include <utils/protocol/protocol.h>
 
