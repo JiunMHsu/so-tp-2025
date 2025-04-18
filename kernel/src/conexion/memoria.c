@@ -1,38 +1,64 @@
 #include "memoria.h"
 
-void *atender_memoria(void *fd_prt);
+static int32_t conectar_memoria(void);
+static void desconectar_memoria(int32_t fd_memoria);
 
-int32_t conectar_memoria(void)
+static int32_t conectar_memoria()
 {
     mem_address datos_memoria = get_mem_address();
+    int32_t fd_memoria = crear_conexion(datos_memoria.ip, datos_memoria.puerto);
 
-    int32_t fd_conexion_memoria = crear_conexion(datos_memoria.ip, datos_memoria.puerto);
-
-    int32_t respuesta_conexion_memoria = handshake(fd_conexion_memoria, KERNEL);
-
-    if (respuesta_conexion_memoria == -1)
+    if (handshake(fd_memoria, KERNEL) == -1)
     {
-        perror("No se puedo establecer la conexion con la memoria");
-        cerrar_conexion(fd_conexion_memoria);
+        log_mensaje_error("Error al conectar a memoria");
+        cerrar_conexion(fd_memoria);
         return -1;
     }
 
-    pthread_t hilo_memoria;
-    pthread_create(&hilo_memoria, NULL, &atender_memoria, &fd_conexion_memoria);
-    pthread_detach(hilo_memoria);
-
-    return 0;
+    return fd_memoria;
 }
 
-void *atender_memoria(void *fd_prt)
+static void desconectar_memoria(int32_t fd_memoria)
 {
-    int32_t fd_conexion_memoria = *((int *)fd_prt);
-
-    while (1)
+    if (fd_memoria != -1)
     {
-        enviar_mensaje("Mensaje desde Kernel", fd_conexion_memoria);
-        sleep(2);
+        cerrar_conexion(fd_memoria);
+        log_evento("Memoria desconectada");
     }
+}
 
-    return NULL;
+// TODO: implementar
+int32_t solicitar_creacion_proceso(u_int32_t pid, u_int32_t tamanio, char *ruta_codigo)
+{
+    // crear una mem_request (definida en utils)
+    // operación: INICIAR_PROCESO
+    // { operacion, pid, tamanio, ruta_codigo } (definida en utils)
+
+    // conectar a memoria
+    // enviar la mem_request (definida en utils)
+    // destruir la mem_request (definida en utils)
+
+    // recibir mem_response (definida en utils)
+    // desconectar de memoria
+
+    // retornar la respuesta
+    return -1;
+}
+
+// TODO: implementar
+int32_t solicitar_finalizacion_proceso(u_int32_t pid)
+{
+    // crear una mem_request (definida en utils)
+    // operación: FINALIZAR_PROCESO
+    // { operacion, pid } (definida en utils)
+
+    // conectar a memoria
+    // enviar la mem_request (definida en utils)
+    // destruir la mem_request (definida en utils)
+
+    // recibir mem_response (definida en utils)
+    // desconectar de memoria
+
+    // retornar la respuesta
+    return -1;
 }
