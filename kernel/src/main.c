@@ -11,8 +11,8 @@ int main(int argc, char *argv[])
     iniciar_config();
     iniciar_logger(get_log_level());
 
-    iniciar_cpu();
-    iniciar_io();
+    inicializar_cpu();
+    inicializar_io();
     iniciar_servidor();
     // planificador
 

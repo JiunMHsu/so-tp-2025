@@ -1,31 +1,123 @@
 #include "io.h"
 
-// colección global de IOs
+// TODO: reemplazar por colecciones thread-safe (listas y colas con mutex)
+t_list *ios;
+t_queue *finalizados;
 
-void iniciar_io()
+static t_io *crear_io(char *nombre_io, int32_t fd_io);
+static void destruir_io(t_io *io);
+static t_io *buscar_por_nombre(char *nombre_io);
+
+static void *consumir_io(void *dispositivo_io);
+static void finalizar_consumo_para(t_pcb *proceso, motivo_fin_io motivo);
+
+static void desconectar_io(char *nombre_io);
+
+// TODO: inicializar estructura de datos para manejar IOs
+void inicializar_io()
 {
-    // TODO: inicializar estructura de datos para manejar IOs
 }
 
-void *manejar_conexion_io(void *fd_ptr)
+// TODO: implementar
+void conectar_io(char *nombre_io, int32_t fd_io)
 {
-    int32_t fd_io = *((int32_t *)fd_ptr);
-    free(fd_ptr);
+    // crear t_io*
+    // agregar a lista
+    // crear hilo de consumo
+}
 
-    if (recibir_cliente(fd_io) != IO)
+// TODO: implementar
+int32_t bloquear_para_io(char *nombre_io, t_pcb *pcb)
+{
+    return 0;
+}
+
+// TODO: implementar
+t_fin_de_io *get_finalizado(void)
+{
+    return NULL;
+}
+
+void destruir_fin_de_io(t_fin_de_io *fin_de_io)
+{
+    free(fin_de_io);
+}
+
+static t_io *crear_io(char *nombre_io, int32_t fd_io)
+{
+    t_io *io = malloc(sizeof(t_io));
+    io->fd_io = fd_io;
+    io->nombre = strdup(nombre_io);
+    io->cola_procesos = queue_create();
+    io->rutina_consumo = 0;
+
+    return io;
+}
+
+static void destruir_io(t_io *io)
+{
+    cerrar_conexion(io->fd_io);
+
+    // no destruye los procesos
+    queue_destroy(io->cola_procesos);
+    free(io->nombre);
+    free(io);
+}
+
+static t_io *buscar_por_nombre(char *nombre_io)
+{
+    bool _tiene_nombre(void *_io)
     {
-        log_mensaje_error("Error cliente inválido");
-        return NULL;
-    }
+        t_io *io = (t_io *)_io;
+        return strcmp(io->nombre, nombre_io) == 0;
+    };
 
-    // Escuchar nombre de IO
+    return (t_io *)list_find(ios, &_tiene_nombre);
+}
 
-    // TODO: Lógica de atención
+// TODO: implementar
+static void *consumir_io(void *dispositivo_io)
+{
+    t_io *io = (t_io *)dispositivo_io;
+
     while (1)
     {
-        enviar_mensaje("mensaje desde kernel", fd_io);
-        sleep(2);
+        // esperar por un proceso
+        // pop de la cola (io->cola_procesos)
+
+        // empaquetar la petición a IO
+        // enviar al socket de IO (io->fd_io)
+        // esperar y recibir respuesta
+
+        // manejar la respuesta
     }
 
     return NULL;
+}
+
+static void finalizar_consumo_para(t_pcb *proceso, motivo_fin_io motivo)
+{
+    t_fin_de_io *fin_de_io = malloc(sizeof(t_fin_de_io));
+    fin_de_io->proceso = proceso;
+    fin_de_io->motivo = motivo;
+
+    // agregar a la cola de finalizados
+    queue_push(finalizados, fin_de_io);
+}
+
+// TODO: implementar
+/**
+ * @brief Función ideada para que la rutina de consumo llame en caso de
+ * escuchar un -1 por el socket. Simplemente mueve los procesos a la cola
+ * de finalizados y libera las estructuras, no cancela el hilo de ejecución.
+ *
+ * @param nombre_io
+ *
+ */
+static void desconectar_io(char *nombre_io)
+{
+    // remover io de la lista
+    // pasar los procesos a la cola de finalizados {motivo DISCONNECTED}
+
+    // destruir io
 }
