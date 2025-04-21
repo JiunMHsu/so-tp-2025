@@ -13,5 +13,6 @@ void destruir_logger(void);
 
 void log_inicio_io(u_int32_t pid, u_int32_t tiempo);
 void log_finalizacion_io(u_int32_t pid);
+void log_error_peticion(char *mensaje);
 
 #endif // IO_LOGGER_H
