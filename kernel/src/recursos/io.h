@@ -8,6 +8,8 @@
 #include <commons/collections/queue.h> // temporal (reemplazar por mqueue)
 #include <utils/sockets/sockets.h>
 #include <utils/protocol/protocol.h>
+#include <utils/io/peticion_io.h>
+#include <utils/io/fin_de_io.h>
 // #include <utils/mlist/mlist.h>
 // #include <utils/mqueue/mqueue.h>
 
@@ -23,14 +25,7 @@ typedef struct
     pthread_t rutina_consumo;
 } t_io;
 
-typedef enum
-{
-    EXECUTED,
-    DISCONNECTED,
-} motivo_fin_io;
-
 typedef struct
-
 {
     t_pcb *proceso;
     motivo_fin_io motivo;
