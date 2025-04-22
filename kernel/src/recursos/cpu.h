@@ -7,6 +7,8 @@
 #include <commons/collections/queue.h> // temporal (reemplazar por mqueue)
 #include <utils/sockets/sockets.h>
 #include <utils/protocol/protocol.h>
+#include <utils/ejecucion/peticion_ejecucion.h>
+#include <utils/ejecucion/desalojo.h>
 // #include <utils/mlist/mlist.h>
 // #include <utils/mqueue/mqueue.h>
 
@@ -37,26 +39,11 @@ typedef struct
     int32_t fd_dispatch;
 } args_ejecucion;
 
-typedef enum
-{
-    SCHEDULER_INT,
-    SYSCALL,
-} motivo_desalojo;
-
-typedef struct
-{
-    u_int32_t pid;
-    u_int32_t program_counter;
-    motivo_desalojo motivo;
-    char *syscall;
-} t_desalojo;
-
 /**
  * @brief Inicializa la colección global para manejar las CPUs.
  *
  */
 void inicializar_cpu(void);
-// void destruir_cpu(void);
 
 void conectar_cpu(char *id_cpu, int32_t fd_dispatch, int32_t fd_interrupt);
 

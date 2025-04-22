@@ -1,6 +1,7 @@
-#include "cliente/kernel.h"
-#include "cliente/memoria.h"
 #include <stdlib.h>
+
+#include "conexion/kernel.h"
+#include "conexion/memoria.h"
 
 int main(int argc, char *argv[])
 {

@@ -60,7 +60,7 @@ int8_t ejecutar(u_int32_t pid, u_int32_t program_counter)
     return 0;
 }
 
-// TODO: implementar
+// TODO: implementar _ejecutar
 static void *_ejecutar(void *_args)
 {
     args_ejecucion args = *((args_ejecucion *)_args);
@@ -68,9 +68,11 @@ static void *_ejecutar(void *_args)
     u_int32_t program_counter = args.program_counter;
     int32_t fd_dispatch = args.fd_dispatch;
 
-    // empaquetar pid y program_counter
-    // enviar
-    // esperar y escuchar respuesta
+    t_peticion_ejecucion *peticion = crear_peticion_ejecucion(pid, program_counter);
+    enviar_peticion_ejecucion(fd_dispatch, peticion);
+    destruir_peticion_ejecucion(peticion);
+
+    // esperar y escuchar respuesta, bloqueante
 
     // armar t_desalojo
     // push a desalojados
@@ -78,20 +80,15 @@ static void *_ejecutar(void *_args)
     return NULL;
 }
 
-// TODO: implementar
+// TODO: implementar enviar_interrupcion
 void enviar_interrupcion(u_int32_t pid)
 {
 }
 
-// TODO: implementar
+// TODO: implementar get_desalojo
 t_desalojo *get_desalojo(void)
 {
     return NULL;
-}
-
-// TODO: implementar
-void destruir_desalojo(t_desalojo *desalojado)
-{
 }
 
 static t_cpu *crear_cpu(char *id, int32_t fd_dispatch, int32_t fd_interrupt)

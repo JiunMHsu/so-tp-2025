@@ -1,5 +1,5 @@
-#ifndef CLIENTE_MEMORIA_H
-#define CLIENTE_MEMORIA_H
+#ifndef CONEXION_MEMORIA_H
+#define CONEXION_MEMORIA_H
 
 #include <stdlib.h>
 #include <pthread.h>
@@ -14,4 +14,4 @@
 int32_t conectar_memoria(void);
 void *atender_memoria(void *);
 
-#endif
+#endif // CONEXION_MEMORIA_H
