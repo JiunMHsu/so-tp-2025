@@ -17,13 +17,11 @@ typedef struct
 {
     int32_t fd_dispatch;
     int32_t fd_interrupt;
-} kernel_sockets;
+} t_kernel_sockets;
 
-kernel_sockets conectar_kernel(void);
+t_kernel_sockets conectar_kernel(void);
 
-int32_t conectar_kernel_dispatch(void);
-int32_t conectar_kernel_interrupt(void);
-void *atender_kernel_interrupt(void *);
-void *atender_kernel_dispatch(void *);
+// recibir_peticion_ejecucion
+// recibir_interrupt
 
 #endif // CONEXION_KERNEL_H
