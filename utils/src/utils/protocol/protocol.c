@@ -1,5 +1,10 @@
 #include "protocol.h"
 
+static void crear_buffer(t_packet *paquete);
+static void *serializar_paquete(t_packet *paquete, int32_t tamanio_paquete);
+static int32_t recibir_operacion(int32_t fd_conexion);
+static void *recibir_buffer(int32_t *tamanio, int32_t fd_conexion);
+
 t_packet *crear_paquete(void)
 {
     t_packet *paquete = malloc(sizeof(t_packet));
@@ -8,7 +13,7 @@ t_packet *crear_paquete(void)
     return paquete;
 }
 
-void crear_buffer(t_packet *paquete)
+static void crear_buffer(t_packet *paquete)
 {
     paquete->buffer = malloc(sizeof(t_buffer));
     paquete->buffer->size = 0;
@@ -37,7 +42,7 @@ void agregar_a_paquete(t_packet *paquete, void *contenido, int32_t tamanio)
     paquete->buffer->size += tamanio + sizeof(int32_t);
 }
 
-void *serializar_paquete(t_packet *paquete, int32_t tamanio_paquete)
+static void *serializar_paquete(t_packet *paquete, int32_t tamanio_paquete)
 {
     void *serializado = malloc(tamanio_paquete);
     int32_t offset = 0;
@@ -75,7 +80,7 @@ void eliminar_paquete(t_packet *paquete)
     free(paquete);
 }
 
-int32_t recibir_operacion(int32_t fd_conexion)
+static int32_t recibir_operacion(int32_t fd_conexion)
 {
     op_code code;
     if (recv(fd_conexion, &code, sizeof(int32_t), MSG_WAITALL) > 0)
@@ -87,7 +92,7 @@ int32_t recibir_operacion(int32_t fd_conexion)
     }
 }
 
-void *recibir_buffer(int32_t *tamanio, int32_t fd_conexion)
+static void *recibir_buffer(int32_t *tamanio, int32_t fd_conexion)
 {
     void *buffer;
 

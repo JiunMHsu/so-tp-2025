@@ -1,12 +1,9 @@
-#include <utils/sockets/sockets.h>
-#include <utils/protocol/protocol.h>
+#include <utils/io/peticion_io.h>
+#include <utils/io/motivo_fin_io.h>
 
 #include "logger/logger.h"
 #include "config/config.h"
-
-int32_t fd_kernel;
-
-int8_t conectar_con_kernel(char *nombre_interfaz);
+#include "conexion/kernel.h"
 
 int main(int argc, char *argv[])
 {
@@ -19,46 +16,29 @@ int main(int argc, char *argv[])
     char *nombre_interfaz = argv[1];
 
     iniciar_config();
-
     iniciar_logger(get_log_level());
 
-    /* Loggeo el valor de config para confirmar los valores
-    log_info(logger, "IP_KERNELL: %s", IP_KERNELL);
-    log_info(logger, "PUERTO_KERNELL: %d", PUERTO_KERNELL);
-    log_info(logger, "LOG_LEVEL: %s", LOG_LEVEL_STR); */
-
-    int8_t resultado = conectar_con_kernel(nombre_interfaz);
-    if (resultado == -1)
+    int32_t fd_kernel = conectar_con_kernel(nombre_interfaz);
+    if (fd_kernel == -1)
         return EXIT_FAILURE;
 
-    while (1) // Es una espera activa? Hay que hacer uso del semaforo?
+    while (1)
     {
-        char *mensaje = recibir_mensaje(fd_kernel);
-        if (mensaje == NULL)
+        t_peticion_io *peticion = recibir_peticion_io(fd_kernel);
+        if (peticion == NULL)
         {
-            printf("El servidor se desconectó. Cerrando conexión...\n");
             cerrar_conexion(fd_kernel);
+            log_mensaje_error("Error al recibir la petición de IO");
             return EXIT_FAILURE;
         }
 
-        printf("Mensaje recibido: %s\n", mensaje);
-        free(mensaje);
+        log_inicio_io(peticion->pid, peticion->tiempo);
+        usleep(peticion->tiempo);
+        log_finalizacion_io(peticion->pid);
+        destruir_peticion_io(peticion);
+
+        enviar_motivo_fin_io(fd_kernel, EXECUTED);
     }
 
     return EXIT_SUCCESS;
-}
-
-int8_t conectar_con_kernel(char *nombre_interfaz)
-{
-    kernel_address address = get_kernel_address();
-    fd_kernel = crear_conexion(address.ip, address.puerto);
-    int32_t response = handshake(fd_kernel, IO);
-
-    if (response == -1)
-    {
-        cerrar_conexion(fd_kernel);
-        return -1;
-    }
-
-    return 0;
 }
