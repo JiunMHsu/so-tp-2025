@@ -33,7 +33,7 @@ static void *escuchar_cpu(void *_)
         int32_t fd_dispatch = esperar_cliente(fd_escucha_dispatch, NULL);
         if (fd_dispatch < 0)
         {
-            log_mensaje_error("Error al aceptar cliente");
+            log_mensaje_error("Error al aceptar cliente por dispatch");
             finalizar_servidor();
             exit(EXIT_FAILURE);
         }
@@ -46,6 +46,14 @@ static void *escuchar_cpu(void *_)
         }
 
         int32_t fd_interrupt = esperar_cliente(fd_escucha_interrupt, NULL);
+        if (fd_interrupt < 0)
+        {
+            log_mensaje_error("Error al aceptar cliente por interrupción");
+            cerrar_conexion(fd_dispatch);
+            finalizar_servidor();
+            exit(EXIT_FAILURE);
+        }
+
         if (recibir_cliente(fd_interrupt) != CPU)
         {
             log_mensaje_error("Error cliente inválido, cerrando conexión");
