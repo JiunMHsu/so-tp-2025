@@ -72,9 +72,7 @@ static void *_ejecutar(void *_args)
     enviar_peticion_ejecucion(fd_dispatch, peticion);
     destruir_peticion_ejecucion(peticion);
 
-    // esperar y escuchar respuesta, bloqueante
-
-    // armar t_desalojo
+    // esperar y escuchar desalojo, bloqueante
     // push a desalojados
 
     return NULL;

@@ -80,6 +80,4 @@ void enviar_interrupcion(u_int32_t pid);
  */
 t_desalojo *get_desalojo(void);
 
-void destruir_desalojo(t_desalojo *desalojado);
-
 #endif // RECURSOS_CPU_H
