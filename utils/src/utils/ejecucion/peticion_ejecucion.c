@@ -3,7 +3,7 @@
 static t_packet *empaquetar_peticion_ejecucion(t_peticion_ejecucion *peticion);
 
 // TODO: implementar empaquetar_peticion_ejecucion
-t_peticion_ejecucion *crear_peticion_ejecucion(uint32_t pid, uint32_t program_counter)
+t_peticion_ejecucion *crear_peticion_ejecucion(u_int32_t pid, u_int32_t program_counter)
 {
     return NULL;
 }
