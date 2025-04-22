@@ -23,7 +23,7 @@ void destruir_peticion_io(t_peticion_io *peticion_io)
 void enviar_peticion_io(int32_t fd_conexion, t_peticion_io *peticion_io)
 {
     t_packet *paquete = empaquetar_peticion_io(peticion_io);
-    enviar_paquete(fd_conexion, paquete);
+    enviar_paquete(paquete, fd_conexion);
     eliminar_paquete(paquete);
 }
 
