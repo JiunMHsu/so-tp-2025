@@ -44,18 +44,18 @@ int main(int argc, char *argv[])
             cerrar_conexion(kernel_sockets.fd_dispatch);
             cerrar_conexion(kernel_sockets.fd_interrupt);
             // cerrar_conexion_memoria();
-            break;
+            return EXIT_FAILURE;
         }
 
-        ejecutar_ciclo_instruccion(peticion->pid, peticion->program_counter);
-
-        // TODO: ver como obtener pc actualizado
+        fin_ejecucion fin_ejecucion = ejecutar_ciclo_instruccion(peticion->pid,
+                                                                 peticion->program_counter);
 
         // armar el desalojo
         // enviar el desalojo
 
         // destruir la peticion
         // destruir el desalojo
+        // destruir fin_ejecucion
     }
 
     return EXIT_SUCCESS;

@@ -14,5 +14,6 @@
 // INIT_PROC /2
 // DUMP_MEMORY /0
 // IO /2
+// EXIT /0
 
 #endif // KERNEL_SYSCALLS_H
