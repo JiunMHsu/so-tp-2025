@@ -21,7 +21,8 @@ void inicializar_io()
 // TODO: implementar
 void conectar_io(char *nombre_io, int32_t fd_io)
 {
-    // crear t_io*
+    t_io *io = crear_io(nombre_io, fd_io);
+
     // agregar a lista
     // crear hilo de consumo
 }

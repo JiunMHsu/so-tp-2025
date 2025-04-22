@@ -12,6 +12,11 @@ void destruir_logger()
     log_destroy(io_logger);
 }
 
+void log_mensaje_error(char *error)
+{
+    log_error(io_logger, "%s", error);
+}
+
 void log_inicio_io(u_int32_t pid, u_int32_t tiempo)
 {
     log_info(io_logger, "## PID: %d - Inicio de IO - Tiempo: %d", pid, tiempo);
