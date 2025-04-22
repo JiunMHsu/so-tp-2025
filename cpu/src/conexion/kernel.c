@@ -3,10 +3,13 @@
 static int32_t conectar_kernel_dispatch(void);
 static int32_t conectar_kernel_interrupt(void);
 
-t_kernel_sockets conectar_kernel(void)
+t_kernel_sockets conectar_kernel(char *id_cpu)
 {
     int32_t fd_conexion_dispatch = conectar_kernel_dispatch();
     int32_t fd_conexion_interrupt = conectar_kernel_interrupt();
+
+    if (fd_conexion_dispatch != -1)
+        enviar_mensaje(id_cpu, fd_conexion_dispatch);
 
     return (t_kernel_sockets){fd_conexion_dispatch, fd_conexion_interrupt};
 }

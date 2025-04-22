@@ -19,9 +19,10 @@ typedef struct
     int32_t fd_interrupt;
 } t_kernel_sockets;
 
-t_kernel_sockets conectar_kernel(void);
+t_kernel_sockets conectar_kernel(char* id_cpu);
 
 // recibir_peticion_ejecucion
 // recibir_interrupt
+// enviar_desalojo
 
 #endif // CONEXION_KERNEL_H

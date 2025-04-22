@@ -2,6 +2,7 @@
 
 int32_t fd_memoria;
 
+// TODO: Revisar implementacion, se debería enviar el id_cpu??
 int8_t conectar_memoria()
 {
     mem_address datos_memoria = get_memoria_address();
