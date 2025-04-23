@@ -1,50 +1,62 @@
-#include "cliente/kernel.h"
-#include "cliente/memoria.h"
 #include <stdlib.h>
+
+#include "conexion/kernel.h"
+#include "conexion/memoria.h"
+#include "interrupcion/interrupcion.h"
+#include "ciclo_instruccion/ciclo_instruccion.h"
 
 int main(int argc, char *argv[])
 {
+    if (argc != 2)
+    {
+        printf("Se debe especificar el id de la CPU \n");
+        return EXIT_FAILURE;
+    }
+
+    char *id_cpu = argv[1];
+
     iniciar_config();
     iniciar_logger();
 
-    int32_t fd_conexion_dispatch = conectar_kernel_dispatch();
-
-    if (fd_conexion_dispatch == -1)
+    t_kernel_sockets kernel_sockets = conectar_kernel(id_cpu);
+    if (kernel_sockets.fd_dispatch == -1 || kernel_sockets.fd_interrupt == -1)
     {
+        log_mensaje_error("No se pudo establecer la conexion con el kernel.");
         return EXIT_FAILURE;
     }
 
-    int32_t fd_conexion_interrupt = conectar_kernel_interrupt();
-
-    if (fd_conexion_interrupt == -1)
+    if (conectar_memoria() == -1)
     {
+        cerrar_conexion(kernel_sockets.fd_dispatch);
+        cerrar_conexion(kernel_sockets.fd_interrupt);
         return EXIT_FAILURE;
     }
 
-    // Implementar conexion con memoria
-    int32_t fd_conexion_memoria = conectar_memoria();
+    inicializar_interrupcion(kernel_sockets.fd_interrupt);
+    // inicializar_instrucciones();
 
-    if (fd_conexion_memoria == -1)
+    while (1)
     {
-        return EXIT_FAILURE;
+        t_peticion_ejecucion *peticion = recibir_peticion_ejecucion(kernel_sockets.fd_dispatch);
+        if (peticion == NULL)
+        {
+            log_mensaje_error("Error al recibir la peticion de ejecucion.");
+            cerrar_conexion(kernel_sockets.fd_dispatch);
+            cerrar_conexion(kernel_sockets.fd_interrupt);
+            // cerrar_conexion_memoria();
+            return EXIT_FAILURE;
+        }
+
+        fin_ejecucion fin_ejecucion = ejecutar_ciclo_instruccion(peticion->pid,
+                                                                 peticion->program_counter);
+
+        // armar el desalojo
+        // enviar el desalojo
+
+        // destruir la peticion
+        // destruir el desalojo
+        // destruir fin_ejecucion
     }
-
-    // Hilo para la escucha de interrupciones
-    pthread_t hilo_interrupt;
-
-    pthread_create(&hilo_interrupt, NULL, &atender_kernel_interrupt, &fd_conexion_interrupt);
-    pthread_detach(hilo_interrupt);
-
-    pthread_t hilo_dispatch;
-
-    pthread_create(&hilo_dispatch, NULL, &atender_kernel_dispatch, &fd_conexion_dispatch);
-    pthread_detach(hilo_dispatch);
-
-    pthread_t hilo_memoria;
-    pthread_create(&hilo_memoria, NULL, &atender_memoria, &fd_conexion_memoria);
-    pthread_detach(hilo_memoria);
-
-    pause();
 
     return EXIT_SUCCESS;
 }
