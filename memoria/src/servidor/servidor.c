@@ -1,14 +1,42 @@
 #include "servidor.h"
 
-int32_t fd_memoria;
+int32_t fd_escucha;
+sem_t fin_de_proceso;
 
-static void *escuchar_conexiones(void *_);
+static void *atender_kernel(void *fd_ptr);
+static void *atender_cpu(void *fd_ptr);
 
 void iniciar_servidor()
 {
-    pthread_t hilo_escucha;
-    pthread_create(&hilo_escucha, NULL, &escuchar_conexiones, NULL);
-    pthread_detach(hilo_escucha);
+    char *puerto_escucha = get_puerto_escucha();
+    fd_memoria = crear_servidor(puerto_escucha);
+
+    while (1)
+    {
+        int32_t *fd_cliente = malloc(sizeof(int32_t));
+        *fd_cliente = esperar_cliente(fd_memoria, NULL);
+
+        int8_t modulo_cliente = recibir_cliente(*fd_cliente);
+        switch (modulo_cliente)
+        {
+        case KERNEL:
+            log_evento("Kernel conectado.");
+
+            pthread_t atencion_kernel;
+            pthread_create(&atencion_kernel, NULL, &atender_kernel, fd_cliente);
+            pthread_detach(atencion_kernel);
+            break;
+        case CPU:
+            log_evento("CPU conectado.");
+
+            pthread_t atencion_cpu;
+            pthread_create(&atencion_cpu, NULL, &atender_cpu, fd_cliente);
+            pthread_detach(atencion_cpu);
+            break;
+        default:
+            log_mensaje_error("Modulo desconocido.");
+        }
+    }
 }
 
 void finalizar_servidor(void)
@@ -24,30 +52,23 @@ void finalizar_servidor_por_sigint(int _)
     exit(EXIT_SUCCESS);
 }
 
-static void *escuchar_conexiones(void *_)
+static void *atender_kernel(void *fd_ptr)
 {
-    char *puerto_escucha = get_puerto_escucha();
-    fd_memoria = crear_servidor(puerto_escucha);
+    int32_t fd_kernel = *((int32_t *)fd_ptr);
+    free(fd_ptr);
+
+    // escuchar
+    // procesar
+    // desconectar
+}
+
+static void *atender_cpu(void *fd_ptr)
+{
+    int32_t fd_kernel = *((int32_t *)fd_ptr);
+    free(fd_ptr);
 
     while (1)
     {
-        int32_t fd_cliente = esperar_cliente(fd_memoria, NULL);
-
-        int8_t modulo_cliente = recibir_cliente(fd_cliente);
-        switch (modulo_cliente)
-        {
-        case KERNEL:
-            log_evento("Kernel conectado.");
-            break;
-        case CPU:
-            log_evento("CPU conectado.");
-            break;
-        default:
-            log_mensaje_error("Modulo desconocido.");
-            finalizar_servidor();
-            exit(EXIT_FAILURE);
-        }
+        // escuchar peticiones
     }
-
-    return NULL;
 }
