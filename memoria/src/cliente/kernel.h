@@ -1,6 +1,0 @@
-#ifndef MEMORIA_CLIENTE_KERNEL_H
-#define MEMORIA_CLIENTE_KERNEL_H
-
-#include <stdlib.h>
-
-#endif // MEMORIA_CLIENTE_KERNEL_H

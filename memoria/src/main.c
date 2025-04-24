@@ -12,7 +12,5 @@ int main(int argc, char *argv[])
 
     iniciar_servidor();
 
-    pause(); // temporal para bloquear el hilo principal
-
     return 0;
 }

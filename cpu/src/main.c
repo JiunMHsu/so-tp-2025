@@ -25,7 +25,7 @@ int main(int argc, char *argv[])
         return EXIT_FAILURE;
     }
 
-    if (conectar_memoria() == -1)
+    if (conectar_memoria())
     {
         cerrar_conexion(kernel_sockets.fd_dispatch);
         cerrar_conexion(kernel_sockets.fd_interrupt);

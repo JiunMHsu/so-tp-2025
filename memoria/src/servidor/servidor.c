@@ -59,6 +59,7 @@ static void *atender_kernel(void *fd_ptr)
 
     // escuchar
     // procesar
+    // responder
     // desconectar
 
     return NULL;
