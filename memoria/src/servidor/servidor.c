@@ -9,12 +9,12 @@ static void *atender_cpu(void *fd_ptr);
 void iniciar_servidor()
 {
     char *puerto_escucha = get_puerto_escucha();
-    fd_memoria = crear_servidor(puerto_escucha);
+    fd_escucha = crear_servidor(puerto_escucha);
 
     while (1)
     {
         int32_t *fd_cliente = malloc(sizeof(int32_t));
-        *fd_cliente = esperar_cliente(fd_memoria, NULL);
+        *fd_cliente = esperar_cliente(fd_escucha, NULL);
 
         int8_t modulo_cliente = recibir_cliente(*fd_cliente);
         switch (modulo_cliente)
@@ -42,7 +42,7 @@ void iniciar_servidor()
 void finalizar_servidor(void)
 {
     log_evento("Finalizando servidor...");
-    cerrar_conexion(fd_memoria);
+    cerrar_conexion(fd_escucha);
     log_evento("Servidor finalizado.");
 }
 
@@ -60,6 +60,8 @@ static void *atender_kernel(void *fd_ptr)
     // escuchar
     // procesar
     // desconectar
+
+    return NULL;
 }
 
 static void *atender_cpu(void *fd_ptr)
@@ -71,4 +73,6 @@ static void *atender_cpu(void *fd_ptr)
     {
         // escuchar peticiones
     }
+
+    return NULL;
 }
