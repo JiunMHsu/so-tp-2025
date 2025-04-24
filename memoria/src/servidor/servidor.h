@@ -10,8 +10,6 @@
 
 #include "logger/logger.h"
 #include "config/config.h"
-#include "cliente/cpu.h"
-#include "cliente/kernel.h"
 
 void iniciar_servidor(void);
 void finalizar_servidor(void);
