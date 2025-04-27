@@ -9,6 +9,14 @@
 #include "logger/logger.h"
 
 void inicializar_instrucciones(void);
+void noop(char **parametros);
+void _write(char **parametros);
+void _read(char **parametros);
+void go_to(char **parametros);
+void io(char **parametros);
+void init_proc(char **parametros);
+void dump_memory(char **parametros);
+void _exit(char **parametros);
 
 // Las instrucciones deben respetar la firma
 // void instruccion(char **parametros);
