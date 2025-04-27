@@ -33,7 +33,7 @@ int main(int argc, char *argv[])
     }
 
     inicializar_interrupcion(kernel_sockets.fd_interrupt);
-    // inicializar_instrucciones();
+    inicializar_instrucciones();
 
     while (1)
     {
