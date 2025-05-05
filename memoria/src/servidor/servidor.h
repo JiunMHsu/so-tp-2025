@@ -11,6 +11,14 @@
 #include "logger/logger.h"
 #include "config/config.h"
 
+//lista auxiliar para el mockeo de datos 
+typedef struct {
+    int32_t pid;
+    int32_t size;
+    } t_proceso_mock;
+
+t_list* procesos_mock;
+
 void iniciar_servidor(void);
 void finalizar_servidor(void);
 void finalizar_servidor_por_sigint(int);

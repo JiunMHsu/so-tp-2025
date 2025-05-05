@@ -57,11 +57,38 @@ static void *atender_kernel(void *fd_ptr)
     int32_t fd_kernel = *((int32_t *)fd_ptr);
     free(fd_ptr);
 
-    // escuchar
-    // procesar
-    // responder
-    // desconectar
+    while(1) 
+    {
+        t_list* elementos = recibir_paquete(fd_kernel);
 
+        if(elementos == NULL) {
+            //TODO ver que hacer cuando el elemento enviado esta vacio
+        }
+
+        // procesar
+        // Mock: asumimos que solo se recibe el tamaño (int)
+        int32_t* tamanio = list_get(elementos,0);
+        int32_t pid = list_size(procesos_mock);
+        
+        // Creo un nuevo nodo para la lista mockeada 
+        t_proceso_mock* nuevo = malloc(sizeof(t_proceso_mock));
+        nuevo->pid = pid;
+        nuevo->size = *tamanio;
+        list_add(procesos_mock, nuevo);
+
+        log_creacion_proceso(pid, *tamanio);
+
+        // responder
+        int32_t valor_mock = 1;   // Enviar valor entero mock (1 = OK)
+        t_packet* respuesta = crear_paquete();
+        agregar_a_paquete(respuesta, &valor_mock, sizeof(int32_t));
+        enviar_paquete(respuesta, fd_kernel);
+        eliminar_paquete(respuesta);
+
+        // desconectar
+        list_destroy_and_destroy_elements(elementos, 1, free);
+    }    
+    close(fd_kernel);
     return NULL;
 }
 
