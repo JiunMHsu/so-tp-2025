@@ -1,4 +1,7 @@
+#include <utils/ejecucion/peticion_ejecucion.h>
+
 #include "servidor.h"
+
 
 int32_t fd_escucha;
 sem_t fin_de_proceso;
@@ -67,13 +70,33 @@ static void *atender_kernel(void *fd_ptr)
 
 static void *atender_cpu(void *fd_ptr)
 {
-    int32_t fd_kernel = *((int32_t *)fd_ptr);
+    int32_t fd_cpu = *((int32_t *)fd_ptr);
     free(fd_ptr);
 
     while (1)
     {
         // escuchar peticiones
-    }
+        t_peticion_ejecucion* peticion = recibir_peticion_ejecucion(fd_cpu);
+        
+        if(peticion == NULL)
+        {
+            log_mensaje_error("Error al recibir la peticion de ejecucion. Cerrando conexion con CPU...");
 
-    return NULL;
+            break;
+        }
+
+        log_obtencion_instruccion(peticion->pid, peticion->program_counter, "NOOP");
+
+        // Devuelvo la instruccion (Modificar mas adelante por una funcion)
+        enviar_mensaje("Instruccion enviada", fd_cpu);
+
+        destruir_peticion_ejecucion(peticion);
+    }
+    
+    // Desconecto
+    close(fd_cpu);
+    log_evento("Conexion con CPU finalizada.");
+
+        return NULL;
 }
+
