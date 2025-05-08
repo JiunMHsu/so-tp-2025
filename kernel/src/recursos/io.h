@@ -20,10 +20,16 @@ typedef struct
 {
     char *nombre;
     int32_t fd_io;
-    t_mutex_queue *cola_procesos;
-    sem_t *hay_proceso;
+    t_mutex_queue *peticiones;
+    sem_t *hay_peticion;
     pthread_t rutina_consumo;
 } t_io;
+
+typedef struct
+{
+    t_pcb *proceso;
+    u_int32_t tiempo;
+} t_peticion_consumo;
 
 typedef struct
 {
