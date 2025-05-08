@@ -15,3 +15,29 @@ fin_ejecucion ejecutar_ciclo_instruccion(u_int32_t pid, u_int32_t pc)
 
     return (fin_ejecucion){0, 0, NULL}; // TODO: devolver el motivo de desalojo
 }
+
+// Recibo peticion de ejecucion desde kernell
+
+void fetch()
+{
+    // creo una mem_request -> mando pid y pc
+    // log fectch instruccion -> muestra el pc
+}
+
+void decode()
+{
+    // obtengo la funcion que le corresponde a la instruccion desde el diccionario de instrucciones
+}
+
+void execute()
+{
+    // ejecuta la funcion obtenida con los parametros necesarios
+}
+
+void check_desalojo()
+{
+}
+
+void check_interrupt()
+{
+}
