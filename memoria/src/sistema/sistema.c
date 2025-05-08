@@ -18,5 +18,5 @@ char *obtener_instruccion(u_int32_t pid, u_int32_t program_counter)
 {
     char* instruccion = "La instruccion se envio correctamente.";
 
-    return instrucccion;
+    return instruccion;
 }
