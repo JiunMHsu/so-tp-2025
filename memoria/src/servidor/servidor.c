@@ -76,7 +76,7 @@ static void *atender_cpu(void *fd_ptr)
 
     while (1)
     {
-        // escuchar peticiones
+        // Escuchar peticiones
         t_peticion_cpu* peticion = recibir_peticion_cpu(fd_cpu);
         
         if(peticion == NULL)
@@ -88,8 +88,9 @@ static void *atender_cpu(void *fd_ptr)
 
         log_obtencion_instruccion(peticion->pid, peticion->program_counter, "NOOP");
 
-        // Devuelvo la instruccion (Modificar mas adelante por una funcion)
-        enviar_mensaje("Instruccion enviada", fd_cpu);
+        // Devuelvo la instruccion 
+        char* instruccion = obtener_instruccion(peticion->pid, peticion->program_counter);
+        enviar_mensaje(instruccion, fd_cpu);
 
         destruir_peticion_cpu(peticion);
     }
