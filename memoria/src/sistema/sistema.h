@@ -6,4 +6,6 @@
 #include <commons/collections/dictionary.h>
 #include <commons/collections/list.h>
 
+char* obtener_instruccion()
+
 #endif // MEMORIA_SISTEMA_H

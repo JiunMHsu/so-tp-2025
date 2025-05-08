@@ -1,4 +1,5 @@
 #include <utils/ejecucion/peticion_ejecucion.h>
+#include <utils/mem_request/cpu.h>
 
 #include "servidor.h"
 
@@ -76,7 +77,7 @@ static void *atender_cpu(void *fd_ptr)
     while (1)
     {
         // escuchar peticiones
-        t_peticion_ejecucion* peticion = recibir_peticion_ejecucion(fd_cpu);
+        t_peticion_cpu* peticion = recibir_peticion_cpu(fd_cpu);
         
         if(peticion == NULL)
         {
@@ -90,13 +91,13 @@ static void *atender_cpu(void *fd_ptr)
         // Devuelvo la instruccion (Modificar mas adelante por una funcion)
         enviar_mensaje("Instruccion enviada", fd_cpu);
 
-        destruir_peticion_ejecucion(peticion);
+        destruir_peticion_cpu(peticion);
     }
     
     // Desconecto
     close(fd_cpu);
     log_evento("Conexion con CPU finalizada.");
 
-        return NULL;
+    return NULL;
 }
 

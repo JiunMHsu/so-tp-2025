@@ -10,5 +10,9 @@ t_dictionary *procesos;
 // 2. parsear las instrucciones a lista ->["NOOP", "WRITE 0 EJEMPLO_DE_ENUNCIADO", ...]
 // 3. guardar en diccionario {clave: pid, valor: lista de instrucciones}
 
+// TODO hacer la busqueda de instruccion (Alejo)
 // si cpu te pide una instruccion segun pid y pc
 // - buscar en el diccionario la lista de instrucciones
+
+char* obtener_instrruccion
+
