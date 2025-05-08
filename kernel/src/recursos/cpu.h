@@ -3,17 +3,16 @@
 
 #include <stdlib.h>
 #include <pthread.h>
-#include <commons/collections/list.h>  // temporal (reemplazar por mlist)
-#include <commons/collections/queue.h> // temporal (reemplazar por mqueue)
-#include <utils/sockets/sockets.h>
+#include <semaphore.h>
 #include <utils/protocol/protocol.h>
 #include <utils/ejecucion/peticion_ejecucion.h>
 #include <utils/ejecucion/desalojo.h>
-// #include <utils/mlist/mlist.h>
-// #include <utils/mqueue/mqueue.h>
+#include <utils/mlist/mlist.h>
+#include <utils/mqueue/mqueue.h>
 
 #include "config/config.h"
 #include "logger/logger.h"
+#include "pcb/pcb.h"
 
 typedef struct
 {
@@ -22,22 +21,15 @@ typedef struct
     int32_t fd_interrupt;
 
     /**
-     * @brief PID del proceso que está ejecutando la CPU.
+     * @brief pcb del proceso que está ejecutando la CPU.
      *
-     * @note -1 indica que no está ejecutando nada.
+     * @note NULL indica que no está ejecutando nada.
      *
      */
-    int32_t executing;
-
-    // capaz necesita algunos semaforos para sincro
+    t_pcb *proceso;
+    pthread_mutex_t mutex_proceso;
+    sem_t *hay_proceso;
 } t_cpu;
-
-typedef struct
-{
-    u_int32_t pid;
-    u_int32_t program_counter;
-    int32_t fd_dispatch;
-} args_ejecucion;
 
 /**
  * @brief Inicializa la colección global para manejar las CPUs.
@@ -59,7 +51,7 @@ void conectar_cpu(char *id_cpu, int32_t fd_dispatch, int32_t fd_interrupt);
  * @note Asume que hay al menos una CPU disponible.
  *
  */
-int8_t ejecutar(u_int32_t pid, u_int32_t program_counter);
+int8_t ejecutar(t_pcb *proceso);
 
 /**
  * @brief Envía una interrupción a la CPU que se encuentra
