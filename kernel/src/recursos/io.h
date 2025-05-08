@@ -3,7 +3,9 @@
 
 #include <stdlib.h>
 #include <pthread.h>
+#include <semaphore.h>
 #include <string.h>
+#include <utils/sockets/sockets.h>
 #include <utils/protocol/protocol.h>
 #include <utils/io/peticion_io.h>
 #include <utils/io/motivo_fin_io.h>
@@ -19,6 +21,7 @@ typedef struct
     char *nombre;
     int32_t fd_io;
     t_mutex_queue *cola_procesos;
+    sem_t *hay_proceso;
     pthread_t rutina_consumo;
 } t_io;
 
@@ -56,6 +59,11 @@ int32_t bloquear_para_io(char *nombre_io, t_pcb *proceso);
  */
 t_fin_de_io *get_finalizado(void);
 
+/**
+ * @brief Destruye el puntero a fin_de_io. No destruye el proceso.
+ * 
+ * @param fin_de_io 
+ */
 void destruir_fin_de_io(t_fin_de_io *fin_de_io);
 
 #endif // RECURSOS_IO_H
