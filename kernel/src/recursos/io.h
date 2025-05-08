@@ -4,14 +4,11 @@
 #include <stdlib.h>
 #include <pthread.h>
 #include <string.h>
-#include <commons/collections/list.h>  // temporal (reemplazar por mlist)
-#include <commons/collections/queue.h> // temporal (reemplazar por mqueue)
-#include <utils/sockets/sockets.h>
 #include <utils/protocol/protocol.h>
 #include <utils/io/peticion_io.h>
 #include <utils/io/motivo_fin_io.h>
-// #include <utils/mlist/mlist.h>
-// #include <utils/mqueue/mqueue.h>
+#include <utils/mlist/mlist.h>
+#include <utils/mqueue/mqueue.h>
 
 #include "config/config.h"
 #include "logger/logger.h"
@@ -21,7 +18,7 @@ typedef struct
 {
     char *nombre;
     int32_t fd_io;
-    t_queue *cola_procesos; // TODO: reemplazar por mqueue
+    t_mutex_queue *cola_procesos;
     pthread_t rutina_consumo;
 } t_io;
 
