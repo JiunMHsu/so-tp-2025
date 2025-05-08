@@ -3,14 +3,13 @@
 
 #include <stdlib.h>
 #include <pthread.h>
-#include <commons/collections/list.h>  // temporal (reemplazar por mlist)
-#include <commons/collections/queue.h> // temporal (reemplazar por mqueue)
+#include <semaphore.h>
 #include <utils/sockets/sockets.h>
 #include <utils/protocol/protocol.h>
 #include <utils/ejecucion/peticion_ejecucion.h>
 #include <utils/ejecucion/desalojo.h>
-// #include <utils/mlist/mlist.h>
-// #include <utils/mqueue/mqueue.h>
+#include <utils/mlist/mlist.h>
+#include <utils/mqueue/mqueue.h>
 
 #include "config/config.h"
 #include "logger/logger.h"
@@ -28,6 +27,7 @@ typedef struct
      *
      */
     int32_t executing;
+    pthread_t rutina_consumo;
 
     // capaz necesita algunos semaforos para sincro
 } t_cpu;

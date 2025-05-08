@@ -1,6 +1,6 @@
 #include "mqueue.h"
 
-t_mutex_queue *crear_mutex_queue()
+t_mutex_queue *mqueue_create()
 {
     t_mutex_queue *mqueue = malloc(sizeof(t_mutex_queue));
     mqueue->queue = queue_create();
@@ -8,7 +8,7 @@ t_mutex_queue *crear_mutex_queue()
     return mqueue;
 }
 
-void *pop_mutex_queue(t_mutex_queue *mqueue)
+void *mqueue_pop(t_mutex_queue *mqueue)
 {
     pthread_mutex_lock(&(mqueue->mutex));
     void *contenido = queue_pop(mqueue->queue);
@@ -17,7 +17,7 @@ void *pop_mutex_queue(t_mutex_queue *mqueue)
 }
 
 // Ver si se usa
-void *peek_mutex_queue(t_mutex_queue *mqueue)
+void *mqueue_peek(t_mutex_queue *mqueue)
 {
     pthread_mutex_lock(&(mqueue->mutex));
     void *contenido = queue_peek(mqueue->queue);
@@ -25,14 +25,14 @@ void *peek_mutex_queue(t_mutex_queue *mqueue)
     return contenido;
 }
 
-void push_mutex_queue(t_mutex_queue *mqueue, void *item)
+void mqueue_push(t_mutex_queue *mqueue, void *item)
 {
     pthread_mutex_lock(&(mqueue->mutex));
     queue_push(mqueue->queue, item);
     pthread_mutex_unlock(&(mqueue->mutex));
 }
 
-void destruir_mutex_queue(t_mutex_queue *mqueue)
+void mqueue_destroy(t_mutex_queue *mqueue)
 {
     if (mqueue == NULL)
         return;

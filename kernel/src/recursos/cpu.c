@@ -1,8 +1,9 @@
 #include "cpu.h"
 
-// TODO: reemplazar por colecciones thread-safe (listas y colas con mutex)
-t_list *cpus;
-t_queue *desalojados;
+t_mutex_list *cpus;
+
+sem_t hay_desalojado;
+t_mutex_queue *desalojados;
 
 static t_cpu *crear_cpu(char *id, int32_t fd_dispatch, int32_t fd_interrupt);
 static t_cpu *buscar_por_id(char *id);
@@ -13,6 +14,7 @@ static void *_ejecutar(void *contexto);
 
 void inicializar_cpu()
 {
+    cpus = mlist_create();
 }
 
 void conectar_cpu(char *id_cpu, int32_t fd_dispatch, int32_t fd_interrupt)
