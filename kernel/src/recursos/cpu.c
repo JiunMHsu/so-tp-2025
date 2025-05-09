@@ -104,9 +104,7 @@ void enviar_interrupcion(u_int32_t pid)
 t_desalojo *get_desalojo(void)
 {
     sem_wait(hay_desalojado);
-    t_desalojo *desalojado = mqueue_pop(desalojados);
-
-    return desalojado;
+    return (t_desalojo *)mqueue_pop(desalojados);
 }
 
 static t_cpu *crear_cpu(char *id, int32_t fd_dispatch, int32_t fd_interrupt)
