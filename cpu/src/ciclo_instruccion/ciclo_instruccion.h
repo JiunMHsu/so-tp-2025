@@ -6,6 +6,7 @@
 
 #include "logger/logger.h"
 #include "conexion/memoria.h"
+#include "instrucciones/instrucciones.h"
 
 typedef struct
 {

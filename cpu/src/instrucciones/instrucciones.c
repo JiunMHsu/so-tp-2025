@@ -1,7 +1,8 @@
 #include "instrucciones.h"
 
-t_dictionary *instrucciones;
+t_dictionary *diccionario_instrucciones;
 
+//TODO: DONDE SE LLAMA A INICIALIZAR INSTRUCCIONES??
 void inicializar_instrucciones()
 {
     instrucciones = dictionary_create();

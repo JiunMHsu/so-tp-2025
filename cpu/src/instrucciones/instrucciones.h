@@ -8,6 +8,12 @@
 
 #include "logger/logger.h"
 
+typedef struct
+{
+    void *funcion_instruccion;
+    char **parametros;
+} instruccion_ejecutable;
+
 void inicializar_instrucciones(void);
 void noop(char **parametros);
 void _write(char **parametros);

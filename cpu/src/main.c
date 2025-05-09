@@ -16,6 +16,7 @@ int main(int argc, char *argv[])
     char *id_cpu = argv[1];
 
     iniciar_config();
+    // TODO: falta agregar id_cpu como parametro -> Requerimiento del tp, se debe poder identificar a cpu pertenece el logger
     iniciar_logger();
 
     t_kernel_sockets kernel_sockets = conectar_kernel(id_cpu);
