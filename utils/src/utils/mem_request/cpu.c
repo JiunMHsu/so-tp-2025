@@ -6,6 +6,15 @@ t_peticion_cpu *recibir_peticion_cpu(int32_t fd_conexion)
     t_list* paquete = recibir_paquete(fd_conexion);
     t_peticion_cpu* peticion = malloc(sizeof(t_peticion_cpu));
 
+    if(paquete == NULL || list_size(paquete) != 2)
+    {
+        if(paquete != NULL)
+            list_destroy_and_destroy_elements(paquete, &free);
+
+        free(peticion);
+
+        return NULL;
+    }
 
     peticion->pid = *(u_int32_t*) list_get(paquete, 0);
     peticion->program_counter = *(u_int32_t*) list_get(paquete, 1);

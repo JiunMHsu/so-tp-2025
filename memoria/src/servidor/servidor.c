@@ -1,4 +1,3 @@
-#include <utils/ejecucion/peticion_ejecucion.h>
 #include <utils/mem_request/cpu.h>
 
 #include "servidor.h"
@@ -86,12 +85,14 @@ static void *atender_cpu(void *fd_ptr)
             break;
         }
 
-        log_obtencion_instruccion(peticion->pid, peticion->program_counter, "NOOP");
-
         // Devuelvo la instruccion 
         char* instruccion = obtener_instruccion(peticion->pid, peticion->program_counter);
-        enviar_mensaje(instruccion, fd_cpu);
 
+        log_obtencion_instruccion(peticion->pid, peticion->program_counter, instruccion);
+        enviar_mensaje(instruccion, fd_cpu);
+        
+        // libero los punteros
+        free(instruccion);
         destruir_peticion_cpu(peticion);
     }
     

@@ -16,7 +16,20 @@ t_dictionary *procesos;
 
 char *obtener_instruccion(u_int32_t pid, u_int32_t program_counter)
 {
-    char* instruccion = "La instruccion se envio correctamente.";
+    char pid_str[20];
+    sprintf(pid_str, "%u", pid);
+    t_list* lista_instrucciones = dictionary_get(procesos, pid_str);
+    if(lista_instrucciones == NULL)
+    {
+        return strdup("No se encontraron procesos.");
+    }
 
-    return instruccion;
+    if(program_counter >= list_size(lista_instrucciones))
+    {
+        return strdup("El Program Counter se encuentra fuera de rango.");
+    }
+
+    char* instruccion = list_get(lista_instrucciones, program_counter);
+
+    return strdup(instruccion);
 }
