@@ -138,7 +138,7 @@ void mlist_iterate(t_mutex_list *lista_mutex, void (*closure)(void *));
  *
  * @param lista_mutex
  * @param criterio
- * @return `u_int32_t`
+ * @return `int32_t`
  */
 int32_t mlist_index_of(t_mutex_list *lista_mutex, int32_t (*criterio)(void *));
 

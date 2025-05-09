@@ -16,6 +16,7 @@ static void *consumir_io(void *dispositivo_io);
 static void finalizar_consumo_para(t_pcb *proceso, motivo_fin_io motivo);
 
 static void desconectar_io(char *nombre_io);
+static void _encolar_a_finalizados(void *_peticion_consumo);
 
 void inicializar_io()
 {
@@ -34,14 +35,15 @@ void conectar_io(char *nombre_io, int32_t fd_io)
     mlist_add(ios, io);
 }
 
-int32_t bloquear_para_io(char *nombre_io, t_pcb *pcb)
+int32_t bloquear_para_io(char *nombre_io, t_pcb *proceso, u_int32_t tiempo)
 {
     t_io *io = buscar_por_nombre(nombre_io);
     if (io == NULL)
         return -1;
 
-    mqueue_push(io->cola_procesos, pcb);
-    sem_post(io->hay_proceso);
+    t_peticion_consumo *peticion = crear_peticion_consumo(proceso, tiempo);
+    mqueue_push(io->peticiones, peticion);
+    sem_post(io->hay_peticion);
     return 0;
 }
 
@@ -124,25 +126,26 @@ static void *consumir_io(void *dispositivo_io)
     while (1)
     {
         sem_wait(io->hay_peticion);
+
         t_peticion_consumo *peticion = (t_peticion_consumo *)mqueue_pop(io->peticiones);
-        t_peticion_io *peticion_io = crear_peticion_io(peticion->proceso->pid, peticion->tiempo);
 
-        enviar_peticion_io(fd_io, peticion_io);
-
+        t_pcb *proceso = peticion->proceso;
+        u_int32_t tiempo = peticion->tiempo;
         destruir_peticion_consumo(peticion);
+
+        t_peticion_io *peticion_io = crear_peticion_io(proceso->pid, tiempo);
+        enviar_peticion_io(fd_io, peticion_io);
         destruir_peticion_io(peticion_io);
 
         int32_t respuesta_io = recibir_senial(fd_io);
 
-        if (respuesta_io == -1)
+        if (respuesta_io == EXECUTED)
+            finalizar_consumo_para(proceso, EXECUTED);
+        else // caso -1 (o cualquier otra respuesta que no sea EXECUTED)
         {
-            // TODO: completar proceso desconexión io
-            // desconectar_io(io->nombre);
-            // finalizar_consumo_para(peticion->proceso, DISCONNECTED);
-            // return NULL;
+            finalizar_consumo_para(proceso, DISCONNECTED);
+            desconectar_io(io->nombre);
         }
-
-        // TODO: completar proceso consumo exitoso
     }
 
     return NULL;
@@ -158,19 +161,25 @@ static void finalizar_consumo_para(t_pcb *proceso, motivo_fin_io motivo)
     sem_post(hay_finalizado);
 }
 
-// TODO: implementar
-/**
- * @brief Función ideada para que la rutina de consumo llame en caso de
- * escuchar un -1 por el socket. Simplemente mueve los procesos a la cola
- * de finalizados y libera las estructuras, no cancela el hilo de ejecución.
- *
- * @param nombre_io
- *
- */
 static void desconectar_io(char *nombre_io)
 {
-    // remover io de la lista
-    // pasar los procesos a la cola de finalizados {motivo DISCONNECTED}
+    int32_t _tiene_nombre(void *_io)
+    {
+        t_io *io = (t_io *)_io;
+        return strcmp(io->nombre, nombre_io) == 0;
+    };
 
-    // destruir io
+    t_io *io = mlist_remove_by_condition(ios, &_tiene_nombre);
+    if (io == NULL)
+        return;
+
+    mlist_iterate(io->peticiones, &_encolar_a_finalizados);
+    destruir_io(io);
 }
+
+static void _encolar_a_finalizados(void *_peticion_consumo)
+{
+    t_peticion_consumo *peticion_consumo = (t_peticion_consumo *)_peticion_consumo;
+    finalizar_consumo_para(peticion_consumo->proceso, DISCONNECTED);
+    destruir_peticion_consumo(peticion_consumo);
+};

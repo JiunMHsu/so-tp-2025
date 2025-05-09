@@ -53,7 +53,7 @@ void conectar_io(char *nombre_io, int32_t fd_io);
  *
  * @return int32_t : 0 si fue exitosa, -1 si hubo un error
  */
-int32_t bloquear_para_io(char *nombre_io, t_pcb *proceso);
+int32_t bloquear_para_io(char *nombre_io, t_pcb *proceso, u_int32_t tiempo);
 
 /**
  * @brief Escucha constantemente si hay procesos que terminaron su IO.
