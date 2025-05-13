@@ -1,44 +1,53 @@
 #include "plani_largo_plazo.h"
 
-// TODO: implementar planificador de largo plazo
+q_estado *new;
+q_estado *ready;
+q_estado *exit;
 
-// void crear_procesos() 
-// {
-//     sem_wait(&iniciar_planificacion);
-    
-//     while(1)
-//     {
-//        //no entiendo como le llega el procesos
-//         queue_push(NEW, proceso_nuevo);
+u_int16_t pid_count;
 
-//         if(queue_size(NEW) == 1) 
-//         {
-//             esperar_solicitud(proceso_nuevo);
-//         }
-//         else
-//         {
-//             //TODO: agregar a redy segun el algoritmo
-//         }
-//     }
+static void *admitir_proceso(void *_);
+static void crear_proceso(t_pcb *pcb);
+// void esperar_solicitud(Proceso *proceso_nuevo);
 
+// TODO: Implementar
+void inicializar_planificador_largo_plazo(algoritmo_planificacion alg_planificacion,
+                                          q_estado *estado_new,
+                                          q_estado *estado_ready,
+                                          q_estado *estado_exit)
+{
+    hay_proceso_new = malloc(sizeof(sem_t));
+    sem_init(hay_proceso_new, 0, 0);
 
-// }
+    u_int16_t pid_count = 0;
 
+    // mas cosas
+}
 
-// void esperar_solicitud(Proceso* proceso_nuevo) 
-// {
-//     while (1) 
-//     {
-//         int32_t solicitud = solicitar_creacion_proceso(proceso_nuevo->pid, proceso_nuevo->tamanio, );
-//         if (solicitud == 1) 
-//         {
-//             queue_pop(NEW);
-//             queue_push(READY, proceso_nuevo);
-//             break;
-//         } 
-//         else 
-//         {
-//             while (!finalizo_otro_proceso()); //TODO
-//         }
-//     }
-// }
+void insertar_a_new(char *pseudocodigo, u_int32_t tamanio_proceso)
+{
+    // creo el pcb y push a new
+
+    // switch(alg_planificacion)
+    // {
+    //     case FIFO: (mlist_push_as_queue)
+    //     case PMCP: (ordered_push)
+    // }
+}
+
+// TODO: Implementar
+void crear_proceso(t_pcb *pcb)
+{
+}
+
+static void *admitir_proceso(void *_)
+{
+    while (1)
+    {
+        t_pcb *proceso_nuevo = pop_proceso(new);
+        // crear y push a ready
+        // TODO: Implementar
+    }
+}
+
+// TODO: rutina exit

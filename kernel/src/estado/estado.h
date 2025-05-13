@@ -18,7 +18,6 @@ typedef struct
 /**
  * @brief Crea una cola de procesos para el estado dado.
  *
- * @param coigo_estado
  * @return `q_estado*`
  */
 q_estado *crear_estado();
