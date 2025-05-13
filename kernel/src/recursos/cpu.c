@@ -16,6 +16,7 @@ void inicializar_cpu()
 {
     cpus = mlist_create();
     desalojados = mqueue_create();
+    hay_desalojado = malloc(sizeof(sem_t));
     sem_init(hay_desalojado, 0, 0);
 }
 

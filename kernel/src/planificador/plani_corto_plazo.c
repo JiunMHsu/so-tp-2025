@@ -1,9 +1,11 @@
 #include "plani_corto_plazo.h"
 
-// TODO: implementar planificador de corto plazo
+q_estado *ready;
 
-q_estado *cola_ready;
-
-// 1. funcion inicializacion
+void inicializar_planificador_corto_plazo(algoritmo_planificacion alg_planificacion,
+                                          q_estado *estado_ready)
+{
+    ready = estado_ready;
+}
 
 // funciones rutina

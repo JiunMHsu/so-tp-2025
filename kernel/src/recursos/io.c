@@ -22,6 +22,7 @@ void inicializar_io()
 {
     ios = mlist_create();
     finalizados = mqueue_create();
+    hay_finalizado = malloc(sizeof(sem_t));
     sem_init(hay_finalizado, 0, 0);
 }
 

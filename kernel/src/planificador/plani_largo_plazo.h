@@ -10,18 +10,9 @@
 #include "logger/logger.h"
 #include "pcb/pcb.h"
 #include "planificador.h"
-#include "memoria.h"
-
-
-#endif // PLANIFICADOR_LARGO_PLAZO_H
-
-typedef emun
-{
-    FIFO,
-    SJF
-}algoritmos_de_planificacion;
-
+#include "recursos/memoria.h"
 
 void crear_procesos();
+// void esperar_solicitud(Proceso *proceso_nuevo);
 
-void esperar_solicitud(Proceso* proceso_nuevo);
+#endif // PLANIFICADOR_LARGO_PLAZO_H

@@ -1,22 +1,23 @@
 #include "planificador.h"
 
-
+sem_t *fin_planificador;
 
 void inicializar_planificador(char *archivo_pseudocodigo, u_int32_t tamanio_proceso)
 {
-    //semaforo binario para ordenar
-    sem_init(&iniciar_planificacion, 0, 0);
-    //porque solo quiero leer la cadena, puntero a la misma direccion
-    ALGORITMO_A_USAR = archivo_pseudocodigo;
+    fin_planificador = malloc(sizeof(sem_t));
+    sem_init(fin_planificador, 0, 0);
 
-    printf("Presione Enter para iniciar la planificación...\n");
-    //TODO que espere el enter 
+    // TODO: Implementar lectura de entrada estandar con readline (Espera del ENTER)
+    printf("Presione Enter para iniciar la planificación...\n"); 
 
-    NEW = queue_create();
-    READY = queue_create();
+    // porque solo quiero leer la cadena, puntero a la misma direccion
+    algoritmo_planificacion algoritmo_corto_plazo = get_alg_plani_corto_plazo();
+    algoritmo_planificacion algoritmo_ingreso_a_ready = get_alg_ingreso_a_ready();
 
-    sem_post(&iniciar_planificacion);
+    q_estado *new = crear_estado();
+    q_estado *ready = crear_estado();
+    q_estado *exit = crear_estado();
+    q_estado *susp_ready = crear_estado();
 
-    //hacer sem_destroy donde corresponda
+    sem_wait(fin_planificador);
 }
-
