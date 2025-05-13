@@ -6,7 +6,6 @@
 #include <pthread.h>
 #include  <commons/collections/queue.h>
 
-
 #include "plani_largo_plazo.h"
 #include "plani_medio_plazo.h"
 #include "plani_corto_plazo.h"
