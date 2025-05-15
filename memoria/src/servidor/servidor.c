@@ -77,23 +77,26 @@ static void *atender_cpu(void *fd_ptr)
         {
             log_mensaje_error("Error al recibir la peticion de ejecucion. Cerrando conexion con CPU...");
             cerrar_conexion(fd_cpu);
+            return NULL;
+        }
+
+        switch (peticion->operacion)
+        {
+        case FETCH_INSTRUCCION:
+            char *instruccion = obtener_instruccion(peticion->pid, peticion->program_counter);
+
+            log_obtencion_instruccion(peticion->pid, peticion->program_counter, instruccion);
+            enviar_mensaje(instruccion, fd_cpu);
+            free(instruccion); // si obtener instruccion no hiciera strdup, no haría falta
+            break;
+
+        default:
+            log_mensaje_error("Operacion no soportada.");
             break;
         }
 
-        // Devuelvo la instruccion
-        char *instruccion = obtener_instruccion(peticion->pid, peticion->program_counter);
-
-        log_obtencion_instruccion(peticion->pid, peticion->program_counter, instruccion);
-        enviar_mensaje(instruccion, fd_cpu);
-
-        // libero los punteros
-        free(instruccion);
         destruir_peticion_cpu(peticion);
     }
-
-    // Desconecto
-    close(fd_cpu);
-    log_evento("Conexion con CPU finalizada.");
 
     return NULL;
 }
