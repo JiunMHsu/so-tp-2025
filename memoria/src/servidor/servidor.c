@@ -1,10 +1,6 @@
-#include <utils/mem_request/cpu.h>
-
 #include "servidor.h"
 
-
 int32_t fd_escucha;
-sem_t fin_de_proceso;
 
 static void *atender_kernel(void *fd_ptr);
 static void *atender_cpu(void *fd_ptr);
@@ -75,31 +71,29 @@ static void *atender_cpu(void *fd_ptr)
 
     while (1)
     {
-        // Escuchar peticiones
-        t_peticion_cpu* peticion = recibir_peticion_cpu(fd_cpu);
-        
-        if(peticion == NULL)
+        t_peticion_cpu *peticion = recibir_peticion_cpu(fd_cpu);
+
+        if (peticion == NULL)
         {
             log_mensaje_error("Error al recibir la peticion de ejecucion. Cerrando conexion con CPU...");
-
+            cerrar_conexion(fd_cpu);
             break;
         }
 
-        // Devuelvo la instruccion 
-        char* instruccion = obtener_instruccion(peticion->pid, peticion->program_counter);
+        // Devuelvo la instruccion
+        char *instruccion = obtener_instruccion(peticion->pid, peticion->program_counter);
 
         log_obtencion_instruccion(peticion->pid, peticion->program_counter, instruccion);
         enviar_mensaje(instruccion, fd_cpu);
-        
+
         // libero los punteros
         free(instruccion);
         destruir_peticion_cpu(peticion);
     }
-    
+
     // Desconecto
     close(fd_cpu);
     log_evento("Conexion con CPU finalizada.");
 
     return NULL;
 }
-
