@@ -3,6 +3,8 @@
 
 #include <stdio.h>
 #include <stdlib.h>
+#include <string.h>
+#include <commons/string.h>
 #include <commons/collections/dictionary.h>
 #include <commons/collections/list.h>
 

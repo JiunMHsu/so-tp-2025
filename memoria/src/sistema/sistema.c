@@ -10,26 +10,13 @@ t_dictionary *procesos;
 // 2. parsear las instrucciones a lista ->["NOOP", "WRITE 0 EJEMPLO_DE_ENUNCIADO", ...]
 // 3. guardar en diccionario {clave: pid, valor: lista de instrucciones}
 
-// TODO hacer la busqueda de instruccion
-// si cpu te pide una instruccion segun pid y pc
-// - buscar en el diccionario la lista de instrucciones
-
 char *obtener_instruccion(u_int32_t pid, u_int32_t program_counter)
 {
-    char pid_str[20];
-    sprintf(pid_str, "%u", pid);
-    t_list* lista_instrucciones = dictionary_get(procesos, pid_str);
-    if(lista_instrucciones == NULL)
-    {
-        return strdup("No se encontraron procesos.");
-    }
+    char pid_str = string_itoa(pid);
+    t_list *lista_instrucciones = dictionary_get(procesos, pid_str);
 
-    if(program_counter >= list_size(lista_instrucciones))
-    {
-        return strdup("El Program Counter se encuentra fuera de rango.");
-    }
+    char *instruccion = (char *)list_get(lista_instrucciones, program_counter);
+    free(pid_str);
 
-    char* instruccion = list_get(lista_instrucciones, program_counter);
-
-    return strdup(instruccion);
+    return instruccion == NULL ? NULL : strdup(instruccion);
 }
