@@ -3,15 +3,14 @@
 
 #include <stdlib.h>
 #include <pthread.h>
+#include <semaphore.h>
 #include <string.h>
-#include <commons/collections/list.h>  // temporal (reemplazar por mlist)
-#include <commons/collections/queue.h> // temporal (reemplazar por mqueue)
 #include <utils/sockets/sockets.h>
 #include <utils/protocol/protocol.h>
 #include <utils/io/peticion_io.h>
 #include <utils/io/motivo_fin_io.h>
-// #include <utils/mlist/mlist.h>
-// #include <utils/mqueue/mqueue.h>
+#include <utils/mlist/mlist.h>
+#include <utils/mqueue/mqueue.h>
 
 #include "config/config.h"
 #include "logger/logger.h"
@@ -21,9 +20,16 @@ typedef struct
 {
     char *nombre;
     int32_t fd_io;
-    t_queue *cola_procesos; // TODO: reemplazar por mqueue
+    t_mutex_queue *peticiones;
+    sem_t *hay_peticion;
     pthread_t rutina_consumo;
 } t_io;
+
+typedef struct
+{
+    t_pcb *proceso;
+    u_int32_t tiempo;
+} t_peticion_consumo;
 
 typedef struct
 {
@@ -47,7 +53,7 @@ void conectar_io(char *nombre_io, int32_t fd_io);
  *
  * @return int32_t : 0 si fue exitosa, -1 si hubo un error
  */
-int32_t bloquear_para_io(char *nombre_io, t_pcb *proceso);
+int32_t bloquear_para_io(char *nombre_io, t_pcb *proceso, u_int32_t tiempo);
 
 /**
  * @brief Escucha constantemente si hay procesos que terminaron su IO.
@@ -59,6 +65,11 @@ int32_t bloquear_para_io(char *nombre_io, t_pcb *proceso);
  */
 t_fin_de_io *get_finalizado(void);
 
+/**
+ * @brief Destruye el puntero a fin_de_io. No destruye el proceso.
+ * 
+ * @param fin_de_io 
+ */
 void destruir_fin_de_io(t_fin_de_io *fin_de_io);
 
 #endif // RECURSOS_IO_H

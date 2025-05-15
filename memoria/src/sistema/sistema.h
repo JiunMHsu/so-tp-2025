@@ -3,7 +3,11 @@
 
 #include <stdio.h>
 #include <stdlib.h>
+#include <string.h>
+#include <commons/string.h>
 #include <commons/collections/dictionary.h>
 #include <commons/collections/list.h>
+
+char* obtener_instruccion(u_int32_t pid, u_int32_t program_counter);
 
 #endif // MEMORIA_SISTEMA_H
