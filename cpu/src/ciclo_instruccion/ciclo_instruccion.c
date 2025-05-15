@@ -12,68 +12,79 @@ fin_ejecucion ejecutar_ciclo_instruccion(u_int32_t pid, u_int32_t program_counte
 
         // desalojar si hay syscall o si hay interrupcion
 
-        // por ahora
+        log_fetch_instruccion(pid, program_counter);
         char *instruccion_a_ejecutar = fetch(pid, program_counter);
 
-        instruccion_ejecutable instruccion = decode(instruccion_a_ejecutar); //TODO: tendria que ser un puntero a instruccion_ejecutable?
+        instruccion_ejecutable instruccion = decode(instruccion_a_ejecutar); // TODO: tendria que ser un puntero a instruccion_ejecutable?
 
+        // checkeo si lo que estoy por ejecutar es una syscall => si lo es, desalojo
+        // aumento program_counter para tenerlo actualizado (porque en realidad eso se hace en execute)
+        if (check_desalojo() == 1)
+        {
+            return (fin_ejecucion)
+            {
+                SYSCALL, program_counter++, instruccion_a_ejecutar;
+            }
+        }
+
+        log_instruccion_ejecutada(pid, instruccion.nombre_instruccion, instruccion.parametros);
         execute(instruccion, &program_counter);
+
+        if (check_interrupt() == 1)
+        {
+            resetear_interrupcion();
+            break;
+        }
     }
 
-    return (fin_ejecucion){0, 0, NULL}; // TODO: devolver el motivo de desalojo
+    return (fin_ejecucion)
+    {
+        SCHEDULER_INT, program_counter, NULL;
+    };
 }
 
 // Recibo peticion de ejecucion desde kernell
 
 char *fetch(u_int32_t pid, u_int32_t program_counter)
 {
-    // creo una mem_request -> mando pid y pc
-    // log fectch instruccion -> muestra el pc
-    // la instruccion se recibe como un mensaje -> memoria solo envia un texto plano, cpu decodifica
+    t_peticion_cpu peticion_instruccion = crear_peticion_instruccion(pid, program_counter);
 
-    // TODO: puede ser que esto quedase mejor en una funcion enviar_mem_request(pid, pc)
-    //--
-    t_packet paquete = crear_paquete();
+    enviar_peticion_cpu(fd_memoria, peticion_instruccion);
 
-    agregar_a_paquete(paquete, pid, sizeof(u_int32_t));
-    agregar_a_paquete(paquete, program_counter, sizeof(u_int32_t));
+    destruir_peticion_cpu(peticion_instruccion);
 
-    enviar_paquete(paquete, fd_memoria);
-    //--
-
-    char *instruccion_recibida = recibir_mensaje(fd_memoria);
+    char *instruccion_recibida = recibir_mensaje(fd_memoria); // TODO: manejo de errores
 
     return instruccion_recibida;
 }
 
 instruccion_ejecutable decode(char *instruccion_recibida)
 {
-    // obtengo la funcion que le corresponde a la instruccion desde el diccionario de instrucciones
-    // obtengo los parametros
-    // traduce las direcciones de memoria en caso de ser necesario (logica -> fisica)
     instruccion_ejecutable instruccion;
-    char **partes_instruccion = string_split(diccionario_instrucciones, " ");
-    char *clave_instrucciones = partes_instruccion[0];
-    void *funcion_instruccion = dictionary_get(diccionario_instrucciones, );
+    char **partes_instruccion = string_split(instruccion_recibida, " ");
+    char *clave_instruccion = partes_instruccion[0];
+    void *funcion_instruccion = dictionary_get(diccionario_instrucciones, clave_instruccion);
+    char **parametros;
 
     instruccion.funcion_instruccion = funcion_instruccion;
 
-    if (!strcmp(clave_instrucciones, "NOOP"))
+    if (string_equals_ignore_case(clave_instruccion, "NOOP"))
     {
-        char **parametros;
-
-        for (int32_t i = 1; i < string_array_size(partes_instruccion); i++)
-        {
-            string_array_push(partes_instruccion[i]);
-        }
-
-        instruccion.parametros = parametros;
-
-        // TODO: traduccion de direcciones de memoria para WRITE y READ -> puede ser que instruccion a ejecutar tenga otro campo "direccion fisica"
-        // podria haber un modulo MMU que tiene las funciones de traduccion -> lo llamo aca adentro de un if que evalua si hay READ o WRITE
-    } else {
         instruccion.parametros = NULL;
+        return instruccion;
     }
+
+    // salteo clave de instruccion
+    for (int32_t i = 1; i < string_array_size(partes_instruccion); i++)
+    {
+        string_array_push(parametros, partes_instruccion[i]);
+    }
+
+    instruccion.nombre_instruccion = clave_instruccion;
+    instruccion.parametros = parametros;
+
+    // TODO: traduccion de direcciones de memoria para WRITE y READ -> puede ser que instruccion a ejecutar tenga otro campo "direccion fisica"
+    // podria haber un modulo MMU que tiene las funciones de traduccion -> lo llamo aca adentro de un if que evalua si hay READ o WRITE
 
     string_array_destroy(partes_instruccion);
 
@@ -82,18 +93,33 @@ instruccion_ejecutable decode(char *instruccion_recibida)
 
 void execute(instruccion_ejecutable instruccion, u_int32_t *program_counter)
 {
-    // ejecuta la funcion obtenida con los parametros necesarios
-    //TODO: como voy a solucionar el tema de GOTO? tiene que acutualizar el valor del program_counter al que diga la instruccion
-    //deberia modificar los params de la funcion de la instruccion?
-    program_counter ++;
-    
-    instruccion.funcion_instruccion(instruccion.parametros);
+    if (string_equals_ignore_case(instruccion.nombre_instruccion, "GOTO"))
+    {
+        instruccion.funcion_instruccion(instruccion.parametros, &program_counter);
+    }
+    else
+    {
+        (*program_counter)++;
+
+        instruccion.funcion_instruccion(instruccion.parametros);
+    }
 }
 
-void check_desalojo()
+int8_t check_desalojo(char *nombre_instruccion)
 {
+    if (string_equals_ignore_case(nombre_instruccion, "IO") ||
+        string_equals_ignore_case(nombre_instruccion, "MEMORY_DUMP") ||
+        string_equals_ignore_case(nombre_instruccion, "INIT_PROC") ||
+        string_equals_ignore_case(nombre_instruccion, "DUMP_MEMORY") ||
+        string_equals_ignore_case(nombre_instruccion, "EXIT"))
+    {
+        return 1;
+    }
+
+    return -1;
 }
 
-void check_interrupt()
+int8_t check_interrupt()
 {
+    return hay_interrupcion();
 }

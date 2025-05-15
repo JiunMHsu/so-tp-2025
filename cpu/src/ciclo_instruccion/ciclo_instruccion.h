@@ -5,8 +5,11 @@
 #include <utils/ejecucion/desalojo.h>
 
 #include "logger/logger.h"
+#include "conexion/kernel.h"
 #include "conexion/memoria.h"
 #include "instrucciones/instrucciones.h"
+#include "utils/mem_request/cpu.h"
+#include "interrupcion/interrupcion.h"
 
 typedef struct
 {
