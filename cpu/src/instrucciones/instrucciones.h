@@ -22,7 +22,7 @@ void go_to(char **parametros);
 void io(char **parametros);
 void init_proc(char **parametros);
 void dump_memory(char **parametros);
-void _exit(char **parametros);
+void __exit(char **parametros);
 
 // Las instrucciones deben respetar la firma
 // void instruccion(char **parametros);

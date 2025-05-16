@@ -1,6 +1,6 @@
 #include "instrucciones.h"
 
-t_dictionary *diccionario_instrucciones;
+t_dictionary *instrucciones;
 
 //TODO: DONDE SE LLAMA A INICIALIZAR INSTRUCCIONES??
 void inicializar_instrucciones()
@@ -14,7 +14,7 @@ void inicializar_instrucciones()
     dictionary_put(instrucciones, "IO", &io);
     dictionary_put(instrucciones, "INIT_PROC", &init_proc);
     dictionary_put(instrucciones, "DUMP_MEMORY", &dump_memory);
-    dictionary_put(instrucciones, "EXIT", &_exit);
+    dictionary_put(instrucciones, "EXIT", &__exit);
 }
 
 void noop(char **parametros)
@@ -45,6 +45,6 @@ void dump_memory(char **parametros)
 {
 }
 
-void _exit(char **parametros)
+void __exit(char **parametros)
 {
 }

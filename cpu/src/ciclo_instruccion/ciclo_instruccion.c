@@ -1,5 +1,11 @@
 #include "ciclo_instruccion.h"
 
+static char *fetch(u_int32_t pid, u_int32_t program_counter);
+static instruccion_ejecutable decode(char *instruccion_recibida);
+static void execute(instruccion_ejecutable instruccion, u_int32_t *program_counter);
+static int8_t check_desalojo(char *nombre_instruccion);
+static int8_t check_interrupt();
+
 fin_ejecucion ejecutar_ciclo_instruccion(u_int32_t pid, u_int32_t program_counter)
 {
     while (1)
@@ -19,12 +25,12 @@ fin_ejecucion ejecutar_ciclo_instruccion(u_int32_t pid, u_int32_t program_counte
 
         // checkeo si lo que estoy por ejecutar es una syscall => si lo es, desalojo
         // aumento program_counter para tenerlo actualizado (porque en realidad eso se hace en execute)
-        if (check_desalojo() == 1)
+        if (check_desalojo(instruccion) == 1)
         {
             return (fin_ejecucion)
             {
-                SYSCALL, program_counter++, instruccion_a_ejecutar;
-            }
+                SYSCALL, program_counter++, instruccion_a_ejecutar
+            };
         }
 
         log_instruccion_ejecutada(pid, instruccion.nombre_instruccion, instruccion.parametros);
@@ -45,7 +51,7 @@ fin_ejecucion ejecutar_ciclo_instruccion(u_int32_t pid, u_int32_t program_counte
 
 // Recibo peticion de ejecucion desde kernell
 
-char *fetch(u_int32_t pid, u_int32_t program_counter)
+static char *fetch(u_int32_t pid, u_int32_t program_counter)
 {
     t_peticion_cpu peticion_instruccion = crear_peticion_instruccion(pid, program_counter);
 
@@ -58,7 +64,7 @@ char *fetch(u_int32_t pid, u_int32_t program_counter)
     return instruccion_recibida;
 }
 
-instruccion_ejecutable decode(char *instruccion_recibida)
+static instruccion_ejecutable decode(char *instruccion_recibida)
 {
     instruccion_ejecutable instruccion;
     char **partes_instruccion = string_split(instruccion_recibida, " ");
@@ -91,7 +97,7 @@ instruccion_ejecutable decode(char *instruccion_recibida)
     return instruccion;
 }
 
-void execute(instruccion_ejecutable instruccion, u_int32_t *program_counter)
+static void execute(instruccion_ejecutable instruccion, u_int32_t *program_counter)
 {
     if (string_equals_ignore_case(instruccion.nombre_instruccion, "GOTO"))
     {
@@ -105,7 +111,7 @@ void execute(instruccion_ejecutable instruccion, u_int32_t *program_counter)
     }
 }
 
-int8_t check_desalojo(char *nombre_instruccion)
+static int8_t check_desalojo(char *nombre_instruccion)
 {
     if (string_equals_ignore_case(nombre_instruccion, "IO") ||
         string_equals_ignore_case(nombre_instruccion, "MEMORY_DUMP") ||
@@ -119,7 +125,7 @@ int8_t check_desalojo(char *nombre_instruccion)
     return -1;
 }
 
-int8_t check_interrupt()
+static int8_t check_interrupt()
 {
     return hay_interrupcion();
 }
