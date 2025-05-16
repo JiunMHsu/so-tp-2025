@@ -6,8 +6,14 @@ static void execute(instruccion_ejecutable instruccion, u_int32_t *program_count
 static int8_t check_desalojo(char *nombre_instruccion);
 static int8_t check_interrupt();
 
+int8_t hay_desalojo;
+u_int32_t global_program_counter;
+
 fin_ejecucion ejecutar_ciclo_instruccion(u_int32_t pid, u_int32_t program_counter)
 {
+    hay_desalojo = 0;
+    global_program_counter = program_counter;
+
     while (1)
     {
         // fetch (llamada a memoria)
@@ -18,39 +24,38 @@ fin_ejecucion ejecutar_ciclo_instruccion(u_int32_t pid, u_int32_t program_counte
 
         // desalojar si hay syscall o si hay interrupcion
 
-        log_fetch_instruccion(pid, program_counter);
-        char *instruccion_a_ejecutar = fetch(pid, program_counter);
+        log_fetch_instruccion(pid, global_program_counter);
+        char *instruccion_a_ejecutar = fetch(pid, global_program_counter);
 
-        instruccion_ejecutable instruccion = decode(instruccion_a_ejecutar); // TODO: tendria que ser un puntero a instruccion_ejecutable?
-
-        // checkeo si lo que estoy por ejecutar es una syscall => si lo es, desalojo
-        // aumento program_counter para tenerlo actualizado (porque en realidad eso se hace en execute)
-        if (check_desalojo(instruccion) == 1)
-        {
-            return (fin_ejecucion)
-            {
-                SYSCALL, program_counter++, instruccion_a_ejecutar
-            };
-        }
+        instruccion_ejecutable instruccion = decode(instruccion_a_ejecutar);
 
         log_instruccion_ejecutada(pid, instruccion.nombre_instruccion, instruccion.parametros);
-        execute(instruccion, &program_counter);
+        execute(instruccion);
 
-        if (check_interrupt() == 1)
+        if (check_desalojo(instruccion))
+        {
+            resetear_desalojo();
+            destruir_instruccion_ejecutable(instruccion);
+
+            return (fin_ejecucion){SYSCALL, global_program_counter, instruccion_a_ejecutar};
+        }
+
+        if (check_interrupt())
         {
             resetear_interrupcion();
+            destruir_instruccion_ejecutable(instruccion);
+
             break;
         }
+
+        // TODO: implementar funcion destruir_instruccion_ejecutable
+        destruir_instruccion_ejecutable(instruccion);
     }
 
-    return (fin_ejecucion)
-    {
-        SCHEDULER_INT, program_counter, NULL;
-    };
+    return (fin_ejecucion){SCHEDULER_INT, global_program_counter, NULL};
 }
 
 // Recibo peticion de ejecucion desde kernell
-
 static char *fetch(u_int32_t pid, u_int32_t program_counter)
 {
     t_peticion_cpu peticion_instruccion = crear_peticion_instruccion(pid, program_counter);
@@ -59,20 +64,23 @@ static char *fetch(u_int32_t pid, u_int32_t program_counter)
 
     destruir_peticion_cpu(peticion_instruccion);
 
-    char *instruccion_recibida = recibir_mensaje(fd_memoria); // TODO: manejo de errores
+    char *instruccion_recibida = recibir_mensaje(fd_memoria);
 
     return instruccion_recibida;
 }
 
 static instruccion_ejecutable decode(char *instruccion_recibida)
 {
-    instruccion_ejecutable instruccion;
-    char **partes_instruccion = string_split(instruccion_recibida, " ");
-    char *clave_instruccion = partes_instruccion[0];
-    void *funcion_instruccion = dictionary_get(diccionario_instrucciones, clave_instruccion);
-    char **parametros;
+    // TODO: cambiar por una funcion crear_instruccion_ejecutable y otra destruir_instruccion_ejecutable -> alocar memoria manualmente
+    // instruccion_ejecutable instruccion;
+    // char **partes_instruccion = string_split(instruccion_recibida, " ");
+    // char *clave_instruccion = partes_instruccion[0];
+    // void *funcion_instruccion = dictionary_get(diccionario_instrucciones, clave_instruccion);
+    // char **parametros;
+    // instruccion.funcion_instruccion = funcion_instruccion;
 
-    instruccion.funcion_instruccion = funcion_instruccion;
+    // TODO: implemetar funcion crear_instruccion_ejecutable
+    instruccion_ejecutable instruccion = crear_instruccion_ejecutable(instruccion_recibida); // la instruccion se libera al final del ciclo
 
     if (string_equals_ignore_case(clave_instruccion, "NOOP"))
     {
@@ -97,35 +105,34 @@ static instruccion_ejecutable decode(char *instruccion_recibida)
     return instruccion;
 }
 
-static void execute(instruccion_ejecutable instruccion, u_int32_t *program_counter)
+static void execute(instruccion_ejecutable instruccion)
 {
-    if (string_equals_ignore_case(instruccion.nombre_instruccion, "GOTO"))
-    {
-        instruccion.funcion_instruccion(instruccion.parametros, &program_counter);
-    }
-    else
-    {
-        (*program_counter)++;
+    global_program_counter++;
 
-        instruccion.funcion_instruccion(instruccion.parametros);
-    }
+    instruccion.funcion_instruccion(instruccion.parametros);
 }
 
 static int8_t check_desalojo(char *nombre_instruccion)
 {
-    if (string_equals_ignore_case(nombre_instruccion, "IO") ||
-        string_equals_ignore_case(nombre_instruccion, "MEMORY_DUMP") ||
-        string_equals_ignore_case(nombre_instruccion, "INIT_PROC") ||
-        string_equals_ignore_case(nombre_instruccion, "DUMP_MEMORY") ||
-        string_equals_ignore_case(nombre_instruccion, "EXIT"))
-    {
-        return 1;
-    }
-
-    return -1;
+    return hay_desalojo;
 }
 
 static int8_t check_interrupt()
 {
     return hay_interrupcion();
+}
+
+static void set_desalojo()
+{
+    hay_desalojo = 1;
+}
+
+static void resetear_desalojo()
+{
+    hay_desalojo = 0;
+}
+
+static void set_program_counter(u_int32_t valor)
+{
+    global_program_counter = valor;
 }
