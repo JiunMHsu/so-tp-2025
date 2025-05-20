@@ -61,20 +61,22 @@ static void *atender_kernel(void *fd_ptr)
     {
         t_kernel_mem_req *paquete = recibir_kernel_mem_request(fd_kernel);
 
+        if (paquete == NULL)
+            return NULL;
+
         switch (paquete->operacion)
         {
 
         case INICIAR_PROCESO:
-            // iniciar_proceso() esta en sistema.c
-            // verificar si hay espacio suficiente leyendo el archivo que veine del path como lista
-            // cargar en un diccionario el pid como clave y la lista de instrucciones como valor
-            // Esto va en el iniciar proceso
-            //  log_creacion_proceso(pid, *tamanio);
-            //  enviar_senial(valor_mock, fd_kernel);
-            // int32_t valor_mock = 1; // Enviar valor entero mock (1 = OK)
+            iniciar_proceso(paquete->pid, paquete->path);
+            int32_t valor_mock = 1; // Enviar valor entero mock (1 = OK)
+            enviar_senial(valor_mock, fd_kernel);
             break;
 
         case FINALIZAR_PROCESO:
+            finalizar_proceso(paquete->pid);
+            int32_t valor_mock = 1;
+            enviar_senial(valor_mock, fd_kernel);
             break;
 
         default:
