@@ -11,10 +11,10 @@ typedef struct
     pthread_mutex_t mutex;
 } t_mutex_queue;
 
-t_mutex_queue *crear_mutex_queue(void);
-void *pop_mutex_queue(t_mutex_queue *mqueue);
-void *peek_mutex_queue(t_mutex_queue *mqueue);
-void push_mutex_queue(t_mutex_queue *mqueue, void *item);
-void destruir_mutex_queue(t_mutex_queue *mqueue);
+t_mutex_queue *mqueue_create(void);
+void *mqueue_pop(t_mutex_queue *mqueue);
+void *mqueue_peek(t_mutex_queue *mqueue);
+void mqueue_push(t_mutex_queue *mqueue, void *item);
+void mqueue_destroy(t_mutex_queue *mqueue);
 
 #endif // UTILS_MQUEUE_H

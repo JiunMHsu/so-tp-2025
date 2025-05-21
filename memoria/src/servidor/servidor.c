@@ -1,7 +1,6 @@
 #include "servidor.h"
 
 int32_t fd_escucha;
-sem_t fin_de_proceso;
 
 static void *atender_kernel(void *fd_ptr);
 static void *atender_cpu(void *fd_ptr);
@@ -92,12 +91,36 @@ static void *atender_kernel(void *fd_ptr)
 
 static void *atender_cpu(void *fd_ptr)
 {
-    int32_t fd_kernel = *((int32_t *)fd_ptr);
+    int32_t fd_cpu = *((int32_t *)fd_ptr);
     free(fd_ptr);
 
     while (1)
     {
-        // escuchar peticiones
+        t_peticion_cpu *peticion = recibir_peticion_cpu(fd_cpu);
+
+        if (peticion == NULL)
+        {
+            log_mensaje_error("Error al recibir la peticion de ejecucion. Cerrando conexion con CPU...");
+            cerrar_conexion(fd_cpu);
+            return NULL;
+        }
+
+        switch (peticion->operacion)
+        {
+        case FETCH_INSTRUCCION:
+            char *instruccion = obtener_instruccion(peticion->pid, peticion->program_counter);
+
+            log_obtencion_instruccion(peticion->pid, peticion->program_counter, instruccion);
+            enviar_mensaje(instruccion, fd_cpu);
+            free(instruccion); // si obtener instruccion no hiciera strdup, no haría falta
+            break;
+
+        default:
+            log_mensaje_error("Operacion no soportada.");
+            break;
+        }
+
+        destruir_peticion_cpu(peticion);
     }
 
     return NULL;
