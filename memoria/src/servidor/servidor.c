@@ -65,9 +65,8 @@ static void *atender_kernel(void *fd_ptr)
 
         switch (paquete->operacion)
         {
-
         case INICIAR_PROCESO:
-            iniciar_proceso(paquete->pid, paquete->path);
+            crear_proceso(paquete->pid, paquete->path);
             int32_t valor_mock = 1; // Enviar valor entero mock (1 = OK)
             enviar_senial(valor_mock, fd_kernel);
             break;

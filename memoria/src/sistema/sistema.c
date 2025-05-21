@@ -2,22 +2,17 @@
 
 t_dictionary *procesos;
 
-// cuando se quiere crear un proceso
 void inicializar_espacio_sistema()
 {
     procesos = dictionary_create();
 }
 
-// Nico
-//  1. leer el archivo de instrucciones
-//  2. parsear las instrucciones a lista ->["NOOP", "WRITE 0 EJEMPLO_DE_ENUNCIADO", ...]
-//  3. guardar en diccionario {clave: pid, valor: lista de instrucciones}
 void crear_proceso(int32_t pid, char *path)
 {
     t_list *lista_instrucciones = leer_instrucciones(path);
     dictionary_put(procesos, string_itoa(pid), lista_instrucciones);
     int tamanio = list_size(lista_instrucciones);
-    log_creacion_proceso(pid, tamanio);
+    log_creacion_proceso(pid, tamanio); // TODO: el tamaño es el de espacio de memoria
 }
 
 t_list *leer_instrucciones(char *path)

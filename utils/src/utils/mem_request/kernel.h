@@ -3,12 +3,14 @@
 
 #include <stdlib.h>
 #include <stdint.h>
-#include <protocol.h>
+#include <utils/protocol/protocol.h>
+
 typedef enum
 {
     INICIAR_PROCESO,
     FINALIZAR_PROCESO,
 } kernel_req_operation;
+
 typedef struct
 {
     kernel_req_operation operacion;
