@@ -1,4 +1,5 @@
 #include "planificador.h"
+#include <readline/readline.h>
 
 sem_t *fin_planificador;
 
@@ -7,10 +8,10 @@ void inicializar_planificador(char *archivo_pseudocodigo, u_int32_t tamanio_proc
     fin_planificador = malloc(sizeof(sem_t));
     sem_init(fin_planificador, 0, 0);
 
-    // TODO: Implementar lectura de entrada estandar con readline (Espera del ENTER)
-    printf("Presione Enter para iniciar la planificación...\n");
+    
+    esperar_enter();
 
-    // porque solo quiero leer la cadena, puntero a la misma direccion
+
     algoritmo_planificacion algoritmo_corto_plazo = get_alg_plani_corto_plazo();
     algoritmo_planificacion algoritmo_ingreso_a_ready = get_alg_ingreso_a_ready();
 
@@ -19,7 +20,29 @@ void inicializar_planificador(char *archivo_pseudocodigo, u_int32_t tamanio_proc
     q_estado *exit = crear_estado();
     q_estado *susp_ready = crear_estado();
 
-    // TODO: Implementar inicializacion de otros planificadores
+    // TODO: Implementar inicializacion del planificador mediano plazo
+    inicializar_planificador_corto_plazo(algoritmo_corto_plazo, ready);
+    inicializar_planificador_largo_plazo(algoritmo_ingreso_a_ready, new, ready, exit);
+
 
     sem_wait(fin_planificador);
 }
+
+void esperar_enter() 
+{
+    char *input;
+
+    do 
+    {
+        input = readline("Presione Enter para comenzar...\n");
+
+        // Para que no rompa si devuelve null
+        if (input == NULL) {
+            break;
+        }
+
+    } while (input[0] != '\0');  
+
+    free(input); 
+}
+
