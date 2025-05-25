@@ -11,7 +11,7 @@ void inicializar_planificador_corto_plazo(algoritmo_planificacion algoritmo_cort
     algoritmo = algoritmo_corto_plazo;
     ready = estado_ready;
     alpha = get_alfa_estimacion();
-    estimacion_inicial = //funcion del config que no encuentro
+    // estimacion_inicial = get_estimacion_inicial();
 
 }
 

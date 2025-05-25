@@ -8,6 +8,7 @@
 
 #include "config/config.h"
 #include "logger/logger.h"
+#include "estado/estado.h"
 #include "pcb/pcb.h"
 
 #endif // PLANIFICADOR_CORTO_PLAZO_H
