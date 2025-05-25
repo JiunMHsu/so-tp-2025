@@ -1,8 +1,8 @@
 #include "plani_largo_plazo.h"
 
-q_estado *new;
-q_estado *ready;
-q_estado *exit_; // con guion bajo porque si no se confundia con una funcion de stdlib
+static q_estado *new;
+static q_estado *ready;
+static q_estado *exit_; // con guion bajo porque si no se confundia con una funcion de stdlib
 
 u_int16_t pid_count;
 

@@ -1,6 +1,6 @@
 #include "plani_corto_plazo.h"
 
-q_estado *ready;
+static q_estado *ready;
 
 void inicializar_planificador_corto_plazo(algoritmo_planificacion alg_planificacion,
                                           q_estado *estado_ready)

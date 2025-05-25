@@ -43,7 +43,7 @@ int32_t bloquear_para_io(char *nombre_io, t_pcb *proceso, u_int32_t tiempo)
         return -1;
 
     t_peticion_consumo *peticion = crear_peticion_consumo(proceso, tiempo);
-    mqueue_push(io->peticiones, peticion);
+    mlist_push_as_queue(io->peticiones, peticion);
     sem_post(io->hay_peticion);
     return 0;
 }
@@ -68,7 +68,7 @@ static t_io *crear_io(char *nombre_io, int32_t fd_io)
     t_io *io = malloc(sizeof(t_io));
     io->fd_io = fd_io;
     io->nombre = strdup(nombre_io);
-    io->nombre = mqueue_create();
+    io->peticiones = mlist_create();
     sem_init(io->hay_peticion, 0, 0);
     io->rutina_consumo = 0;
 
@@ -83,7 +83,7 @@ static void destruir_io(t_io *io)
     cerrar_conexion(io->fd_io);
 
     free(io->nombre);
-    mqueue_destroy(io->peticiones);
+    mlist_destroy(io->peticiones);
     sem_destroy(io->hay_peticion);
     free(io);
 
@@ -128,7 +128,7 @@ static void *consumir_io(void *dispositivo_io)
     {
         sem_wait(io->hay_peticion);
 
-        t_peticion_consumo *peticion = (t_peticion_consumo *)mqueue_pop(io->peticiones);
+        t_peticion_consumo *peticion = (t_peticion_consumo *)mlist_pop_as_queue(io->peticiones);
 
         t_pcb *proceso = peticion->proceso;
         u_int32_t tiempo = peticion->tiempo;
