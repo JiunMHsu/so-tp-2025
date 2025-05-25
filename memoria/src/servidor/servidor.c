@@ -67,14 +67,13 @@ static void *atender_kernel(void *fd_ptr)
         {
         case INICIAR_PROCESO:
             crear_proceso(paquete->pid, paquete->path);
-            int32_t valor_mock = 1; // Enviar valor entero mock (1 = OK)
+            int32_t valor_mock = 500;
             enviar_senial(valor_mock, fd_kernel);
             break;
 
         case FINALIZAR_PROCESO:
             finalizar_proceso(paquete->pid);
-            int32_t valor_mock = 1;
-            enviar_senial(valor_mock, fd_kernel);
+            enviar_senial(1, fd_kernel);
             break;
 
         default:
