@@ -1,7 +1,6 @@
 #include "interrupcion.h"
 
-int32_t fd_interrupt;
-int8_t llego_interrupcion = 0;
+int8_t llego_interrupcion;
 
 // otras globales de interrupcion
 
@@ -9,6 +8,8 @@ void *atender_kernel_interrupt(void *_);
 
 void inicializar_interrupcion(int32_t fd_interrupt)
 {
+    llego_interrupcion = 0;
+
     pthread_t hilo_interrupt;
 
     pthread_create(&hilo_interrupt, NULL, &atender_kernel_interrupt, fd_interrupt);
@@ -47,10 +48,7 @@ void *atender_kernel_interrupt(void *fd_ptr)
 int8_t hay_interrupcion()
 {
     // TODO: falta mutex??
-    if (llego_interrupcion != 0)
-        return 1;
-
-    return -1;
+    return llego_interrupcion;
 }
 
 void resetear_interrupcion()
