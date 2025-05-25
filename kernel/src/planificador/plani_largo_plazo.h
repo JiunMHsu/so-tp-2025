@@ -17,6 +17,6 @@ void inicializar_planificador_largo_plazo(algoritmo_planificacion alg_planificac
                                           q_estado *estado_ready,
                                           q_estado *estado_exit);
 
-void insertar_a_new(char *pseudocodigo, u_int32_t tamanio_proceso);
+void insertar_proceso_nuevo(char *pseudocodigo, u_int32_t tamanio_proceso);
 
 #endif // PLANIFICADOR_LARGO_PLAZO_H

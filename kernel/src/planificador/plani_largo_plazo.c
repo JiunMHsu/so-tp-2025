@@ -2,18 +2,18 @@
 
 q_estado *new;
 q_estado *ready;
-q_estado *exit_; //con guion bajo porque si no se confundia con una funcion de stdlib
+q_estado *exit_; // con guion bajo porque si no se confundia con una funcion de stdlib
 
 u_int16_t pid_count;
 
 algoritmo_planificacion algoritmo;
 
-static void *admitir_proceso(void *_);
-static void crear_proceso(t_pcb *pcb);
 sem_t *hay_proceso_new;
 sem_t puede_crearse_proceso;
 // void esperar_solicitud(Proceso *proceso_nuevo);
 
+static void *admitir_proceso(void *_);
+static void crear_proceso(t_pcb *pcb);
 
 void inicializar_planificador_largo_plazo(algoritmo_planificacion alg_planificacion,
                                           q_estado *estado_new,
@@ -35,31 +35,26 @@ void inicializar_planificador_largo_plazo(algoritmo_planificacion alg_planificac
     pthread_create(&hilo_admision, NULL, admitir_proceso, NULL);
 }
 
-void pusheo_a_new_por_algoritmo(t_pcb *pcb) 
+void pusheo_a_new_por_algoritmo(t_pcb *pcb)
 {
-    switch (algoritmo) {
-        case FIFO:
-            mlist_push_as_queue(new, pcb);
-            break;
-        case PMCP:
-            ordered_push(new, pcb); 
-            break;
+    switch (algoritmo)
+    {
+    case FIFO:
+        push_proceso(new, pcb);
+        break;
+    case PMCP:
+        // TODO: Definir el criterio de ordenamiento
+        ordered_insert_proceso(new, pcb, &criterio_prioridad);
+        break;
     }
 }
 
-void insertar_a_new(char *pseudocodigo, u_int32_t tamanio_proceso)
-{  
-     t_pcb *pcb = malloc(sizeof(t_pcb));
-    pcb->pid = pid_count;
-    pcb->tamanio = tamanio_proceso;
-    pcb->pseudocodigo = pseudocodigo;
-    pid_count++;
-
+void insertar_proceso_nuevo(char *pseudocodigo, u_int32_t tamanio_proceso)
+{
+    t_pcb *pcb = crear_pcb(pid_count++, tamanio_proceso, pseudocodigo);
     pusheo_a_new_por_algoritmo(pcb);
-
-    sem_post(hay_proceso_new); 
+    // sem_post(hay_proceso_new);
 }
-
 
 static void *admitir_proceso(void *_)
 {
@@ -73,29 +68,27 @@ static void *admitir_proceso(void *_)
 
         if (solicitud)
         {
-            mlist_push_as_queue(ready, pcb);
+            push_proceso(ready, pcb);
         }
         else
         {
             pusheo_a_new_por_algoritmo(pcb);
-            sem_wait(&puede_crearse_proceso); 
-            sem_post(hay_proceso_new);        
+            sem_wait(&puede_crearse_proceso);
+            sem_post(hay_proceso_new);
         }
     }
 
     return NULL;
 }
 
-
 void rutina_exit(t_pcb *proceso_finalizado)
 {
 
     int32_t solicitud = solicitar_finalizacion_proceso(proceso_finalizado);
 
-    if(solicitud) 
+    if (solicitud)
     {
         sem_post(&puede_crearse_proceso);
-        mlist_push_as_queue(exit_, proceso_finalizado);
+        push_proceso(exit_, proceso_finalizado);
     }
 }
-    

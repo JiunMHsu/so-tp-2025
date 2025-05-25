@@ -14,6 +14,4 @@
 void inicializar_planificador_corto_plazo(algoritmo_planificacion alg_planificacion,
                                           q_estado *estado_ready);
 
-void crear_proceso(char *pseudocodigo, u_int32_t tamanio_proceso);
-
 #endif // PLANIFICADOR_CORTO_PLAZO_H

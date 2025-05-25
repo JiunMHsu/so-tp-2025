@@ -31,6 +31,14 @@ q_estado *crear_estado();
 void push_proceso(q_estado *estado, t_pcb *pcb);
 
 /**
+ * @brief Inserta un proceso en el estado dado de forma ordenada.
+ *
+ * @param estado
+ * @param pcb
+ */
+void ordered_insert_proceso(q_estado *estado, t_pcb *pcb, int (*criterio)(t_pcb *, t_pcb *));
+
+/**
  * @brief Desencola un proceso del estado dado.
  *        El puntero retornado nunca será NULL.
  *
