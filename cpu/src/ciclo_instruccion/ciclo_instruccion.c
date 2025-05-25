@@ -72,15 +72,15 @@ static char *fetch(u_int32_t pid, u_int32_t program_counter)
 static instruccion_ejecutable decode(char *instruccion_recibida)
 {
     // TODO: cambiar por una funcion crear_instruccion_ejecutable y otra destruir_instruccion_ejecutable -> alocar memoria manualmente
-    // instruccion_ejecutable instruccion;
-    // char **partes_instruccion = string_split(instruccion_recibida, " ");
-    // char *clave_instruccion = partes_instruccion[0];
-    // void *funcion_instruccion = dictionary_get(diccionario_instrucciones, clave_instruccion);
-    // char **parametros;
-    // instruccion.funcion_instruccion = funcion_instruccion;
+    instruccion_ejecutable instruccion;
+    char **partes_instruccion = string_split(instruccion_recibida, " ");
+    char *clave_instruccion = partes_instruccion[0];
+    void *funcion_instruccion = dictionary_get(diccionario_instrucciones, clave_instruccion);
+    char **parametros;
+    instruccion.funcion_instruccion = funcion_instruccion;
 
     // TODO: implemetar funcion crear_instruccion_ejecutable
-    instruccion_ejecutable instruccion = crear_instruccion_ejecutable(instruccion_recibida); // la instruccion se libera al final del ciclo
+    //instruccion_ejecutable instruccion = crear_instruccion_ejecutable(instruccion_recibida); // la instruccion se libera al final del ciclo
 
     if (string_equals_ignore_case(clave_instruccion, "NOOP"))
     {

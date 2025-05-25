@@ -14,7 +14,7 @@
 typedef struct
 {
     motivo_desalojo motivo;
-    u_int32_t pc;
+    u_int32_t program_counter;
     char *syscall; // NULL si no hubo syscall
 } fin_ejecucion;
 
