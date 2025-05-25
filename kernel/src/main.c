@@ -2,10 +2,15 @@
 #include "logger/logger.h"
 #include "recursos/cpu.h"
 #include "recursos/io.h"
+#include "planificador/planificador.h"
 #include "servidor/servidor.h"
 
 int main(int argc, char *argv[])
 {
+    // TODO: Leer por argumentos el archivo de pseudocodigo y el tamaño del proceso
+    char *pseudocodigo = "";
+    u_int32_t tamanio_proceso = 0;
+
     signal(SIGINT, &finalizar_servidor_por_sigint);
 
     iniciar_config();
@@ -14,8 +19,8 @@ int main(int argc, char *argv[])
     inicializar_cpu();
     inicializar_io();
     iniciar_servidor();
-    // planificador
 
-    pause(); // temporal para bloquear el hilo principal
+    inicializar_planificador(pseudocodigo, tamanio_proceso);
+
     return EXIT_SUCCESS;
 }
