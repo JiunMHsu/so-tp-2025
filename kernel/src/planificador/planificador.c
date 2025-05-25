@@ -3,6 +3,8 @@
 
 sem_t *fin_planificador;
 
+static void esperar_enter();
+
 void inicializar_planificador(char *archivo_pseudocodigo, u_int32_t tamanio_proceso)
 {
     fin_planificador = malloc(sizeof(sem_t));
@@ -28,7 +30,7 @@ void inicializar_planificador(char *archivo_pseudocodigo, u_int32_t tamanio_proc
     sem_wait(fin_planificador);
 }
 
-void esperar_enter() 
+static void esperar_enter() 
 {
     char *input;
 

@@ -14,6 +14,7 @@ sem_t puede_crearse_proceso;
 
 static void *admitir_proceso(void *_);
 static void crear_proceso(t_pcb *pcb);
+static int es_de_mayor_tamanio(t_pcb *proceso_a, t_pcb *proceso_b);
 
 void inicializar_planificador_largo_plazo(algoritmo_planificacion alg_planificacion,
                                           q_estado *estado_new,
@@ -44,9 +45,19 @@ void pusheo_a_new_por_algoritmo(t_pcb *pcb)
         break;
     case PMCP:
         // TODO: Definir el criterio de ordenamiento
-        ordered_insert_proceso(new, pcb, &criterio_prioridad);
+        ordered_insert_proceso(new, pcb, &es_de_mayor_tamanio);
+        break;
+    default:
+        // no debería ocurrir nunca
+        log_mensaje_error("Algoritmo de ingreso a NEW no soportado.");
         break;
     }
+}
+
+// TODO: Definir el criterio de ordenamiento
+static int es_de_mayor_tamanio(t_pcb *proceso_a, t_pcb *proceso_b)
+{
+    return proceso_a->tamanio > proceso_b->tamanio;
 }
 
 void insertar_proceso_nuevo(char *pseudocodigo, u_int32_t tamanio_proceso)
@@ -64,7 +75,7 @@ static void *admitir_proceso(void *_)
 
         t_pcb *pcb = pop_proceso(new);
 
-        int32_t solicitud = solicitar_creacion_proceso(pcb->pid, pcb->tamanio, pcb->pseudocodigo);
+        int32_t solicitud = solicitar_creacion_proceso(pcb->pid, pcb->tamanio, pcb->ejecutable);
 
         if (solicitud)
         {
@@ -83,8 +94,7 @@ static void *admitir_proceso(void *_)
 
 void rutina_exit(t_pcb *proceso_finalizado)
 {
-
-    int32_t solicitud = solicitar_finalizacion_proceso(proceso_finalizado);
+    int32_t solicitud = solicitar_finalizacion_proceso(proceso_finalizado->pid);
 
     if (solicitud)
     {
