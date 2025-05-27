@@ -56,11 +56,34 @@ static void *atender_kernel(void *fd_ptr)
     int32_t fd_kernel = *((int32_t *)fd_ptr);
     free(fd_ptr);
 
-    // escuchar
-    // procesar
-    // responder
-    // desconectar
+    while (1)
+    {
+        t_kernel_mem_req *paquete = recibir_kernel_mem_request(fd_kernel);
 
+        if (paquete == NULL)
+            return NULL;
+
+        switch (paquete->operacion)
+        {
+        case INICIAR_PROCESO:
+            crear_proceso(paquete->pid, paquete->path);
+            int32_t valor_mock = 500;
+            enviar_senial(valor_mock, fd_kernel);
+            break;
+
+        case FINALIZAR_PROCESO:
+            finalizar_proceso(paquete->pid);
+            enviar_senial(1, fd_kernel);
+            break;
+
+        default:
+            break;
+        }
+
+        destruir_kernel_mem_request(paquete);
+    }
+
+    close(fd_kernel);
     return NULL;
 }
 

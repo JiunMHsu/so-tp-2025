@@ -7,7 +7,17 @@
 #include <commons/string.h>
 #include <commons/collections/dictionary.h>
 #include <commons/collections/list.h>
+#include <utils/mem_request/kernel.h>
+#include <utils/string/string.h>
 
-char* obtener_instruccion(u_int32_t pid, u_int32_t program_counter);
+#include "logger/logger.h"
+
+void inicializar_espacio_sistema(void);
+
+void crear_proceso(int32_t pid, char *path);
+t_list *leer_instrucciones(char *path);
+void finalizar_proceso(int32_t pid);
+
+char *obtener_instruccion(u_int32_t pid, u_int32_t program_counter);
 
 #endif // MEMORIA_SISTEMA_H

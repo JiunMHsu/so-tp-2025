@@ -20,7 +20,7 @@ typedef struct
 {
     char *nombre;
     int32_t fd_io;
-    t_mutex_queue *peticiones;
+    t_mutex_list *peticiones;
     sem_t *hay_peticion;
     pthread_t rutina_consumo;
 } t_io;

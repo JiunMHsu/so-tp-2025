@@ -17,6 +17,9 @@ void push_proceso(q_estado *estado, t_pcb *pcb)
     sem_post(estado->hay_proceso);
 }
 
+// TODO: Implementar
+void ordered_insert_proceso(q_estado *estado, t_pcb *pcb, int (*criterio)(t_pcb *, t_pcb *)) {}
+
 t_pcb *pop_proceso(q_estado *estado)
 {
     sem_wait(estado->hay_proceso);
