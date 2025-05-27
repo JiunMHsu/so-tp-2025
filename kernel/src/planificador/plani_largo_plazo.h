@@ -8,9 +8,9 @@
 
 #include "config/config.h"
 #include "logger/logger.h"
-#include "pcb/pcb.h"
-#include "planificador.h"
 #include "recursos/memoria.h"
+#include "estado/estado.h"
+#include "pcb/pcb.h"
 
 void inicializar_planificador_largo_plazo(algoritmo_planificacion alg_planificacion,
                                           q_estado *q_new,

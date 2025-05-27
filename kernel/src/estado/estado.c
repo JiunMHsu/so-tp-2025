@@ -26,6 +26,13 @@ t_pcb *pop_proceso(q_estado *estado)
     return (t_pcb *)mlist_pop_as_queue(estado->lista);
 }
 
+t_pcb *peek_proceso(q_estado *estado)
+{
+   t_pcb *peeked = (t_pcb *)mlist_peek(estado->lista);
+   sem_post(estado->hay_proceso);
+   return peeked;
+}
+
 t_pcb *remove_proceso(q_estado *estado, u_int32_t pid)
 {
     int32_t _es_proceso(void *pcb)

@@ -49,6 +49,15 @@ void ordered_insert_proceso(q_estado *estado, t_pcb *pcb, int (*criterio)(t_pcb 
 t_pcb *pop_proceso(q_estado *estado);
 
 /**
+ * @brief Devuelve el primer proceso encolado en el estado dado.
+ *        El puntero retornado nunca será NULL.
+ *
+ * @param estado
+ * @return `t_pcb*`
+ */
+t_pcb *peek_proceso(q_estado *estado);
+
+/**
  * @brief
  *
  * @param estado
