@@ -63,6 +63,7 @@ mem_address get_mem_address(void);
 algoritmo_planificacion get_alg_plani_corto_plazo(void);
 algoritmo_planificacion get_alg_ingreso_a_ready(void);
 double get_alfa_estimacion(void);
+double get_estimacion_inicial(void);
 
 /**
  * @brief Tiempo en milisegundos que se debe esperar

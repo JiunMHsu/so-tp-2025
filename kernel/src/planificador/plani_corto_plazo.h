@@ -10,9 +10,7 @@
 #include "logger/logger.h"
 #include "estado/estado.h"
 #include "pcb/pcb.h"
-#include "estado/estado.h"
 
-void inicializar_planificador_corto_plazo(algoritmo_planificacion alg_planificacion,
-                                          q_estado *estado_ready);
+void inicializar_planificador_corto_plazo(q_estado *q_ready, q_estado *q_exit);
 
 #endif // PLANIFICADOR_CORTO_PLAZO_H

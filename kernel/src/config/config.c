@@ -75,6 +75,11 @@ double get_alfa_estimacion()
     return config_get_double_value(kernel_config, "ALFA");
 }
 
+double get_estimacion_inicial()
+{
+    return config_get_double_value(kernel_config, "ESTIMACION_INICIAL");
+}
+
 u_int32_t get_tiempo_suspension()
 {
     return config_get_int_value(kernel_config, "TIEMPO_SUSPENSION");
