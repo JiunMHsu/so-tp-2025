@@ -15,8 +15,7 @@ static void crear_proceso(t_pcb *pcb);
 static int es_de_mayor_tamanio(t_pcb *proceso_a, t_pcb *proceso_b);
 static void *destruir_proceso(void *_);
 
-void inicializar_planificador_largo_plazo(algoritmo_planificacion alg_planificacion,
-                                          q_estado *q_new,
+void inicializar_planificador_largo_plazo(q_estado *q_new,
                                           q_estado *q_ready,
                                           q_estado *q_exit)
 {
@@ -25,7 +24,7 @@ void inicializar_planificador_largo_plazo(algoritmo_planificacion alg_planificac
 
     pid_count = 0;
 
-    algoritmo = alg_planificacion;
+    algoritmo = get_alg_ingreso_a_ready();
     q_new = q_new;
     q_ready = q_ready;
     q_exit = q_exit;

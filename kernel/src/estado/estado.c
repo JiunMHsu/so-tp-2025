@@ -17,8 +17,12 @@ void push_proceso(q_estado *estado, t_pcb *pcb)
     sem_post(estado->hay_proceso);
 }
 
-// TODO: Implementar
-void ordered_insert_proceso(q_estado *estado, t_pcb *pcb, int (*criterio)(t_pcb *, t_pcb *)) {}
+// TODO: Revisar tipado
+void ordered_insert_proceso(q_estado *estado, t_pcb *pcb, int (*comparador)(t_pcb *, t_pcb *))
+{
+    mlist_add_sorted(estado->lista, pcb, comparador);
+    sem_post(estado->hay_proceso);
+}
 
 t_pcb *pop_proceso(q_estado *estado)
 {
@@ -28,9 +32,9 @@ t_pcb *pop_proceso(q_estado *estado)
 
 t_pcb *peek_proceso(q_estado *estado)
 {
-   t_pcb *peeked = (t_pcb *)mlist_peek(estado->lista);
-   sem_post(estado->hay_proceso);
-   return peeked;
+    t_pcb *peeked = (t_pcb *)mlist_peek(estado->lista);
+    sem_post(estado->hay_proceso);
+    return peeked;
 }
 
 t_pcb *remove_proceso(q_estado *estado, u_int32_t pid)

@@ -12,8 +12,7 @@
 #include "estado/estado.h"
 #include "pcb/pcb.h"
 
-void inicializar_planificador_largo_plazo(algoritmo_planificacion alg_planificacion,
-                                          q_estado *q_new,
+void inicializar_planificador_largo_plazo(q_estado *q_new,
                                           q_estado *q_ready,
                                           q_estado *q_exit);
 

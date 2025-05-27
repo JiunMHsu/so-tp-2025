@@ -36,7 +36,7 @@ void push_proceso(q_estado *estado, t_pcb *pcb);
  * @param estado
  * @param pcb
  */
-void ordered_insert_proceso(q_estado *estado, t_pcb *pcb, int (*criterio)(t_pcb *, t_pcb *));
+void ordered_insert_proceso(q_estado *estado, t_pcb *pcb, int (*comparador)(t_pcb *, t_pcb *));
 
 /**
  * @brief Desencola un proceso del estado dado.
@@ -47,6 +47,15 @@ void ordered_insert_proceso(q_estado *estado, t_pcb *pcb, int (*criterio)(t_pcb 
  * @note Función bloqueante.
  */
 t_pcb *pop_proceso(q_estado *estado);
+
+/**
+ * @brief Desencola un proceso del estado dado según un criterio.
+ *
+ * @param estado
+ * @param criterio
+ * @return t_pcb*
+ */
+t_pcb *pop_proceso_por_criterio(q_estado *estado, int (*criterio)(t_pcb *, t_pcb *));
 
 /**
  * @brief Devuelve el primer proceso encolado en el estado dado.

@@ -6,7 +6,7 @@ static q_estado *q_exit;
 static double alpha;
 static double estimacion_inicial;
 
-double estimar_rafaga(double anterior_estimado, double real_anterior);
+static double estimar_rafaga(double anterior_estimado, double real_anterior);
 
 static void *planificar_por_fifo(void *_);
 static void *planificar_por_sjf(void *_);
@@ -39,7 +39,7 @@ void inicializar_planificador_corto_plazo(q_estado *q_ready, q_estado *q_exit)
     }
 }
 
-double estimar_rafaga(double anterior_estimado, double real_anterior)
+static double estimar_rafaga(double anterior_estimado, double real_anterior)
 {
     return alpha * real_anterior + (1 - alpha) * anterior_estimado;
 }
