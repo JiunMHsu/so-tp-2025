@@ -5,6 +5,7 @@
 #include <stdio.h>
 #include <pthread.h>
 #include <semaphore.h>
+#include <readline/readline.h>
 
 #include "config/config.h"
 #include "estado/estado.h"
@@ -22,7 +23,6 @@
  * @note Crea los semaforos necesarios.
  * @note Lanza las rutinas de planificacion (crea los hilos).
  */
-
 void inicializar_planificador(char *archivo_pseudocodigo, u_int32_t tamanio_proceso);
 
 #endif // PLANIFICADOR_H

@@ -1,25 +1,24 @@
 #include "plani_largo_plazo.h"
 
-static q_estado *new;
-static q_estado *ready;
-static q_estado *exit_; // con guion bajo porque si no se confundia con una funcion de stdlib
+static q_estado *q_new;
+static q_estado *q_ready;
+static q_estado *q_exit;
 
-u_int16_t pid_count;
+static u_int16_t pid_count;
 
-algoritmo_planificacion algoritmo;
+static algoritmo_planificacion algoritmo;
 
-sem_t *hay_proceso_new;
-sem_t puede_crearse_proceso;
-// void esperar_solicitud(Proceso *proceso_nuevo);
+static sem_t *hay_proceso_new;
+static sem_t *puede_crearse_proceso;
 
 static void *admitir_proceso(void *_);
 static void crear_proceso(t_pcb *pcb);
 static int es_de_mayor_tamanio(t_pcb *proceso_a, t_pcb *proceso_b);
 
 void inicializar_planificador_largo_plazo(algoritmo_planificacion alg_planificacion,
-                                          q_estado *estado_new,
-                                          q_estado *estado_ready,
-                                          q_estado *estado_exit)
+                                          q_estado *q_new,
+                                          q_estado *q_ready,
+                                          q_estado *q_exit)
 {
     hay_proceso_new = malloc(sizeof(sem_t));
     sem_init(hay_proceso_new, 0, 0);
@@ -28,9 +27,9 @@ void inicializar_planificador_largo_plazo(algoritmo_planificacion alg_planificac
     pid_count = 0;
 
     algoritmo = alg_planificacion;
-    new = estado_new;
-    ready = estado_ready;
-    exit_ = estado_exit;
+    q_new = q_new;
+    q_ready = q_ready;
+    q_exit = q_exit;
 
     pthread_t hilo_admision;
     pthread_create(&hilo_admision, NULL, admitir_proceso, NULL);
