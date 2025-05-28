@@ -8,14 +8,13 @@
 
 #include "config/config.h"
 #include "logger/logger.h"
-#include "pcb/pcb.h"
-#include "planificador.h"
 #include "recursos/memoria.h"
+#include "estado/estado.h"
+#include "pcb/pcb.h"
 
-void inicializar_planificador_largo_plazo(algoritmo_planificacion alg_planificacion,
-                                          q_estado *estado_new,
-                                          q_estado *estado_ready,
-                                          q_estado *estado_exit);
+void inicializar_planificador_largo_plazo(q_estado *q_new,
+                                          q_estado *q_ready,
+                                          q_estado *q_exit);
 
 void insertar_proceso_nuevo(char *pseudocodigo, u_int32_t tamanio_proceso);
 

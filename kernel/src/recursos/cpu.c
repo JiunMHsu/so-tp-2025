@@ -1,23 +1,29 @@
 #include "cpu.h"
 
-t_mutex_list *cpus;
+static t_mutex_list *cpus;
 
-sem_t *hay_desalojado;
-t_mutex_queue *desalojados;
+static sem_t *hay_cpu_libre;
+static sem_t *hay_finalizado;
+static t_mutex_queue *finalizados;
+
+static void *_ejecutar(void *_cpu);
 
 static t_cpu *crear_cpu(char *id, int32_t fd_dispatch, int32_t fd_interrupt);
 static t_cpu *buscar_por_id(char *id);
 static t_cpu *buscar_por_pid(u_int32_t pid);
 static t_cpu *buscar_libre(void);
 
-static void *_ejecutar(void *_cpu);
+static t_fin_de_ejecucion *crear_fin_de_ejecucion(t_pcb *proceso, t_desalojo *desalojado);
 
 void inicializar_cpu()
 {
     cpus = mlist_create();
-    desalojados = mqueue_create();
-    hay_desalojado = malloc(sizeof(sem_t));
-    sem_init(hay_desalojado, 0, 0);
+    finalizados = mqueue_create();
+
+    hay_cpu_libre = malloc(sizeof(sem_t));
+    sem_init(hay_cpu_libre, 0, 0);
+    hay_finalizado = malloc(sizeof(sem_t));
+    sem_init(hay_finalizado, 0, 0);
 }
 
 void conectar_cpu(char *id_cpu, int32_t fd_dispatch, int32_t fd_interrupt)
@@ -40,23 +46,19 @@ void conectar_cpu(char *id_cpu, int32_t fd_dispatch, int32_t fd_interrupt)
     pthread_detach(hilo_ejecucion);
 
     mlist_add(cpus, cpu);
+    sem_post(hay_cpu_libre);
 }
 
-int8_t ejecutar(t_pcb *proceso)
+void ejecutar(t_pcb *proceso)
 {
+    sem_wait(hay_cpu_libre);
+
     t_cpu *cpu_libre = buscar_libre();
-    if (cpu_libre == NULL) // no debería suceder nunca
-    {
-        log_mensaje_error("No hay CPUs libres");
-        return -1;
-    }
 
     pthread_mutex_lock(&(cpu_libre->mutex_proceso));
     cpu_libre->proceso = proceso;
     pthread_mutex_unlock(&(cpu_libre->mutex_proceso));
     sem_post(cpu_libre->hay_proceso);
-
-    return 0;
 }
 
 static void *_ejecutar(void *_cpu)
@@ -71,20 +73,22 @@ static void *_ejecutar(void *_cpu)
         pthread_mutex_lock(&(cpu->mutex_proceso));
         u_int32_t pid = cpu->proceso->pid;
         u_int32_t program_counter = cpu->proceso->program_counter;
-        pthread_mutex_unlock(&(cpu->mutex_proceso));
 
         t_peticion_ejecucion *peticion = crear_peticion_ejecucion(pid, program_counter);
         enviar_peticion_ejecucion(fd_dispatch, peticion);
-        destruir_peticion_ejecucion(peticion);
 
         t_desalojo *desalojado = recibir_desalojo(fd_dispatch);
+        t_fin_de_ejecucion *finalizado = crear_fin_de_ejecucion(cpu->proceso, desalojado);
+        mqueue_push(finalizados, finalizado);
+        sem_post(hay_finalizado);
 
-        mqueue_push(desalojados, desalojado);
-        sem_post(hay_desalojado);
-
-        pthread_mutex_lock(&(cpu->mutex_proceso));
         cpu->proceso = NULL;
         pthread_mutex_unlock(&(cpu->mutex_proceso));
+
+        destruir_peticion_ejecucion(peticion);
+        destruir_desalojo(desalojado);
+
+        sem_post(hay_cpu_libre);
     }
 
     return NULL;
@@ -102,10 +106,10 @@ void enviar_interrupcion(u_int32_t pid)
     enviar_senial(1, cpu->fd_interrupt);
 }
 
-t_desalojo *get_desalojo(void)
+t_fin_de_ejecucion *get_fin_de_ejecucion()
 {
-    sem_wait(hay_desalojado);
-    return (t_desalojo *)mqueue_pop(desalojados);
+    sem_wait(hay_finalizado);
+    return (t_fin_de_ejecucion *)mqueue_pop(finalizados);
 }
 
 static t_cpu *crear_cpu(char *id, int32_t fd_dispatch, int32_t fd_interrupt)
@@ -168,4 +172,27 @@ static t_cpu *buscar_libre(void)
     };
 
     return (t_cpu *)mlist_find(cpus, &_esta_libre);
+}
+
+static t_fin_de_ejecucion *crear_fin_de_ejecucion(t_pcb *proceso, t_desalojo *desalojado)
+{
+    t_fin_de_ejecucion *fin_de_ejecucion = malloc(sizeof(t_fin_de_ejecucion));
+
+    fin_de_ejecucion->proceso = proceso;
+    fin_de_ejecucion->proceso->program_counter = desalojado->program_counter;
+
+    fin_de_ejecucion->motivo = desalojado->motivo;
+    fin_de_ejecucion->syscall = strdup(desalojado->syscall);
+
+    return fin_de_ejecucion;
+}
+
+void destruir_fin_de_ejecucion(t_fin_de_ejecucion *fin_de_ejecucion)
+{
+    if (fin_de_ejecucion == NULL)
+        return;
+
+    free(fin_de_ejecucion->syscall);
+    free(fin_de_ejecucion);
+    fin_de_ejecucion = NULL;
 }

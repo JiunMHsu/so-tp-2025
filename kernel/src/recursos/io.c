@@ -1,9 +1,9 @@
 #include "io.h"
 
-t_mutex_list *ios;
+static t_mutex_list *ios;
 
-sem_t *hay_finalizado;
-t_mutex_queue *finalizados;
+static sem_t *hay_finalizado;
+static t_mutex_queue *finalizados;
 
 static t_io *crear_io(char *nombre_io, int32_t fd_io);
 static void destruir_io(t_io *io);

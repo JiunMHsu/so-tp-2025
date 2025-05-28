@@ -51,6 +51,16 @@ void mlist_add(t_mutex_list *lista_mutex, void *elemento);
 void mlist_add_all(t_mutex_list *lista_mutex, t_mutex_list *otra_lista_mutex);
 
 /**
+ * @brief Agrega un elemento a la lista de forma ordenada.
+ *
+ * @param lista_mutex
+ * @param elemento
+ * @param comparador
+ * @return `int32_t` : índice donde se insertó el elemento.
+ */
+int32_t mlist_add_sorted(t_mutex_list *lista_mutex, void *elemento, int32_t (*comparador)(void *, void *));
+
+/**
  * @brief
  *
  * @param lista_mutex
@@ -58,6 +68,15 @@ void mlist_add_all(t_mutex_list *lista_mutex, t_mutex_list *otra_lista_mutex);
  * @return `void*`
  */
 void *mlist_get(t_mutex_list *lista_mutex, u_int32_t index);
+
+/**
+ * @brief Obtiene el elemento mínimo de la lista según un criterio dado.
+ *
+ * @param lista_mutex
+ * @param minimo
+ * @return void*
+ */
+void *mlist_get_minimum(t_mutex_list *lista_mutex, void *(*minimo)(void *, void *));
 
 /**
  * @brief

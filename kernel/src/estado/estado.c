@@ -1,11 +1,12 @@
 #include "estado.h"
 
-q_estado *crear_estado()
+q_estado *crear_estado(t_state cod_estado)
 {
     q_estado *estado = malloc(sizeof(q_estado));
 
     estado->lista = mlist_create();
     estado->hay_proceso = malloc(sizeof(sem_t));
+    estado->cod_estado = cod_estado;
     sem_init(estado->hay_proceso, 0, 0);
 
     return estado;
@@ -14,16 +15,44 @@ q_estado *crear_estado()
 void push_proceso(q_estado *estado, t_pcb *pcb)
 {
     mlist_push_as_queue(estado->lista, pcb);
+
+    t_state anterior = pcb->estado;
+    set_estado_pcb(pcb, estado->cod_estado);
+    log_cambio_de_estado(pcb->pid, anterior, pcb->estado);
+
     sem_post(estado->hay_proceso);
 }
 
-// TODO: Implementar
-void ordered_insert_proceso(q_estado *estado, t_pcb *pcb, int (*criterio)(t_pcb *, t_pcb *)) {}
+// TODO: Revisar tipado de ordered_insert_proceso
+void ordered_insert_proceso(q_estado *estado, t_pcb *pcb, int32_t (*comparador)(t_pcb *, t_pcb *))
+{
+    mlist_add_sorted(estado->lista, pcb, comparador);
+
+    t_state anterior = pcb->estado;
+    set_estado_pcb(pcb, estado->cod_estado);
+    log_cambio_de_estado(pcb->pid, anterior, pcb->estado);
+
+    sem_post(estado->hay_proceso);
+}
 
 t_pcb *pop_proceso(q_estado *estado)
 {
     sem_wait(estado->hay_proceso);
     return (t_pcb *)mlist_pop_as_queue(estado->lista);
+}
+
+t_pcb *pop_proceso_minimo(q_estado *estado, t_pcb *(*minimo)(t_pcb *, t_pcb *))
+{
+    sem_wait(estado->hay_proceso);
+    return (t_pcb *)mlist_get_minimum(estado->lista, (void *)minimo);
+}
+
+t_pcb *peek_proceso(q_estado *estado)
+{
+    sem_wait(estado->hay_proceso);
+    t_pcb *peeked = (t_pcb *)mlist_peek(estado->lista);
+    sem_post(estado->hay_proceso);
+    return peeked;
 }
 
 t_pcb *remove_proceso(q_estado *estado, u_int32_t pid)

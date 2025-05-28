@@ -1,104 +1,101 @@
 #include "plani_largo_plazo.h"
 
-static q_estado *new;
-static q_estado *ready;
-static q_estado *exit_; // con guion bajo porque si no se confundia con una funcion de stdlib
+static q_estado *q_new;
+static q_estado *q_ready;
+static q_estado *q_exit;
 
-u_int16_t pid_count;
+static u_int16_t pid_count;
 
-algoritmo_planificacion algoritmo;
+static algoritmo_planificacion algoritmo;
 
-sem_t *hay_proceso_new;
-sem_t puede_crearse_proceso;
-// void esperar_solicitud(Proceso *proceso_nuevo);
+static sem_t *puede_crearse_proceso;
 
 static void *admitir_proceso(void *_);
-static void crear_proceso(t_pcb *pcb);
-static int es_de_mayor_tamanio(t_pcb *proceso_a, t_pcb *proceso_b);
+static int _es_de_menor_tamanio_que(t_pcb *proceso_a, t_pcb *proceso_b);
+static void *finalizar_proceso(void *_);
 
-void inicializar_planificador_largo_plazo(algoritmo_planificacion alg_planificacion,
-                                          q_estado *estado_new,
-                                          q_estado *estado_ready,
-                                          q_estado *estado_exit)
+void inicializar_planificador_largo_plazo(q_estado *q_new,
+                                          q_estado *q_ready,
+                                          q_estado *q_exit)
 {
-    hay_proceso_new = malloc(sizeof(sem_t));
-    sem_init(hay_proceso_new, 0, 0);
-    sem_init(&puede_crearse_proceso, 0, 0);
+    puede_crearse_proceso = malloc(sizeof(sem_t));
+    sem_init(puede_crearse_proceso, 0, 1);
 
     pid_count = 0;
 
-    algoritmo = alg_planificacion;
-    new = estado_new;
-    ready = estado_ready;
-    exit_ = estado_exit;
+    algoritmo = get_alg_ingreso_a_ready();
+    q_new = q_new;
+    q_ready = q_ready;
+    q_exit = q_exit;
 
-    pthread_t hilo_admision;
-    pthread_create(&hilo_admision, NULL, admitir_proceso, NULL);
-}
+    pthread_t rutinas[2];
 
-void pusheo_a_new_por_algoritmo(t_pcb *pcb)
-{
-    switch (algoritmo)
-    {
-    case FIFO:
-        push_proceso(new, pcb);
-        break;
-    case PMCP:
-        // TODO: Definir el criterio de ordenamiento
-        ordered_insert_proceso(new, pcb, &es_de_mayor_tamanio);
-        break;
-    default:
-        // no debería ocurrir nunca
-        log_mensaje_error("Algoritmo de ingreso a NEW no soportado.");
-        break;
-    }
-}
+    pthread_create(&rutinas[0], NULL, &admitir_proceso, NULL);
+    pthread_detach(rutinas[0]);
 
-// TODO: Definir el criterio de ordenamiento
-static int es_de_mayor_tamanio(t_pcb *proceso_a, t_pcb *proceso_b)
-{
-    return proceso_a->tamanio > proceso_b->tamanio;
+    pthread_create(&rutinas[1], NULL, &finalizar_proceso, NULL);
+    pthread_detach(rutinas[1]);
 }
 
 void insertar_proceso_nuevo(char *pseudocodigo, u_int32_t tamanio_proceso)
 {
     t_pcb *pcb = crear_pcb(pid_count++, tamanio_proceso, pseudocodigo);
-    pusheo_a_new_por_algoritmo(pcb);
-    // sem_post(hay_proceso_new);
+
+    switch (algoritmo)
+    {
+    case FIFO:
+        push_proceso(q_new, pcb);
+        log_creacion_proceso(pcb->pid);
+        break;
+    case PMCP:
+        // TODO: Definir el criterio de ordenamiento
+        ordered_insert_proceso(q_new, pcb, &_es_de_menor_tamanio_que);
+        log_creacion_proceso(pcb->pid);
+        break;
+    default: // caso SJF, SRT, no debería ocurrir nunca
+        log_mensaje_error("Algoritmo de ingreso a NEW no soportado.");
+        break;
+    }
+}
+
+static int32_t _es_de_menor_tamanio_que(t_pcb *proceso_a, t_pcb *proceso_b)
+{
+    return proceso_a->tamanio <= proceso_b->tamanio;
 }
 
 static void *admitir_proceso(void *_)
 {
     while (1)
     {
-        sem_wait(hay_proceso_new);
-
-        t_pcb *pcb = pop_proceso(new);
-
+        sem_wait(puede_crearse_proceso);
+        t_pcb *pcb = peek_proceso(q_new);
         int32_t solicitud = solicitar_creacion_proceso(pcb->pid, pcb->tamanio, pcb->ejecutable);
 
-        if (solicitud)
-        {
-            push_proceso(ready, pcb);
-        }
-        else
-        {
-            pusheo_a_new_por_algoritmo(pcb);
-            sem_wait(&puede_crearse_proceso);
-            sem_post(hay_proceso_new);
-        }
+        if (solicitud < 1) // caso 0 o -1 (ver si hacer alguna direfencia y que el sistema paniquee)
+            continue;
+
+        push_proceso(q_ready, pcb);
+        remove_proceso(q_new, pcb->pid); // porque peek no remueve de la lista
+        sem_post(puede_crearse_proceso);
     }
 
     return NULL;
 }
 
-void rutina_exit(t_pcb *proceso_finalizado)
+static void *finalizar_proceso(void *_)
 {
-    int32_t solicitud = solicitar_finalizacion_proceso(proceso_finalizado->pid);
-
-    if (solicitud)
+    while (1)
     {
-        sem_post(&puede_crearse_proceso);
-        push_proceso(exit_, proceso_finalizado);
+        t_pcb *proceso = peek_proceso(q_exit);
+        int32_t res_solicitud = solicitar_finalizacion_proceso(proceso->pid);
+
+        if (res_solicitud == 1)
+        {
+            sem_post(puede_crearse_proceso);
+            remove_proceso(q_exit, proceso->pid);
+            destruir_pcb(proceso);
+        }
     }
+
+    return NULL;
 }
