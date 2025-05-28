@@ -51,16 +51,17 @@ int main(int argc, char *argv[])
         fin_ejecucion fin_ejecucion = ejecutar_ciclo_instruccion(peticion->pid,
                                                                  peticion->program_counter);
 
-        //  armar el desalojo
-        //  enviar el desalojo
-        t_desalojo *desalojo = crear_desalojo(peticion->pid, fin_ejecucion.program_counter, fin_ejecucion.motivo, fin_ejecucion.syscall);
+        t_desalojo *desalojo = crear_desalojo(peticion->pid,
+                                              fin_ejecucion.program_counter,
+                                              fin_ejecucion.motivo,
+                                              fin_ejecucion.syscall);
         enviar_desalojo(kernel_sockets.fd_dispatch, desalojo);
 
-        // destruir la peticion
-        // destruir el desalojo
-        // TODO: revisar destruir fin_ejecucion, es necesario?
         destruir_peticion_cpu(peticion);
         destruir_desalojo(desalojo);
+
+        if (fin_ejecucion.syscall != NULL)
+            free(fin_ejecucion.syscall);
     }
 
     return EXIT_SUCCESS;
