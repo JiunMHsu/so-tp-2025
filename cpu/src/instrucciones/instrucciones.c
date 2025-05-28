@@ -2,7 +2,13 @@
 
 t_dictionary *instrucciones;
 
-// TODO: DONDE SE LLAMA A INICIALIZAR INSTRUCCIONES??
+static void inicializar_instrucciones(void);
+static void noop(char **parametros);
+static void _write(char **parametros);
+static void _read(char **parametros);
+static void go_to(char **parametros);
+static void syscall(char **parametros);
+
 void inicializar_instrucciones()
 {
     instrucciones = dictionary_create();
@@ -17,39 +23,33 @@ void inicializar_instrucciones()
     dictionary_put(instrucciones, "EXIT", &syscall);
 }
 
-void noop(char **parametros)
+static void noop(char **_)
 {
-    // No hace nada, consume el tiempo que conlleva el fetch y execute
+    // FUNCIÓN VACÍA
 }
 
-void _write(char **parametros)
-{
-}
-
-void _read(char **parametros)
+static void _write(char **parametros)
 {
 }
 
-void go_to(char **parametros)
+static void _read(char **parametros)
+{
+}
+
+static void go_to(char **parametros)
 {
     // u_int32_t posicion_salto = pasar valor de parametros[0] a int
     // set_program_counter(posicion_salto);
 }
 
-void syscall(char **parametros)
+static void syscall(char **parametros)
 {
+    // set syscall en el desalojo
     set_desalojo();
 }
 
-//TODO: implementar logica creacion
-instruccion_ejecutable crear_instruccion_ejecutable(char *instruccion)
-{
-    return (instruccion_ejecutable){NULL, NULL};
-}
-
-//TODO: implementar logica destruccion
 void destruir_instruccion_ejecutable(instruccion_ejecutable instruccion)
 {
-    //Podria llegar a tener que liberar mas cosas, por ahora lo implemento para que libere el array de strings de los params
-    free(instruccion.parametros);
+    free(instruccion.cod_instruccion);
+    string_array_destroy(instruccion.parametros);
 }

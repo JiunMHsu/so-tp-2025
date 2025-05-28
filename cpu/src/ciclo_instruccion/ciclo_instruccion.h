@@ -3,12 +3,13 @@
 
 #include <stdlib.h>
 #include <utils/ejecucion/desalojo.h>
+#include <utils/mem_request/cpu.h>
+#include <utils/string/string.h>
 
 #include "logger/logger.h"
 #include "conexion/kernel.h"
 #include "conexion/memoria.h"
 #include "instrucciones/instrucciones.h"
-#include "utils/mem_request/cpu.h"
 #include "interrupcion/interrupcion.h"
 
 typedef struct

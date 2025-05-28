@@ -11,16 +11,10 @@
 
 typedef struct
 {
+    char *cod_instruccion;
     void *funcion_instruccion;
     char **parametros;
 } instruccion_ejecutable;
-
-void inicializar_instrucciones(void);
-void noop(char **parametros);
-void _write(char **parametros);
-void _read(char **parametros);
-void go_to(char **parametros);
-void syscall(char **parametros);
 
 // Las instrucciones deben respetar la firma
 // void instruccion(char **parametros);
@@ -38,7 +32,7 @@ void syscall(char **parametros);
  *       Ejemplo: [ "AX", "10", NULL ].
  */
 void (*get_instruccion(char *instruccion))(char **);
-instruccion_ejecutable crear_instruccion_ejecutable(char **);
-void destruir_instruccion_ejecutable(char **);
+
+void destruir_instruccion_ejecutable(instruccion_ejecutable instruccion);
 
 #endif // CPU_INSTRUCCIONES_H
