@@ -13,12 +13,13 @@ void inicializar_planificador(char *archivo_pseudocodigo, u_int32_t tamanio_proc
 
     q_estado *q_new = crear_estado(NEW);
     q_estado *q_ready = crear_estado(READY);
+    q_estado *q_executing = crear_estado(EXEC);
     q_estado *q_exit = crear_estado(EXIT);
     q_estado *q_susp_ready = crear_estado(SUSPENDED_READY);
 
     inicializar_planificador_largo_plazo(q_new, q_ready, q_exit);
     inicializar_planificador_mediano_plazo(q_susp_ready, q_ready, q_exit);
-    inicializar_planificador_corto_plazo(q_ready);
+    inicializar_planificador_corto_plazo(q_ready, q_executing);
 
     sem_wait(fin_planificador);
 }

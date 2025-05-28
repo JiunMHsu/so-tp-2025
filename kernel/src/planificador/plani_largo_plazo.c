@@ -45,17 +45,17 @@ void insertar_proceso_nuevo(char *pseudocodigo, u_int32_t tamanio_proceso)
     {
     case FIFO:
         push_proceso(q_new, pcb);
-        log_creacion_proceso(pcb->pid);
         break;
     case PMCP:
         // TODO: Definir el criterio de ordenamiento
         ordered_insert_proceso(q_new, pcb, &_es_de_menor_tamanio_que);
-        log_creacion_proceso(pcb->pid);
         break;
     default: // caso SJF, SRT, no debería ocurrir nunca
         log_mensaje_error("Algoritmo de ingreso a NEW no soportado.");
-        break;
+        return;
     }
+
+    log_creacion_proceso(pcb->pid);
 }
 
 static int32_t _es_de_menor_tamanio_que(t_pcb *proceso_a, t_pcb *proceso_b)
@@ -81,6 +81,9 @@ static void *admitir_proceso(void *_)
 
     return NULL;
 }
+
+// TODO: Implementar inserción en EXIT
+void insertar_en_exit(t_pcb *proceso) {}
 
 static void *finalizar_proceso(void *_)
 {

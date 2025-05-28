@@ -48,7 +48,7 @@ int32_t bloquear_para_io(char *nombre_io, t_pcb *proceso, u_int32_t tiempo)
     return 0;
 }
 
-t_fin_de_io *get_finalizado(void)
+t_fin_de_io *get_finalizado()
 {
     sem_wait(hay_finalizado);
     return (t_fin_de_io *)mqueue_pop(finalizados);

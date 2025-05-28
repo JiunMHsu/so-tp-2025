@@ -27,7 +27,7 @@ static void desconectar_memoria(int32_t fd_memoria)
     }
 }
 
-// TODO: implementar
+// TODO: implementar solicitar_creacion_proceso
 int32_t solicitar_creacion_proceso(u_int32_t pid, u_int32_t tamanio, char *ruta_codigo)
 {
     // crear una mem_request (definida en utils)
@@ -45,11 +45,29 @@ int32_t solicitar_creacion_proceso(u_int32_t pid, u_int32_t tamanio, char *ruta_
     return -1;
 }
 
-// TODO: implementar
+// TODO: implementar solicitar_finalizacion_proceso
 int32_t solicitar_finalizacion_proceso(u_int32_t pid)
 {
     // crear una mem_request (definida en utils)
     // operación: FINALIZAR_PROCESO
+    // { operacion, pid } (definida en utils)
+
+    // conectar a memoria
+    int32_t fd_memoria = conectar_memoria();
+    // enviar la mem_request (definida en utils)
+    // destruir la mem_request (definida en utils)
+
+    // recibir mem_response (definida en utils)
+    desconectar_memoria(fd_memoria);
+
+    // retornar la respuesta
+    return -1;
+}
+
+int32_t solicitar_dump_memory(u_int32_t pid)
+{
+    // crear una mem_request (definida en utils)
+    // operación: DUMP_MEMORY
     // { operacion, pid } (definida en utils)
 
     // conectar a memoria

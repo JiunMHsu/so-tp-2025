@@ -3,8 +3,8 @@
 static t_mutex_list *cpus;
 
 static sem_t *hay_cpu_libre;
-static sem_t *hay_finalizado;
-static t_mutex_queue *finalizados;
+static sem_t *hay_desalojado;
+static t_mutex_queue *desalojados;
 
 static void *_ejecutar(void *_cpu);
 
@@ -13,17 +13,15 @@ static t_cpu *buscar_por_id(char *id);
 static t_cpu *buscar_por_pid(u_int32_t pid);
 static t_cpu *buscar_libre(void);
 
-static t_fin_de_ejecucion *crear_fin_de_ejecucion(t_pcb *proceso, t_desalojo *desalojado);
-
 void inicializar_cpu()
 {
     cpus = mlist_create();
-    finalizados = mqueue_create();
+    desalojados = mqueue_create();
 
     hay_cpu_libre = malloc(sizeof(sem_t));
     sem_init(hay_cpu_libre, 0, 0);
-    hay_finalizado = malloc(sizeof(sem_t));
-    sem_init(hay_finalizado, 0, 0);
+    hay_desalojado = malloc(sizeof(sem_t));
+    sem_init(hay_desalojado, 0, 0);
 }
 
 void conectar_cpu(char *id_cpu, int32_t fd_dispatch, int32_t fd_interrupt)
@@ -76,17 +74,14 @@ static void *_ejecutar(void *_cpu)
 
         t_peticion_ejecucion *peticion = crear_peticion_ejecucion(pid, program_counter);
         enviar_peticion_ejecucion(fd_dispatch, peticion);
+        destruir_peticion_ejecucion(peticion);
 
         t_desalojo *desalojado = recibir_desalojo(fd_dispatch);
-        t_fin_de_ejecucion *finalizado = crear_fin_de_ejecucion(cpu->proceso, desalojado);
-        mqueue_push(finalizados, finalizado);
-        sem_post(hay_finalizado);
+        mqueue_push(desalojados, desalojado);
+        sem_post(hay_desalojado);
 
         cpu->proceso = NULL;
         pthread_mutex_unlock(&(cpu->mutex_proceso));
-
-        destruir_peticion_ejecucion(peticion);
-        destruir_desalojo(desalojado);
 
         sem_post(hay_cpu_libre);
     }
@@ -106,10 +101,10 @@ void enviar_interrupcion(u_int32_t pid)
     enviar_senial(1, cpu->fd_interrupt);
 }
 
-t_fin_de_ejecucion *get_fin_de_ejecucion()
+t_desalojo *get_desalojado()
 {
-    sem_wait(hay_finalizado);
-    return (t_fin_de_ejecucion *)mqueue_pop(finalizados);
+    sem_wait(hay_desalojado);
+    return (t_desalojo *)mqueue_pop(desalojados);
 }
 
 static t_cpu *crear_cpu(char *id, int32_t fd_dispatch, int32_t fd_interrupt)
@@ -172,27 +167,4 @@ static t_cpu *buscar_libre(void)
     };
 
     return (t_cpu *)mlist_find(cpus, &_esta_libre);
-}
-
-static t_fin_de_ejecucion *crear_fin_de_ejecucion(t_pcb *proceso, t_desalojo *desalojado)
-{
-    t_fin_de_ejecucion *fin_de_ejecucion = malloc(sizeof(t_fin_de_ejecucion));
-
-    fin_de_ejecucion->proceso = proceso;
-    fin_de_ejecucion->proceso->program_counter = desalojado->program_counter;
-
-    fin_de_ejecucion->motivo = desalojado->motivo;
-    fin_de_ejecucion->syscall = strdup(desalojado->syscall);
-
-    return fin_de_ejecucion;
-}
-
-void destruir_fin_de_ejecucion(t_fin_de_ejecucion *fin_de_ejecucion)
-{
-    if (fin_de_ejecucion == NULL)
-        return;
-
-    free(fin_de_ejecucion->syscall);
-    free(fin_de_ejecucion);
-    fin_de_ejecucion = NULL;
 }

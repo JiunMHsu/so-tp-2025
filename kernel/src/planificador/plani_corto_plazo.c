@@ -1,6 +1,7 @@
 #include "plani_corto_plazo.h"
 
 static q_estado *q_ready;
+static q_estado *q_executing;
 
 static sem_t *hay_proceso_ready;
 
@@ -16,9 +17,10 @@ static void *planificar_por_srt(void *_);
 
 static void *manejar_desalojado(void *_);
 
-void inicializar_planificador_corto_plazo(q_estado *q_ready)
+void inicializar_planificador_corto_plazo(q_estado *q_ready, q_estado *q_executing)
 {
     q_ready = q_ready;
+    q_executing = q_executing;
 
     hay_proceso_ready = malloc(sizeof(sem_t));
     sem_init(hay_proceso_ready, 0, 0);
@@ -53,7 +55,8 @@ void inicializar_planificador_corto_plazo(q_estado *q_ready)
     pthread_detach(rutinas[1]);
 }
 
-void insertar_a_ready(t_pcb *proceso) {}
+// TODO: Implementar inserción en READY
+void insertar_en_ready(t_pcb *proceso) {}
 
 static double estimar_rafaga(double anterior_estimado, double real_anterior)
 {
@@ -72,8 +75,7 @@ static void *planificar_por_fifo(void *_)
     {
         t_pcb *proceso = pop_proceso(q_ready);
         ejecutar(proceso); // bloquante si no hay CPU libre
-
-        // TODO: cambio de estado, actualización de métricas
+        push_proceso(q_executing, proceso);
     }
 
     return NULL;
@@ -85,8 +87,7 @@ static void *planificar_por_sjf(void *_)
     {
         t_pcb *proceso = pop_proceso_minimo(q_ready, &_es_de_menor_rafaga);
         ejecutar(proceso); // bloquante si no hay CPU libre
-
-        // TODO: cambio de estado, actualización de métricas
+        push_proceso(q_executing, proceso);
     }
 
     return NULL;
@@ -100,8 +101,7 @@ static void *planificar_por_srt(void *_)
     {
         t_pcb *proceso = pop_proceso_minimo(q_ready, &_es_de_menor_rafaga);
         ejecutar(proceso); // bloquante si no hay CPU libre
-
-        // TODO: cambio de estado, actualización de métricas
+        push_proceso(q_executing, proceso);
     }
 
     return NULL;
@@ -111,23 +111,26 @@ static void *manejar_desalojado(void *_)
 {
     while (1)
     {
-        t_fin_de_ejecucion *finalizado = get_fin_de_ejecucion(); // bloquante si no hay finalizados
-        t_pcb *proceso = finalizado->proceso;
+        t_desalojo *desalojado = get_desalojado(); // bloquante si no hay finalizados
 
-        switch (finalizado->motivo)
+        t_pcb *proceso = remove_proceso(q_executing, desalojado->pid);
+        proceso->program_counter = desalojado->program_counter;
+        // TODO: Actualizar métricas de tiempo
+
+        switch (desalojado->motivo)
         {
         case SCHEDULER_INT:
-            // TODO: Reinsertar en READY
+            insertar_en_ready(proceso);
             break;
         case SYSCALL:
-            // TODO: Llamar a handler de syscall
+            manejar_syscall(proceso, desalojado->syscall);
             break;
         default: // No debería ocurrir nunca
             log_mensaje_error("Motivo de desalojo no soportado.");
             break;
         }
 
-        destruir_fin_de_ejecucion(finalizado);
+        destruir_desalojo(desalojado);
     }
 
     return NULL;
