@@ -31,6 +31,13 @@ typedef struct
     sem_t *hay_proceso;
 } t_cpu;
 
+typedef struct
+{
+    t_pcb *proceso;
+    motivo_desalojo motivo;
+    char *syscall;
+} t_fin_de_ejecucion;
+
 /**
  * @brief Inicializa la colección global para manejar las CPUs.
  *
@@ -45,13 +52,9 @@ void conectar_cpu(char *id_cpu, int32_t fd_dispatch, int32_t fd_interrupt);
  * @param pid
  * @param program_counter
  *
- * @return -1 si no se pudo ejecutar el proceso. 0 en caso de éxito.
- *
- * @note No es y no debería ser bloqueante.
- * @note Asume que hay al menos una CPU disponible.
- *
+ * @note Es bloqueante si no hay CPUs libres.
  */
-int8_t ejecutar(t_pcb *proceso);
+void ejecutar(t_pcb *proceso);
 
 /**
  * @brief Envía una interrupción a la CPU que se encuentra
@@ -65,11 +68,18 @@ void enviar_interrupcion(u_int32_t pid);
  * @brief Escucha constantemente si hay procesos desalojados de la CPU.
  * Sea por un syscall o por una interrupción.
  *
- * @return t_desalojo*
+ * @return t_fin_de_ejecucion*
  *
  * @note Es bloqueante.
- * @note Se debe liberar la estructura retornada con `destruir_desalojo`.
+ * @note Se debe liberar la estructura retornada con `destruir_fin_de_ejecucion`.
  */
-t_desalojo *get_desalojo(void);
+t_fin_de_ejecucion *get_fin_de_ejecucion(void);
+
+/**
+ * @brief Destruye una estructura de fin de ejecución.
+ *
+ * @param fin_de_ejecucion
+ */
+void destruir_fin_de_ejecucion(t_fin_de_ejecucion *fin_de_ejecucion);
 
 #endif // RECURSOS_CPU_H
