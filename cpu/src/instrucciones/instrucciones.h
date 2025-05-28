@@ -16,6 +16,8 @@ typedef struct
     char **parametros;
 } instruccion_ejecutable;
 
+void inicializar_instrucciones(void);
+
 // Las instrucciones deben respetar la firma
 // void instruccion(char **parametros);
 

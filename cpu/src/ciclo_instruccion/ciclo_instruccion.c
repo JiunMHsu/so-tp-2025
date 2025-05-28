@@ -62,7 +62,6 @@ static instruccion_ejecutable decode(char *instruccion_recibida)
     instruccion.parametros = remove_first_element(vec_instruccion);
 
     // TODO: traduccion de direcciones de memoria para WRITE y READ -> puede ser que instruccion a ejecutar tenga otro campo "direccion fisica"
-    // podria haber un modulo MMU que tiene las funciones de traduccion -> lo llamo aca adentro de un if que evalua si hay READ o WRITE
 
     string_array_destroy(vec_instruccion);
     return instruccion;
@@ -71,7 +70,6 @@ static instruccion_ejecutable decode(char *instruccion_recibida)
 static void execute(instruccion_ejecutable instruccion)
 {
     global_program_counter++;
-
     instruccion.funcion_instruccion(instruccion.parametros);
 }
 

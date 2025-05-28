@@ -1,8 +1,11 @@
 #include <stdlib.h>
 
+#include "config/config.h"
+#include "logger/logger.h"
 #include "conexion/kernel.h"
 #include "conexion/memoria.h"
 #include "interrupcion/interrupcion.h"
+#include "instrucciones/instrucciones.h"
 #include "ciclo_instruccion/ciclo_instruccion.h"
 
 int main(int argc, char *argv[])

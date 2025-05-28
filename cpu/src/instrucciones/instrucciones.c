@@ -2,7 +2,6 @@
 
 t_dictionary *instrucciones;
 
-static void inicializar_instrucciones(void);
 static void noop(char **parametros);
 static void _write(char **parametros);
 static void _read(char **parametros);
@@ -38,14 +37,12 @@ static void _read(char **parametros)
 
 static void go_to(char **parametros)
 {
-    // u_int32_t posicion_salto = pasar valor de parametros[0] a int
-    // set_program_counter(posicion_salto);
+    set_program_counter(atoi(parametros[0]));
 }
 
 static void syscall(char **parametros)
 {
-    // set syscall en el desalojo
-    set_desalojo();
+    set_syscall();
 }
 
 void destruir_instruccion_ejecutable(instruccion_ejecutable instruccion)

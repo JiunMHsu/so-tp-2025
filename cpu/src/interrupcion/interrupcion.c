@@ -2,6 +2,7 @@
 
 int8_t llego_interrupcion;
 
+
 // otras globales de interrupcion
 
 void *atender_kernel_interrupt(void *_);
