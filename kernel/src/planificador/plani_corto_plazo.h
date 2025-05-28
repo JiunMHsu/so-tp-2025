@@ -13,5 +13,6 @@
 #include "recursos/cpu.h"
 
 void inicializar_planificador_corto_plazo(q_estado *q_ready);
+void insertar_a_ready(t_pcb *proceso);
 
 #endif // PLANIFICADOR_CORTO_PLAZO_H

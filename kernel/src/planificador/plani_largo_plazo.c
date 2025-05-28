@@ -11,8 +11,7 @@ static algoritmo_planificacion algoritmo;
 static sem_t *puede_crearse_proceso;
 
 static void *admitir_proceso(void *_);
-static void crear_proceso(t_pcb *pcb);
-static int es_de_mayor_tamanio(t_pcb *proceso_a, t_pcb *proceso_b);
+static int _es_de_menor_tamanio_que(t_pcb *proceso_a, t_pcb *proceso_b);
 static void *finalizar_proceso(void *_);
 
 void inicializar_planificador_largo_plazo(q_estado *q_new,
@@ -50,7 +49,7 @@ void insertar_proceso_nuevo(char *pseudocodigo, u_int32_t tamanio_proceso)
         break;
     case PMCP:
         // TODO: Definir el criterio de ordenamiento
-        ordered_insert_proceso(q_new, pcb, &es_de_mayor_tamanio);
+        ordered_insert_proceso(q_new, pcb, &_es_de_menor_tamanio_que);
         log_creacion_proceso(pcb->pid);
         break;
     default: // caso SJF, SRT, no debería ocurrir nunca
@@ -59,10 +58,9 @@ void insertar_proceso_nuevo(char *pseudocodigo, u_int32_t tamanio_proceso)
     }
 }
 
-// TODO: Definir el criterio de ordenamiento
-static int es_de_mayor_tamanio(t_pcb *proceso_a, t_pcb *proceso_b)
+static int32_t _es_de_menor_tamanio_que(t_pcb *proceso_a, t_pcb *proceso_b)
 {
-    return proceso_a->tamanio > proceso_b->tamanio;
+    return proceso_a->tamanio <= proceso_b->tamanio;
 }
 
 static void *admitir_proceso(void *_)
@@ -77,7 +75,7 @@ static void *admitir_proceso(void *_)
             continue;
 
         push_proceso(q_ready, pcb);
-        remove_proceso(q_new, pcb->pid); // porque peek no lo elimina
+        remove_proceso(q_new, pcb->pid); // porque peek no remueve de la lista
         sem_post(puede_crearse_proceso);
     }
 

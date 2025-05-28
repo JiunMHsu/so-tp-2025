@@ -2,6 +2,8 @@
 
 static q_estado *q_ready;
 
+static sem_t *hay_proceso_ready;
+
 static double alpha;
 static double estimacion_inicial;
 
@@ -17,6 +19,9 @@ static void *manejar_desalojado(void *_);
 void inicializar_planificador_corto_plazo(q_estado *q_ready)
 {
     q_ready = q_ready;
+
+    hay_proceso_ready = malloc(sizeof(sem_t));
+    sem_init(hay_proceso_ready, 0, 0);
 
     alpha = get_alfa_estimacion();
     estimacion_inicial = get_estimacion_inicial();
@@ -38,7 +43,17 @@ void inicializar_planificador_corto_plazo(q_estado *q_ready)
         log_mensaje_error("Algoritmo de planificación de corto plazo no soportado.");
         return;
     }
+
+    pthread_t rutinas[2];
+
+    pthread_create(&rutinas[0], NULL, planificador_corto_plazo, NULL);
+    pthread_detach(rutinas[0]);
+
+    pthread_create(&rutinas[1], NULL, &manejar_desalojado, NULL);
+    pthread_detach(rutinas[1]);
 }
+
+void insertar_a_ready(t_pcb *proceso) {}
 
 static double estimar_rafaga(double anterior_estimado, double real_anterior)
 {
@@ -57,6 +72,8 @@ static void *planificar_por_fifo(void *_)
     {
         t_pcb *proceso = pop_proceso(q_ready);
         ejecutar(proceso); // bloquante si no hay CPU libre
+
+        // TODO: cambio de estado, actualización de métricas
     }
 
     return NULL;
@@ -68,6 +85,8 @@ static void *planificar_por_sjf(void *_)
     {
         t_pcb *proceso = pop_proceso_minimo(q_ready, &_es_de_menor_rafaga);
         ejecutar(proceso); // bloquante si no hay CPU libre
+
+        // TODO: cambio de estado, actualización de métricas
     }
 
     return NULL;
@@ -81,6 +100,8 @@ static void *planificar_por_srt(void *_)
     {
         t_pcb *proceso = pop_proceso_minimo(q_ready, &_es_de_menor_rafaga);
         ejecutar(proceso); // bloquante si no hay CPU libre
+
+        // TODO: cambio de estado, actualización de métricas
     }
 
     return NULL;
