@@ -26,6 +26,15 @@ int32_t solicitar_creacion_proceso(u_int32_t pid, u_int32_t tamanio, char *ruta_
  * @return int32_t 1 si la solicitud fue exitosa, 0 en caso contrario. -1 si hubo un error de conexión.
  */
 int32_t solicitar_finalizacion_proceso(u_int32_t pid);
+
+/**
+ * @brief Solicita un volcado de memoria de un proceso.
+ *
+ * @param pid Identificador del proceso cuyo volcado se solicita.
+ * @return int32_t 1 si la solicitud fue exitosa, 0 en caso contrario. -1 si hubo un error de conexión.
+ */
+int32_t solicitar_dump_memory(u_int32_t pid);
+
 // probablemente solicitudes de swapping
 
 #endif // RECURSOS_MEMORIA_H

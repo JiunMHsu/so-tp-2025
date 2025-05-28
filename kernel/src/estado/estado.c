@@ -26,7 +26,7 @@ void push_proceso(q_estado *estado, t_pcb *pcb)
 // TODO: Revisar tipado de ordered_insert_proceso
 void ordered_insert_proceso(q_estado *estado, t_pcb *pcb, int32_t (*comparador)(t_pcb *, t_pcb *))
 {
-    mlist_add_sorted(estado->lista, pcb, comparador);
+    mlist_add_sorted(estado->lista, pcb, (int32_t (*)(void *, void *))comparador);
 
     t_state anterior = pcb->estado;
     set_estado_pcb(pcb, estado->cod_estado);
