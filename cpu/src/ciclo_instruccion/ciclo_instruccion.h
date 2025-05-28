@@ -20,7 +20,8 @@ typedef struct
 } fin_ejecucion;
 
 fin_ejecucion ejecutar_ciclo_instruccion(u_int32_t pid, u_int32_t pc);
-static void set_desalojo(void);
-static void set_program_counter(u_int32_t);
+
+void set_syscall(void);
+void set_program_counter(u_int32_t valor);
 
 #endif // CPU_CICLO_INSTRUCCION_H

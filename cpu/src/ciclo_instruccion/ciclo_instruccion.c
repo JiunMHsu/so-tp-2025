@@ -1,18 +1,19 @@
 #include "ciclo_instruccion.h"
 
+int8_t hay_syscall;
+u_int32_t global_program_counter;
+
 static char *fetch(u_int32_t pid, u_int32_t program_counter);
 static instruccion_ejecutable decode(char *instruccion_recibida);
-static void execute(instruccion_ejecutable instruccion, u_int32_t *program_counter);
-static int8_t check_desalojo(char *nombre_instruccion);
-static int8_t check_interrupt();
+static void execute(instruccion_ejecutable instruccion);
 
-int8_t hay_desalojo;
-u_int32_t global_program_counter;
+static fin_ejecucion crear_fin_ejecucion(motivo_desalojo motivo, u_int32_t program_counter, char *syscall);
 
 fin_ejecucion ejecutar_ciclo_instruccion(u_int32_t pid, u_int32_t program_counter)
 {
-    hay_desalojo = 0;
+    hay_syscall = 0;
     global_program_counter = program_counter;
+    fin_ejecucion fin_de_ejecucion;
 
     while (1)
     {
@@ -22,27 +23,22 @@ fin_ejecucion ejecutar_ciclo_instruccion(u_int32_t pid, u_int32_t program_counte
         execute(instruccion);
         log_instruccion_ejecutada(pid, instruccion.nombre_instruccion, instruccion.parametros);
 
-        if (check_desalojo(instruccion))
+        if (hay_syscall)
         {
-            resetear_desalojo();
-            destruir_instruccion_ejecutable(instruccion);
-
-            return (fin_ejecucion){SYSCALL, global_program_counter, instruccion_str};
-        }
-
-        if (check_interrupt())
-        {
-            resetear_interrupcion();
-            destruir_instruccion_ejecutable(instruccion);
-
+            fin_de_ejecucion = crear_fin_ejecucion(SYSCALL, global_program_counter, instruccion_str);
             break;
         }
 
-        // TODO: implementar funcion destruir_instruccion_ejecutable
-        destruir_instruccion_ejecutable(instruccion);
+        if (hay_interrupcion())
+        {
+            fin_de_ejecucion = crear_fin_ejecucion(SCHEDULER_INT, global_program_counter, NULL);
+            break;
+        }
     }
 
-    return (fin_ejecucion){SCHEDULER_INT, global_program_counter, NULL};
+    destruir_instruccion_ejecutable(instruccion);
+    free(instruccion_str);
+    return fin_de_ejecucion;
 }
 
 static char *fetch(u_int32_t pid, u_int32_t program_counter)
@@ -79,27 +75,22 @@ static void execute(instruccion_ejecutable instruccion)
     instruccion.funcion_instruccion(instruccion.parametros);
 }
 
-static int8_t check_desalojo(char *nombre_instruccion)
+void set_syscall()
 {
-    return hay_desalojo;
+    hay_syscall = 1;
 }
 
-static int8_t check_interrupt()
-{
-    return hay_interrupcion();
-}
-
-static void set_desalojo()
-{
-    hay_desalojo = 1;
-}
-
-static void resetear_desalojo()
-{
-    hay_desalojo = 0;
-}
-
-static void set_program_counter(u_int32_t valor)
+void set_program_counter(u_int32_t valor)
 {
     global_program_counter = valor;
+}
+
+static fin_ejecucion crear_fin_ejecucion(motivo_desalojo motivo, u_int32_t program_counter, char *syscall)
+{
+    fin_ejecucion resultado;
+    resultado.motivo = motivo;
+    resultado.program_counter = program_counter;
+    resultado.syscall = syscall ? strdup(syscall) : NULL;
+
+    return resultado;
 }
