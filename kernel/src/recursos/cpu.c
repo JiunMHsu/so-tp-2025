@@ -77,7 +77,6 @@ static void *_ejecutar(void *_cpu)
         destruir_peticion_ejecucion(peticion);
 
         t_desalojo *desalojado = recibir_desalojo(fd_dispatch);
-        // t_fin_de_ejecucion *finalizado = crear_fin_de_ejecucion(cpu->proceso, desalojado);
         mqueue_push(desalojados, desalojado);
         sem_post(hay_desalojado);
 
