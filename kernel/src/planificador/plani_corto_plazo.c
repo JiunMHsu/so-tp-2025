@@ -6,6 +6,7 @@ static double alpha;
 static double estimacion_inicial;
 
 static double estimar_rafaga(double anterior_estimado, double real_anterior);
+static t_pcb *_es_de_menor_rafaga(t_pcb *a, t_pcb *b);
 
 static void *planificar_por_fifo(void *_);
 static void *planificar_por_sjf(void *_);
@@ -44,6 +45,12 @@ static double estimar_rafaga(double anterior_estimado, double real_anterior)
     return alpha * real_anterior + (1 - alpha) * anterior_estimado;
 }
 
+// TODO: Implementar criterio de menor ráfaga
+static t_pcb *_es_de_menor_rafaga(t_pcb *a, t_pcb *b)
+{
+    return NULL;
+}
+
 static void *planificar_por_fifo(void *_)
 {
     while (1)
@@ -55,9 +62,29 @@ static void *planificar_por_fifo(void *_)
     return NULL;
 }
 
-static void *planificar_por_sjf(void *_) {}
+static void *planificar_por_sjf(void *_)
+{
+    while (1)
+    {
+        t_pcb *proceso = pop_proceso_minimo(q_ready, &_es_de_menor_rafaga);
+        ejecutar(proceso); // bloquante si no hay CPU libre
+    }
 
-static void *planificar_por_srt(void *_) {}
+    return NULL;
+}
+
+static void *planificar_por_srt(void *_)
+{
+    // Iniciar rutina de envío de interrupción
+
+    while (1)
+    {
+        t_pcb *proceso = pop_proceso_minimo(q_ready, &_es_de_menor_rafaga);
+        ejecutar(proceso); // bloquante si no hay CPU libre
+    }
+
+    return NULL;
+}
 
 static void *manejar_desalojado(void *_)
 {

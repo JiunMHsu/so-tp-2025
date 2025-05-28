@@ -5,7 +5,7 @@
 #include <commons/string.h>
 #include <commons/collections/list.h>
 #include <commons/log.h>
-// #include <pcb/pcb.h>
+#include <pcb/pcb.h>
 
 #define LOG_FILE "kernel.log"
 
@@ -17,9 +17,10 @@ void log_mensaje_error(char *error);
 
 void log_syscall_recibida(u_int32_t pid, char *syscall);
 void log_creacion_proceso(u_int32_t pid);
+void log_cambio_de_estado(u_int32_t pid, t_state anterior, t_state actual);
 void log_motivo_bloqueo(u_int32_t pid, char *dispositivo_io);
 void log_fin_de_io(u_int32_t pid);
-void log_desalojo_sjf(u_int32_t pid);
+void log_desalojo_srt(u_int32_t pid);
 void log_finalizacion_proceso(u_int32_t pid);
 
 // definición temporal, no se qué estructura tendrían las métricas

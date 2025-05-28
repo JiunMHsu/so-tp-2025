@@ -46,10 +46,12 @@ void insertar_proceso_nuevo(char *pseudocodigo, u_int32_t tamanio_proceso)
     {
     case FIFO:
         push_proceso(q_new, pcb);
+        log_creacion_proceso(pcb->pid);
         break;
     case PMCP:
         // TODO: Definir el criterio de ordenamiento
         ordered_insert_proceso(q_new, pcb, &es_de_mayor_tamanio);
+        log_creacion_proceso(pcb->pid);
         break;
     default: // caso SJF, SRT, no debería ocurrir nunca
         log_mensaje_error("Algoritmo de ingreso a NEW no soportado.");

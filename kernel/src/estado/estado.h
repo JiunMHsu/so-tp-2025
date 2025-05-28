@@ -7,12 +7,14 @@
 #include <utils/mqueue/mqueue.h>
 #include <utils/mlist/mlist.h>
 
+#include "logger/logger.h"
 #include "pcb/pcb.h"
 
 typedef struct
 {
     t_mutex_list *lista;
     sem_t *hay_proceso;
+    t_state cod_estado;
 } q_estado;
 
 /**
@@ -20,7 +22,7 @@ typedef struct
  *
  * @return `q_estado*`
  */
-q_estado *crear_estado();
+q_estado *crear_estado(t_state cod_estado);
 
 /**
  * @brief Encola un proceso en el estado dado.
@@ -36,7 +38,7 @@ void push_proceso(q_estado *estado, t_pcb *pcb);
  * @param estado
  * @param pcb
  */
-void ordered_insert_proceso(q_estado *estado, t_pcb *pcb, int (*comparador)(t_pcb *, t_pcb *));
+void ordered_insert_proceso(q_estado *estado, t_pcb *pcb, int32_t (*comparador)(t_pcb *, t_pcb *));
 
 /**
  * @brief Desencola un proceso del estado dado.
@@ -49,13 +51,13 @@ void ordered_insert_proceso(q_estado *estado, t_pcb *pcb, int (*comparador)(t_pc
 t_pcb *pop_proceso(q_estado *estado);
 
 /**
- * @brief Desencola un proceso del estado dado según un criterio.
+ * @brief Desencola un proceso del estado dado, según un criterio de mínimo.
  *
  * @param estado
- * @param criterio
+ * @param minimo
  * @return t_pcb*
  */
-t_pcb *pop_proceso_por_criterio(q_estado *estado, int (*criterio)(t_pcb *, t_pcb *));
+t_pcb *pop_proceso_minimo(q_estado *estado, t_pcb *(*minimo)(t_pcb *, t_pcb *));
 
 /**
  * @brief Devuelve el primer proceso encolado en el estado dado.
