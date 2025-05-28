@@ -13,7 +13,7 @@ static sem_t *puede_crearse_proceso;
 static void *admitir_proceso(void *_);
 static void crear_proceso(t_pcb *pcb);
 static int es_de_mayor_tamanio(t_pcb *proceso_a, t_pcb *proceso_b);
-static void *destruir_proceso(void *_);
+static void *finalizar_proceso(void *_);
 
 void inicializar_planificador_largo_plazo(q_estado *q_new,
                                           q_estado *q_ready,
@@ -34,7 +34,7 @@ void inicializar_planificador_largo_plazo(q_estado *q_new,
     pthread_create(&rutinas[0], NULL, &admitir_proceso, NULL);
     pthread_detach(rutinas[0]);
 
-    pthread_create(&rutinas[1], NULL, &destruir_proceso, NULL);
+    pthread_create(&rutinas[1], NULL, &finalizar_proceso, NULL);
     pthread_detach(rutinas[1]);
 }
 
@@ -82,7 +82,7 @@ static void *admitir_proceso(void *_)
     return NULL;
 }
 
-static void *destruir_proceso()
+static void *finalizar_proceso(void *_)
 {
     while (1)
     {

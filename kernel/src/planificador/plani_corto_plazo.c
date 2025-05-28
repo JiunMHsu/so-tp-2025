@@ -1,7 +1,6 @@
 #include "plani_corto_plazo.h"
 
 static q_estado *q_ready;
-static q_estado *q_exit;
 
 static double alpha;
 static double estimacion_inicial;
@@ -14,10 +13,9 @@ static void *planificar_por_srt(void *_);
 
 static void *manejar_desalojado(void *_);
 
-void inicializar_planificador_corto_plazo(q_estado *q_ready, q_estado *q_exit)
+void inicializar_planificador_corto_plazo(q_estado *q_ready)
 {
     q_ready = q_ready;
-    q_exit = q_exit;
 
     alpha = get_alfa_estimacion();
     estimacion_inicial = get_estimacion_inicial();
@@ -51,19 +49,7 @@ static void *planificar_por_fifo(void *_)
     while (1)
     {
         t_pcb *proceso = pop_proceso(q_ready);
-        
-
-        // push_proceso(cola_exec, proceso);
-
-        // proceso = peek_proceso(cola_exec);
-        // enviar_pcb_cpu(proceso);
-        // t_pcb *pos_exec = recibir_pcb_cpu();
-
-        // actualizar_pcb(proceso, pos_exec);
-        // destruir_pcb(pos_exec);
-
-        // proceso = remove_proceso(cola_exec, proceso->pid);
-        // pasar_a_siguiente(proceso);
+        ejecutar(proceso); // bloquante si no hay CPU libre
     }
 
     return NULL;
@@ -73,4 +59,28 @@ static void *planificar_por_sjf(void *_) {}
 
 static void *planificar_por_srt(void *_) {}
 
-static void *manejar_desalojado(void *_) {}
+static void *manejar_desalojado(void *_)
+{
+    while (1)
+    {
+        t_fin_de_ejecucion *finalizado = get_fin_de_ejecucion(); // bloquante si no hay finalizados
+        t_pcb *proceso = finalizado->proceso;
+
+        switch (finalizado->motivo)
+        {
+        case SCHEDULER_INT:
+            // TODO: Reinsertar en READY
+            break;
+        case SYSCALL:
+            // TODO: Llamar a handler de syscall
+            break;
+        default: // No debería ocurrir nunca
+            log_mensaje_error("Motivo de desalojo no soportado.");
+            break;
+        }
+
+        destruir_fin_de_ejecucion(finalizado);
+    }
+
+    return NULL;
+}

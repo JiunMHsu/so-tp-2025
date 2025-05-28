@@ -70,7 +70,7 @@ void enviar_interrupcion(u_int32_t pid);
  *
  * @return t_fin_de_ejecucion*
  *
- * @note Es bloqueante.
+ * @note Es bloqueante. El puntero retornado nunca será NULL.
  * @note Se debe liberar la estructura retornada con `destruir_fin_de_ejecucion`.
  */
 t_fin_de_ejecucion *get_fin_de_ejecucion(void);

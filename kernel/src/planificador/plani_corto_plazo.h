@@ -12,6 +12,6 @@
 #include "pcb/pcb.h"
 #include "recursos/cpu.h"
 
-void inicializar_planificador_corto_plazo(q_estado *q_ready, q_estado *q_exit);
+void inicializar_planificador_corto_plazo(q_estado *q_ready);
 
 #endif // PLANIFICADOR_CORTO_PLAZO_H

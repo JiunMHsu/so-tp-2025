@@ -1,10 +1,10 @@
 #include "cpu.h"
 
-t_mutex_list *cpus;
+static t_mutex_list *cpus;
 
-sem_t *hay_cpu_libre;
-sem_t *hay_finalizado;
-t_mutex_queue *finalizados;
+static sem_t *hay_cpu_libre;
+static sem_t *hay_finalizado;
+static t_mutex_queue *finalizados;
 
 static void *_ejecutar(void *_cpu);
 
@@ -78,9 +78,7 @@ static void *_ejecutar(void *_cpu)
         enviar_peticion_ejecucion(fd_dispatch, peticion);
 
         t_desalojo *desalojado = recibir_desalojo(fd_dispatch);
-        t_fin_de_ejecucion *finalizado = crear_fin_de_ejecucion(cpu->proceso,
-                                                                desalojado->motivo,
-                                                                desalojado->syscall);
+        t_fin_de_ejecucion *finalizado = crear_fin_de_ejecucion(cpu->proceso, desalojado);
         mqueue_push(finalizados, finalizado);
         sem_post(hay_finalizado);
 
