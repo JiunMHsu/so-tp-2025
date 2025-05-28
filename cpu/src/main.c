@@ -41,9 +41,11 @@ int main(int argc, char *argv[])
 
     while (1)
     {
-        t_peticion_ejecucion *peticion = recibir_peticion_ejecucion(kernel_sockets.fd_dispatch);
-        if (peticion == NULL)
+        t_peticion_ejecucion *peticion_exec = recibir_peticion_ejecucion(kernel_sockets.fd_dispatch);
+        if (peticion_exec == NULL)
         {
+            destruir_peticion_ejecucion(peticion_exec);
+
             log_mensaje_error("Error al recibir la peticion de ejecucion.");
             cerrar_conexion(kernel_sockets.fd_dispatch);
             cerrar_conexion(kernel_sockets.fd_interrupt);
@@ -51,16 +53,17 @@ int main(int argc, char *argv[])
             return EXIT_FAILURE;
         }
 
-        fin_ejecucion fin_ejecucion = ejecutar_ciclo_instruccion(peticion->pid,
-                                                                 peticion->program_counter);
+        resetear_interrupcion();
+        fin_ejecucion fin_ejecucion = ejecutar_ciclo_instruccion(peticion_exec->pid,
+                                                                 peticion_exec->program_counter);
 
-        t_desalojo *desalojo = crear_desalojo(peticion->pid,
+        t_desalojo *desalojo = crear_desalojo(peticion_exec->pid,
                                               fin_ejecucion.program_counter,
                                               fin_ejecucion.motivo,
                                               fin_ejecucion.syscall);
         enviar_desalojo(kernel_sockets.fd_dispatch, desalojo);
 
-        destruir_peticion_cpu(peticion);
+        destruir_peticion_ejecucion(peticion_exec);
         destruir_desalojo(desalojo);
 
         if (fin_ejecucion.syscall != NULL)

@@ -1,31 +1,25 @@
 #include "interrupcion.h"
 
-int8_t llego_interrupcion;
+static int32_t fd_interrupt;
 
-
-// otras globales de interrupcion
+static int8_t interrupcion;
+static pthread_mutex_t mutex_interrupcion;
 
 void *atender_kernel_interrupt(void *_);
 
-void inicializar_interrupcion(int32_t fd_interrupt)
+void inicializar_interrupcion(int32_t _fd_interrupt)
 {
-    llego_interrupcion = 0;
+    fd_interrupt = _fd_interrupt;
+    interrupcion = 0;
+    pthread_mutex_init(&mutex_interrupcion, NULL);
 
     pthread_t hilo_interrupt;
-
-    pthread_create(&hilo_interrupt, NULL, &atender_kernel_interrupt, fd_interrupt);
+    pthread_create(&hilo_interrupt, NULL, &atender_kernel_interrupt, NULL);
     pthread_detach(hilo_interrupt);
 }
 
-void *atender_kernel_interrupt(void *fd_ptr)
+void *atender_kernel_interrupt(void *_)
 {
-    // escuchar de kernel
-    // si le cae un int, setear el global
-
-    // TODO: el acceso a la variable global tiene que ser atomico, tendria que haber un mutex => cuando llamo a hay_interrupcion en otro hilo, podria estar modificando el valor aca
-    int32_t fd_interrupt = *((int32_t *)fd_ptr);
-    free(fd_ptr);
-
     while (1)
     {
         int32_t senial_interrupcion = recibir_senial(fd_interrupt);
@@ -39,8 +33,9 @@ void *atender_kernel_interrupt(void *fd_ptr)
 
         log_interrupcion_recibida();
 
-        // TODO: falta mutex
-        llego_interrupcion = 1;
+        pthread_mutex_lock(&mutex_interrupcion);
+        interrupcion = 1;
+        pthread_mutex_unlock(&mutex_interrupcion);
     }
 
     return NULL;
@@ -48,12 +43,16 @@ void *atender_kernel_interrupt(void *fd_ptr)
 
 int8_t hay_interrupcion()
 {
-    // TODO: falta mutex??
-    return llego_interrupcion;
+    pthread_mutex_lock(&mutex_interrupcion);
+    int8_t resultado = interrupcion;
+    pthread_mutex_unlock(&mutex_interrupcion);
+
+    return resultado;
 }
 
 void resetear_interrupcion()
 {
-    // TODO: falta mutex
-    llego_interrupcion = 0;
+    pthread_mutex_lock(&mutex_interrupcion);
+    interrupcion = 0;
+    pthread_mutex_unlock(&mutex_interrupcion);
 }

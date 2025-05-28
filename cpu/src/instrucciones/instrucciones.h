@@ -12,7 +12,7 @@
 typedef struct
 {
     char *cod_instruccion;
-    void *funcion_instruccion;
+    void (*funcion_instruccion)(char **);
     char **parametros;
 } instruccion_ejecutable;
 

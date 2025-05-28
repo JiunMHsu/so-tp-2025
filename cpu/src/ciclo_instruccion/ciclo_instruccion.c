@@ -1,7 +1,7 @@
 #include "ciclo_instruccion.h"
 
-int8_t hay_syscall;
-u_int32_t global_program_counter;
+static int8_t hay_syscall;
+static u_int32_t global_program_counter;
 
 static char *fetch(u_int32_t pid, u_int32_t program_counter);
 static instruccion_ejecutable decode(char *instruccion_recibida);
@@ -15,13 +15,15 @@ fin_ejecucion ejecutar_ciclo_instruccion(u_int32_t pid, u_int32_t program_counte
     global_program_counter = program_counter;
     fin_ejecucion fin_de_ejecucion;
 
+    char *instruccion_str = NULL;
+    instruccion_ejecutable instruccion;
     while (1)
     {
-        char *instruccion_str = fetch(pid, global_program_counter);
-        instruccion_ejecutable instruccion = decode(instruccion_str);
+        instruccion_str = fetch(pid, global_program_counter);
+        instruccion = decode(instruccion_str);
 
         execute(instruccion);
-        log_instruccion_ejecutada(pid, instruccion.nombre_instruccion, instruccion.parametros);
+        log_instruccion_ejecutada(pid, instruccion.cod_instruccion, array_to_string(instruccion.parametros));
 
         if (hay_syscall)
         {
@@ -34,6 +36,9 @@ fin_ejecucion ejecutar_ciclo_instruccion(u_int32_t pid, u_int32_t program_counte
             fin_de_ejecucion = crear_fin_ejecucion(SCHEDULER_INT, global_program_counter, NULL);
             break;
         }
+
+        destruir_instruccion_ejecutable(instruccion);
+        free(instruccion_str);
     }
 
     destruir_instruccion_ejecutable(instruccion);
@@ -44,12 +49,8 @@ fin_ejecucion ejecutar_ciclo_instruccion(u_int32_t pid, u_int32_t program_counte
 static char *fetch(u_int32_t pid, u_int32_t program_counter)
 {
     log_fetch_instruccion(pid, program_counter);
-
-    t_peticion_cpu peticion_instruccion = crear_peticion_instruccion(pid, program_counter);
-    enviar_peticion_cpu(fd_memoria, peticion_instruccion);
-    destruir_peticion_cpu(peticion_instruccion);
-
-    return recibir_mensaje(fd_memoria);
+    enviar_peticion_instruccion(pid, program_counter);
+    return recibir_mensaje_memoria();
 }
 
 static instruccion_ejecutable decode(char *instruccion_recibida)
@@ -58,7 +59,7 @@ static instruccion_ejecutable decode(char *instruccion_recibida)
     char **vec_instruccion = string_split(instruccion_recibida, " ");
 
     instruccion.cod_instruccion = strdup(vec_instruccion[0]);
-    instruccion.funcion_instruccion = dictionary_get(diccionario_instrucciones, vec_instruccion[0]);
+    instruccion.funcion_instruccion = get_instruccion(vec_instruccion[0]);
     instruccion.parametros = remove_first_element(vec_instruccion);
 
     // TODO: traduccion de direcciones de memoria para WRITE y READ -> puede ser que instruccion a ejecutar tenga otro campo "direccion fisica"

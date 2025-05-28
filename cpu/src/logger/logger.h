@@ -3,6 +3,7 @@
 
 #include <commons/log.h>
 #include <commons/config.h>
+#include <utils/string/string.h>
 
 #include "config/config.h"
 

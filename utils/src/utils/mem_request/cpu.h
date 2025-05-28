@@ -1,5 +1,5 @@
-#ifndef CPU_peticion_cpu
-#define CPU_peticion_cpu
+#ifndef CPU_MEM_REQUEST
+#define CPU_MEM_REQUEST
 
 #include <stdlib.h>
 #include <commons/string.h>
@@ -39,4 +39,4 @@ void destruir_peticion_cpu(t_peticion_cpu *peticion);
 
 t_list *convertir_a_lista_de_direcciones_fisicas(char *direcciones_fisicas);
 
-#endif // CPU_peticion_cpu
+#endif // CPU_MEM_REQUEST

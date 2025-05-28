@@ -3,7 +3,6 @@
 
 #include <stdlib.h>
 #include <utils/ejecucion/desalojo.h>
-#include <utils/mem_request/cpu.h>
 #include <utils/string/string.h>
 
 #include "logger/logger.h"

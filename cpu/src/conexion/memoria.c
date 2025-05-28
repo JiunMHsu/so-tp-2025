@@ -2,7 +2,6 @@
 
 int32_t fd_memoria;
 
-// TODO: Revisar implementacion, se debería enviar el id_cpu??
 int8_t conectar_memoria()
 {
     mem_address datos_memoria = get_memoria_address();
@@ -17,4 +16,16 @@ int8_t conectar_memoria()
     }
 
     return 0;
+}
+
+char *recibir_mensaje_memoria()
+{
+    return recibir_mensaje(fd_memoria);
+}
+
+void enviar_peticion_instruccion(u_int32_t pid, u_int32_t program_counter)
+{
+    t_peticion_cpu *peticion_instruccion = crear_peticion_instruccion(pid, program_counter);
+    enviar_peticion_cpu(fd_memoria, peticion_instruccion);
+    destruir_peticion_cpu(peticion_instruccion);
 }
