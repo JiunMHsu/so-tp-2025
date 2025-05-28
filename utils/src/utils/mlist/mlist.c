@@ -34,6 +34,14 @@ void mlist_add(t_mutex_list *lista_mutex, void *elemento)
     pthread_mutex_unlock(&(lista_mutex->mutex));
 }
 
+int32_t mlist_add_sorted(t_mutex_list *lista_mutex, void *elemento, int32_t (*comparador)(void *, void *))
+{
+    pthread_mutex_lock(&(lista_mutex->mutex));
+    int32_t index = list_add_sorted(lista_mutex->list, elemento,  (void *)comparador);
+    pthread_mutex_unlock(&(lista_mutex->mutex));
+    return index;
+}
+
 void mlist_add_all(t_mutex_list *lista_mutex, t_mutex_list *otra_lista_mutex)
 {
     pthread_mutex_lock(&(lista_mutex->mutex));
