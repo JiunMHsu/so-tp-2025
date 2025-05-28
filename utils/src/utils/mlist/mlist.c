@@ -37,7 +37,7 @@ void mlist_add(t_mutex_list *lista_mutex, void *elemento)
 int32_t mlist_add_sorted(t_mutex_list *lista_mutex, void *elemento, int32_t (*comparador)(void *, void *))
 {
     pthread_mutex_lock(&(lista_mutex->mutex));
-    int32_t index = list_add_sorted(lista_mutex->list, elemento,  (void *)comparador);
+    int32_t index = list_add_sorted(lista_mutex->list, elemento, (void *)comparador);
     pthread_mutex_unlock(&(lista_mutex->mutex));
     return index;
 }
@@ -56,6 +56,18 @@ void *mlist_get(t_mutex_list *lista_mutex, u_int32_t index)
 
     pthread_mutex_lock(&(lista_mutex->mutex));
     void *elemento = list_get(lista_mutex->list, index);
+    pthread_mutex_unlock(&(lista_mutex->mutex));
+
+    return elemento;
+}
+
+void *mlist_get_minimum(t_mutex_list *lista_mutex, void *(*minimo)(void *, void *))
+{
+    if (mlist_is_empty(lista_mutex))
+        return NULL;
+
+    pthread_mutex_lock(&(lista_mutex->mutex));
+    void *elemento = list_get_minimum(lista_mutex->list, minimo);
     pthread_mutex_unlock(&(lista_mutex->mutex));
 
     return elemento;

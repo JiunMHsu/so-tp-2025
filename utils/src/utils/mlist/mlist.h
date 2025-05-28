@@ -70,6 +70,15 @@ int32_t mlist_add_sorted(t_mutex_list *lista_mutex, void *elemento, int32_t (*co
 void *mlist_get(t_mutex_list *lista_mutex, u_int32_t index);
 
 /**
+ * @brief Obtiene el elemento mínimo de la lista según un criterio dado.
+ *
+ * @param lista_mutex
+ * @param minimo
+ * @return void*
+ */
+void *mlist_get_minimum(t_mutex_list *lista_mutex, void *(*minimo)(void *, void *));
+
+/**
  * @brief
  *
  * @param lista_mutex
