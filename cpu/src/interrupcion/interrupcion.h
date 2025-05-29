@@ -8,7 +8,7 @@
 #include "logger/logger.h"
 #include "conexion/kernel.h"
 
-void inicializar_interrupcion(int32_t fd_interrupt);
+void inicializar_interrupcion(void);
 int8_t hay_interrupcion(void);
 void resetear_interrupcion(void);
 

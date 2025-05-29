@@ -11,6 +11,8 @@
 #include "logger/logger.h"
 
 int8_t conectar_memoria(void);
+void cerrar_conexion_memoria(void);
+
 char *recibir_mensaje_memoria();
 void enviar_peticion_instruccion(u_int32_t pid, u_int32_t program_counter);
 

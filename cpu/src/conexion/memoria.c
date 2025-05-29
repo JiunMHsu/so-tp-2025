@@ -18,6 +18,12 @@ int8_t conectar_memoria()
     return 0;
 }
 
+void cerrar_conexion_memoria()
+{
+    log_mensaje_error("Cerrando conexión con memoria...");
+    cerrar_conexion(fd_memoria);
+}
+
 char *recibir_mensaje_memoria()
 {
     return recibir_mensaje(fd_memoria);

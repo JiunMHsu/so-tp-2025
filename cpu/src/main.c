@@ -22,34 +22,32 @@ int main(int argc, char *argv[])
     // TODO: falta agregar id_cpu como parametro -> Requerimiento del tp, se debe poder identificar a cpu pertenece el logger
     iniciar_logger();
 
-    t_kernel_sockets kernel_sockets = conectar_kernel(id_cpu);
-    if (kernel_sockets.fd_dispatch == -1 || kernel_sockets.fd_interrupt == -1)
+    if (conectar_kernel(id_cpu))
     {
+        cerrar_conexion_kernel();
         log_mensaje_error("No se pudo establecer la conexion con el kernel.");
         return EXIT_FAILURE;
     }
 
     if (conectar_memoria())
     {
-        cerrar_conexion(kernel_sockets.fd_dispatch);
-        cerrar_conexion(kernel_sockets.fd_interrupt);
+        cerrar_conexion_kernel();
+        log_mensaje_error("No se pudo establecer la conexion con la memoria.");
         return EXIT_FAILURE;
     }
 
-    inicializar_interrupcion(kernel_sockets.fd_interrupt);
+    inicializar_interrupcion();
     inicializar_instrucciones();
 
     while (1)
     {
-        t_peticion_ejecucion *peticion_exec = recibir_peticion_ejecucion(kernel_sockets.fd_dispatch);
+        t_peticion_ejecucion *peticion_exec = recibir_peticion_ejecucion_kernel();
         if (peticion_exec == NULL)
         {
-            destruir_peticion_ejecucion(peticion_exec);
+            log_mensaje_error("Error al recibir la petición de ejecución.");
 
-            log_mensaje_error("Error al recibir la peticion de ejecucion.");
-            cerrar_conexion(kernel_sockets.fd_dispatch);
-            cerrar_conexion(kernel_sockets.fd_interrupt);
-            // cerrar_conexion_memoria();
+            cerrar_conexion_kernel();
+            cerrar_conexion_memoria();
             return EXIT_FAILURE;
         }
 
@@ -57,14 +55,12 @@ int main(int argc, char *argv[])
         fin_ejecucion fin_ejecucion = ejecutar_ciclo_instruccion(peticion_exec->pid,
                                                                  peticion_exec->program_counter);
 
-        t_desalojo *desalojo = crear_desalojo(peticion_exec->pid,
-                                              fin_ejecucion.program_counter,
-                                              fin_ejecucion.motivo,
-                                              fin_ejecucion.syscall);
-        enviar_desalojo(kernel_sockets.fd_dispatch, desalojo);
+        enviar_desalojo_kernel(peticion_exec->pid,
+                               fin_ejecucion.program_counter,
+                               fin_ejecucion.motivo,
+                               fin_ejecucion.syscall);
 
         destruir_peticion_ejecucion(peticion_exec);
-        destruir_desalojo(desalojo);
 
         if (fin_ejecucion.syscall != NULL)
             free(fin_ejecucion.syscall);
