@@ -64,6 +64,7 @@ int32_t solicitar_finalizacion_proceso(u_int32_t pid)
     return -1;
 }
 
+// TODO: implementar solicitar_dump_memory
 int32_t solicitar_dump_memory(u_int32_t pid)
 {
     // crear una mem_request (definida en utils)

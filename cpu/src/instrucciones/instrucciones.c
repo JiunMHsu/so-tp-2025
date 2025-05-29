@@ -2,6 +2,9 @@
 
 t_dictionary *instrucciones;
 
+// Las instrucciones deben respetar la firma
+// void instruccion(char **parametros);
+
 static void noop(char **parametros);
 static void _write(char **parametros);
 static void _read(char **parametros);

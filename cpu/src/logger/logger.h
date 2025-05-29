@@ -29,4 +29,4 @@ void log_pagina_encontrada_cache(u_int32_t pid, u_int32_t numero_pagina);
 void log_pagina_ingresada_cache(u_int32_t pid, u_int32_t numero_pagina);
 void log_pagina_actualizada_cache_memoria(u_int32_t pid, u_int32_t numero_pagina, u_int32_t frame_memoria_principal);
 
-#endif
+#endif // CPU_LOGGER_H

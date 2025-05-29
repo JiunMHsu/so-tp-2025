@@ -95,7 +95,7 @@ static void *planificar_por_sjf(void *_)
 
 static void *planificar_por_srt(void *_)
 {
-    // Iniciar rutina de envío de interrupción
+    // TODO: Iniciar rutina de envío de interrupción
 
     while (1)
     {

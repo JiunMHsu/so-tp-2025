@@ -32,7 +32,7 @@ void log_creacion_proceso(u_int32_t pid, u_int32_t tamanio)
     log_info(memoria_logger, "## PID: %d - Proceso Creado - Tamaño: %d", pid, tamanio);
 }
 
-// TODO
+// TODO: Implementar log_destruccion_proceso
 void log_destruccion_proceso(u_int32_t pid)
 {
 }

@@ -26,4 +26,4 @@ kernel_address get_kernel_address();
 mem_address get_memoria_address();
 t_log_level get_log_level();
 
-#endif
+#endif // CPU_CONFIG_H

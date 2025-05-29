@@ -25,7 +25,7 @@ typedef enum
 {
     /**
      * @brief (FIFO) First In First Out.
-     * No hay nada que explicar aca.
+     * No hay nada que explicar acá.
      *
      */
     FIFO,

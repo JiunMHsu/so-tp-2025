@@ -1,5 +1,5 @@
-#ifndef KERNEL_MEM_REQUEST
-#define KERNEL_MEM_REQUEST
+#ifndef KERNEL_MEM_REQUEST_H
+#define KERNEL_MEM_REQUEST_H
 
 #include <stdlib.h>
 #include <stdint.h>
@@ -23,4 +23,4 @@ void enviar_kernel_mem_request(int32_t fd_memoria, t_kernel_mem_req *mem_request
 t_kernel_mem_req *recibir_kernel_mem_request(int32_t fd_kernel);
 void destruir_kernel_mem_request(t_kernel_mem_req *mem_request);
 
-#endif // KERNEL_MEM_REQUEST
+#endif // KERNEL_MEM_REQUEST_H
