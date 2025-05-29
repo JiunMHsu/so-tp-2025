@@ -39,7 +39,10 @@ void inicializar_planificador_largo_plazo(q_estado *q_new,
 
 void insertar_proceso_nuevo(char *pseudocodigo, u_int32_t tamanio_proceso)
 {
-    t_pcb *pcb = crear_pcb(pid_count++, tamanio_proceso, pseudocodigo);
+    t_pcb *pcb = crear_pcb(pid_count++,
+                           tamanio_proceso,
+                           pseudocodigo,
+                           get_estimacion_inicial());
 
     switch (algoritmo)
     {
@@ -95,7 +98,12 @@ static void *finalizar_proceso(void *_)
         if (res_solicitud == 1)
         {
             sem_post(puede_crearse_proceso);
-            remove_proceso(q_exit, proceso->pid);
+            proceso = remove_proceso(q_exit, proceso->pid);
+
+            log_metricas_proceso(proceso->pid,
+                                 proceso->metricas_estado,
+                                 proceso->metricas_tiempo);
+            log_finalizacion_proceso(proceso->pid);
             destruir_pcb(proceso);
         }
     }

@@ -22,8 +22,6 @@ void log_motivo_bloqueo(u_int32_t pid, char *dispositivo_io);
 void log_fin_de_io(u_int32_t pid);
 void log_desalojo_srt(u_int32_t pid);
 void log_finalizacion_proceso(u_int32_t pid);
-
-// definición temporal, no se qué estructura tendrían las métricas
-void log_metricas_proceso(u_int32_t pid, t_list *metricas_estado, t_list *metricas_tiempo);
+void log_metricas_proceso(u_int32_t pid, t_dictionary *metricas_estado, t_dictionary *metricas_tiempo);
 
 #endif // KERNEL_LOGGER_H
