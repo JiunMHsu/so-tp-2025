@@ -2,8 +2,6 @@
 
 t_log *kernel_logger;
 
-static char *state_to_string(t_state cod_estado);
-
 void iniciar_logger(t_log_level log_level)
 {
     kernel_logger = log_create(LOG_FILE, "Kernel", true, log_level);
@@ -36,32 +34,9 @@ void log_creacion_proceso(u_int32_t pid)
 
 void log_cambio_de_estado(u_int32_t pid, t_state anterior, t_state actual)
 {
-    char *anterior_str = state_to_string(anterior);
-    char *actual_str = state_to_string(actual);
+    char *anterior_str = get_estado_string(anterior);
+    char *actual_str = get_estado_string(actual);
     log_info(kernel_logger, "## (%d) Pasa del estado %s al estado %s", pid, anterior_str, actual_str);
-}
-
-static char *state_to_string(t_state cod_estado)
-{
-    switch (cod_estado)
-    {
-    case NEW:
-        return "NEW";
-    case READY:
-        return "READY";
-    case EXEC:
-        return "EXEC";
-    case BLOCKED:
-        return "BLOCKED";
-    case SUSPENDED_BLOCKED:
-        return "SUSPENDED_BLOCKED";
-    case SUSPENDED_READY:
-        return "SUSPENDED_READY";
-    case EXIT:
-        return "EXIT";
-    default:
-        return "UNKNOWN";
-    }
 }
 
 void log_motivo_bloqueo(u_int32_t pid, char *dispositivo_io)

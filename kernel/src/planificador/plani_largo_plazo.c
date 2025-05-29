@@ -39,7 +39,10 @@ void inicializar_planificador_largo_plazo(q_estado *q_new,
 
 void insertar_proceso_nuevo(char *pseudocodigo, u_int32_t tamanio_proceso)
 {
-    t_pcb *pcb = crear_pcb(pid_count++, tamanio_proceso, pseudocodigo);
+    t_pcb *pcb = crear_pcb(pid_count++,
+                           tamanio_proceso,
+                           pseudocodigo,
+                           get_estimacion_inicial());
 
     switch (algoritmo)
     {
