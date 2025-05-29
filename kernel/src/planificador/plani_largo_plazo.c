@@ -100,7 +100,9 @@ static void *finalizar_proceso(void *_)
             sem_post(puede_crearse_proceso);
             proceso = remove_proceso(q_exit, proceso->pid);
 
-            // TODO: Loggear métricas del proceso
+            log_metricas_proceso(proceso->pid,
+                                 proceso->metricas_estado,
+                                 proceso->metricas_tiempo);
             log_finalizacion_proceso(proceso->pid);
             destruir_pcb(proceso);
         }
