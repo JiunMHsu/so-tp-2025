@@ -1,5 +1,3 @@
-#include <stdlib.h>
-
 #include "config/config.h"
 #include "logger/logger.h"
 #include "conexion/kernel.h"
@@ -12,15 +10,14 @@ int main(int argc, char *argv[])
 {
     if (argc != 2)
     {
-        printf("Se debe especificar el id de la CPU \n");
+        log_mensaje_error("Se debe especificar el id de la CPU.");
         return EXIT_FAILURE;
     }
 
     char *id_cpu = argv[1];
 
     iniciar_config();
-    // TODO: falta agregar id_cpu como parametro -> Requerimiento del tp, se debe poder identificar a cpu pertenece el logger
-    iniciar_logger();
+    iniciar_logger(id_cpu);
 
     if (conectar_kernel(id_cpu))
     {

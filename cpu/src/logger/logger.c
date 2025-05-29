@@ -2,9 +2,10 @@
 
 t_log *cpu_logger;
 
-void iniciar_logger()
+void iniciar_logger(char *id_cpu)
 {
-    cpu_logger = log_create(LOG_FILE, "CPU", true, get_log_level());
+    char *log_file = string_from_format("cpu_%s.log", id_cpu);
+    cpu_logger = log_create(log_file, "CPU", true, get_log_level());
 }
 
 void destruir_logger()
