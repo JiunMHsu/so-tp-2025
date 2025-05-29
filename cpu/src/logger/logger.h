@@ -3,10 +3,9 @@
 
 #include <commons/log.h>
 #include <commons/config.h>
+#include <utils/string/string.h>
 
 #include "config/config.h"
-
-#define LOG_FILE "cpu.log"
 
 typedef enum
 {
@@ -14,7 +13,7 @@ typedef enum
     LECTURA,
 } t_operacion_acceso;
 
-void iniciar_logger();
+void iniciar_logger(char *id_cpu);
 void destruir_logger();
 
 void log_mensaje_error(char *error);

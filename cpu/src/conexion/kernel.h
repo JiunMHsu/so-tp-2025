@@ -13,16 +13,17 @@
 #include "config/config.h"
 #include "logger/logger.h"
 
-typedef struct
-{
-    int32_t fd_dispatch;
-    int32_t fd_interrupt;
-} t_kernel_sockets;
+/**
+ * @brief Conecta el CPU al kernel.
+ *
+ * @param id_cpu Identificador del CPU.
+ *  @return 0 si la conexión fue exitosa, -1 en caso contrario.
+ */
+int8_t conectar_kernel(char *id_cpu);
+void cerrar_conexion_kernel(void);
 
-t_kernel_sockets conectar_kernel(char* id_cpu);
-
-// recibir_peticion_ejecucion
-// recibir_interrupt
-// enviar_desalojo
+t_peticion_ejecucion *recibir_peticion_ejecucion_kernel(void);
+int32_t recibir_interrupt(void);
+void enviar_desalojo_kernel(u_int32_t pid, u_int32_t program_counter, motivo_desalojo motivo, char *syscall);
 
 #endif // CONEXION_KERNEL_H

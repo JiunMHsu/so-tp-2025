@@ -7,6 +7,14 @@
 #include <commons/collections/dictionary.h>
 
 #include "logger/logger.h"
+#include "ciclo_instruccion/ciclo_instruccion.h"
+
+typedef struct
+{
+    char *cod_instruccion;
+    void (*funcion_instruccion)(char **);
+    char **parametros;
+} instruccion_ejecutable;
 
 void inicializar_instrucciones(void);
 
@@ -26,5 +34,7 @@ void inicializar_instrucciones(void);
  *       Ejemplo: [ "AX", "10", NULL ].
  */
 void (*get_instruccion(char *instruccion))(char **);
+
+void destruir_instruccion_ejecutable(instruccion_ejecutable instruccion);
 
 #endif // CPU_INSTRUCCIONES_H
