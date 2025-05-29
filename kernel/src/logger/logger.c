@@ -59,7 +59,37 @@ void log_finalizacion_proceso(u_int32_t pid)
     log_info(kernel_logger, "## (%d) - Finaliza el proceso", pid);
 }
 
-// TODO: Implementar una vez que se hayan definido las métricas
-void log_metricas_proceso(u_int32_t pid, t_list *metricas_estado, t_list *metricas_tiempo)
+void log_metricas_proceso(u_int32_t pid, t_dictionary *metricas_estado, t_dictionary *metricas_tiempo)
 {
+    int8_t cantidad_estados = 7;
+    char *keys[cantidad_estados] = {get_estado_string(NEW),
+                                    get_estado_string(READY),
+                                    get_estado_string(EXEC),
+                                    get_estado_string(BLOCKED),
+                                    get_estado_string(SUSPENDED_BLOCKED),
+                                    get_estado_string(SUSPENDED_READY),
+                                    get_estado_string(EXIT)};
+
+    // char *metricas_estado_str = string_new();
+    // char *metricas_tiempo_str = string_new();
+
+    // for (int i = 0; i < dictionary_size(metricas_estado); i++)
+    // {
+    //     char *key = keys[i];
+    //     int value = dictionary_get(metricas_estado, key);
+    //     string_append_with_format(&metricas_estado_str, "%s: %d ", key, value);
+    // }
+
+    // for (int i = 0; i < dictionary_size(metricas_tiempo); i++)
+    // {
+    //     char *key = keys[i];
+    //     int value = dictionary_get(metricas_tiempo, key);
+    //     string_append_with_format(&metricas_tiempo_str, "%s: %d ", key, value);
+    // }
+
+    // log_info(kernel_logger, "## (%d) - Métricas de estado: %s", pid, metricas_estado_str);
+    // log_info(kernel_logger, "## (%d) - Métricas de tiempo: %s", pid, metricas_tiempo_str);
+
+    // free(metricas_estado_str);
+    // free(metricas_tiempo_str);
 }

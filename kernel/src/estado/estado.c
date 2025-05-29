@@ -16,7 +16,7 @@ void push_proceso(q_estado *estado, t_pcb *pcb)
 {
     mlist_push_as_queue(estado->lista, pcb);
 
-    t_state anterior = pcb->estado;
+    t_state anterior = get_estado_pcb(pcb);
     set_estado_pcb(pcb, estado->cod_estado);
     log_cambio_de_estado(pcb->pid, anterior, pcb->estado);
 
@@ -28,7 +28,7 @@ void ordered_insert_proceso(q_estado *estado, t_pcb *pcb, int32_t (*comparador)(
 {
     mlist_add_sorted(estado->lista, pcb, (int32_t (*)(void *, void *))comparador);
 
-    t_state anterior = pcb->estado;
+    t_state anterior = get_estado_pcb(pcb);
     set_estado_pcb(pcb, estado->cod_estado);
     log_cambio_de_estado(pcb->pid, anterior, pcb->estado);
 

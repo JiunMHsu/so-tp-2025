@@ -39,6 +39,14 @@ t_pcb *crear_pcb(u_int32_t pid, u_int32_t tamanio, char *ejecutable, u_int64_t e
     pcb->estado = -1;
 
     pcb->metricas_estado = dictionary_create();
+    dictionary_put(pcb->metricas_estado, strdup(get_estado_string(NEW)), calloc(1, sizeof(u_int32_t)));
+    dictionary_put(pcb->metricas_estado, strdup(get_estado_string(READY)), calloc(1, sizeof(u_int32_t)));
+    dictionary_put(pcb->metricas_estado, strdup(get_estado_string(EXEC)), calloc(1, sizeof(u_int32_t)));
+    dictionary_put(pcb->metricas_estado, strdup(get_estado_string(BLOCKED)), calloc(1, sizeof(u_int32_t)));
+    dictionary_put(pcb->metricas_estado, strdup(get_estado_string(SUSPENDED_BLOCKED)), calloc(1, sizeof(u_int32_t)));
+    dictionary_put(pcb->metricas_estado, strdup(get_estado_string(SUSPENDED_READY)), calloc(1, sizeof(u_int32_t)));
+    dictionary_put(pcb->metricas_estado, strdup(get_estado_string(EXIT)), calloc(1, sizeof(u_int32_t)));
+
     pcb->metricas_tiempo = dictionary_create();
     dictionary_put(pcb->metricas_estado, strdup(get_estado_string(NEW)), list_create());
     dictionary_put(pcb->metricas_estado, strdup(get_estado_string(READY)), list_create());
@@ -127,20 +135,8 @@ void set_estado_pcb(t_pcb *pcb, t_state estado)
 static void actualizar_metricas_estado(t_pcb *pcb)
 {
     char *estado_string = get_estado_string(pcb->estado);
-    u_int32_t *cantidad;
-
-    // en este caso, si key existe, implica que hay al menos 1 ocurrencia (*cantidad = 1)
-    // no hace falta evaluar si el valor es NULL
-    if (dictionary_has_key(pcb->metricas_estado, estado_string))
-    {
-        cantidad = (u_int32_t *)dictionary_get(pcb->metricas_estado, estado_string);
-        (*cantidad)++;
-        return;
-    }
-
-    cantidad = malloc(sizeof(u_int32_t));
-    *cantidad = 1;
-    dictionary_put(pcb->metricas_estado, strdup(estado_string), cantidad);
+    u_int32_t *cantidad = (u_int32_t *)dictionary_get(pcb->metricas_estado, estado_string);
+    (*cantidad)++;
 }
 
 static void actualizar_metricas_tiempo(t_pcb *pcb)
@@ -154,7 +150,7 @@ static void actualizar_metricas_tiempo(t_pcb *pcb)
     temporal_stop(pcb->temporal);
 
     char *estado_string = get_estado_string(pcb->estado);
-    t_list *lista_tiempos = (t_list *)dictionary_get(pcb->metricas_estado, estado_string);
+    t_list *lista_tiempos = (t_list *)dictionary_get(pcb->metricas_tiempo, estado_string);
 
     u_int64_t *tiempo = malloc(sizeof(u_int64_t));
     *tiempo = temporal_gettime(pcb->temporal);

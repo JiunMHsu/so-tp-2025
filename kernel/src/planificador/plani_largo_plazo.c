@@ -98,7 +98,10 @@ static void *finalizar_proceso(void *_)
         if (res_solicitud == 1)
         {
             sem_post(puede_crearse_proceso);
-            remove_proceso(q_exit, proceso->pid);
+            proceso = remove_proceso(q_exit, proceso->pid);
+
+            // TODO: Loggear métricas del proceso
+            log_finalizacion_proceso(proceso->pid);
             destruir_pcb(proceso);
         }
     }
