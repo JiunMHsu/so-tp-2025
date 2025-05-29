@@ -69,6 +69,7 @@ static t_io *crear_io(char *nombre_io, int32_t fd_io)
     io->fd_io = fd_io;
     io->nombre = strdup(nombre_io);
     io->peticiones = mlist_create();
+    io->hay_peticion = malloc(sizeof(sem_t));
     sem_init(io->hay_peticion, 0, 0);
     io->rutina_consumo = 0;
 

@@ -1,7 +1,6 @@
 #include "plani_largo_plazo.h"
 
 static q_estado *q_new;
-static q_estado *q_ready;
 static q_estado *q_exit;
 
 static u_int16_t pid_count;
@@ -14,9 +13,7 @@ static void *admitir_proceso(void *_);
 static int _es_de_menor_tamanio_que(t_pcb *proceso_a, t_pcb *proceso_b);
 static void *finalizar_proceso(void *_);
 
-void inicializar_planificador_largo_plazo(q_estado *q_new,
-                                          q_estado *q_ready,
-                                          q_estado *q_exit)
+void inicializar_planificador_largo_plazo(q_estado *q_new, q_estado *q_exit)
 {
     puede_crearse_proceso = malloc(sizeof(sem_t));
     sem_init(puede_crearse_proceso, 0, 1);
@@ -25,7 +22,6 @@ void inicializar_planificador_largo_plazo(q_estado *q_new,
 
     algoritmo = get_alg_ingreso_a_ready();
     q_new = q_new;
-    q_ready = q_ready;
     q_exit = q_exit;
 
     pthread_t rutinas[2];
@@ -77,8 +73,8 @@ static void *admitir_proceso(void *_)
         if (solicitud < 1) // caso 0 o -1 (ver si hacer alguna direfencia y que el sistema paniquee)
             continue;
 
-        push_proceso(q_ready, pcb);
-        remove_proceso(q_new, pcb->pid); // porque peek no remueve de la lista
+        pcb = remove_proceso(q_new, pcb->pid); // porque peek no remueve de la lista
+        insertar_en_ready(pcb);
         sem_post(puede_crearse_proceso);
     }
 

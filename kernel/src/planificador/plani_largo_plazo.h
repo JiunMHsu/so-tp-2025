@@ -11,10 +11,9 @@
 #include "recursos/memoria.h"
 #include "estado/estado.h"
 #include "pcb/pcb.h"
+#include "plani_corto_plazo.h"
 
-void inicializar_planificador_largo_plazo(q_estado *q_new,
-                                          q_estado *q_ready,
-                                          q_estado *q_exit);
+void inicializar_planificador_largo_plazo(q_estado *q_new, q_estado *q_exit);
 
 void insertar_proceso_nuevo(char *pseudocodigo, u_int32_t tamanio_proceso);
 

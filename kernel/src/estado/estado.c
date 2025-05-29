@@ -5,8 +5,8 @@ q_estado *crear_estado(t_state cod_estado)
     q_estado *estado = malloc(sizeof(q_estado));
 
     estado->lista = mlist_create();
-    estado->hay_proceso = malloc(sizeof(sem_t));
     estado->cod_estado = cod_estado;
+    estado->hay_proceso = malloc(sizeof(sem_t));
     sem_init(estado->hay_proceso, 0, 0);
 
     return estado;
@@ -23,7 +23,6 @@ void push_proceso(q_estado *estado, t_pcb *pcb)
     sem_post(estado->hay_proceso);
 }
 
-// TODO: Revisar tipado de ordered_insert_proceso
 void ordered_insert_proceso(q_estado *estado, t_pcb *pcb, int32_t (*comparador)(t_pcb *, t_pcb *))
 {
     mlist_add_sorted(estado->lista, pcb, (int32_t (*)(void *, void *))comparador);

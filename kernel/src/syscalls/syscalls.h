@@ -10,6 +10,7 @@
 #include "recursos/io.h"
 #include "recursos/memoria.h"
 #include "planificador/plani_largo_plazo.h"
+#include "planificador/plani_mediano_plazo.h"
 
 void manejar_syscall(t_pcb *proceso, char *syscall);
 
