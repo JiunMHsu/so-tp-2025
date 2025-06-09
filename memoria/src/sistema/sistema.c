@@ -1,16 +1,22 @@
 #include "sistema.h"
 
-t_dictionary *procesos;
+t_dictionary *procesos_instrucciones;
+t_dictionary *procesos_tablas;
 
 void inicializar_espacio_sistema()
 {
-    procesos = dictionary_create();
+    procesos_instrucciones = dictionary_create();
+    procesos_tablas = dictionary_create();
 }
 
 void crear_proceso(int32_t pid, char *path)
 {
     t_list *lista_instrucciones = leer_instrucciones(path);
-    dictionary_put(procesos, string_itoa(pid), lista_instrucciones);
+    dictionary_put(procesos_instrucciones, string_itoa(pid), lista_instrucciones);
+    
+    t_proceso_tabla *tabla = crear_tabla_de_paginas();
+    dictionary_put(procesos_tablas, string_itoa(pid), tabla);
+
     int tamanio = list_size(lista_instrucciones);
     log_creacion_proceso(pid, tamanio); // TODO: el tamaño es el de espacio de memoria
 }
@@ -43,14 +49,14 @@ void finalizar_proceso(int32_t pid)
 {
     char *key_pid = string_itoa(pid);
 
-    if (dictionary_has_key(procesos, key_pid) == false)
+    if (dictionary_has_key(procesos_instrucciones, key_pid) == false)
     {
         log_mensaje_error("Se inteto finalizar un proceso inexistente.");
         free(key_pid);
         return;
     }
 
-    t_list *instrucciones = dictionary_remove(procesos, key_pid);
+    t_list *instrucciones = dictionary_remove(procesos_instrucciones, key_pid);
     list_destroy_and_destroy_elements(instrucciones, free);
     log_destruccion_proceso(pid);
 
@@ -60,7 +66,7 @@ void finalizar_proceso(int32_t pid)
 char *obtener_instruccion(u_int32_t pid, u_int32_t program_counter)
 {
     char *pid_str = string_itoa(pid);
-    t_list *lista_instrucciones = dictionary_get(procesos, pid_str);
+    t_list *lista_instrucciones = dictionary_get(procesos_instrucciones, pid_str);
 
     char *instruccion = (char *)list_get(lista_instrucciones, program_counter);
     free(pid_str);

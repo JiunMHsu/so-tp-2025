@@ -10,6 +10,7 @@
 #include <utils/mem_request/kernel.h>
 #include <utils/string/string.h>
 
+#include "tabla_paginas/tabla_paginas.h"
 #include "logger/logger.h"
 
 void inicializar_espacio_sistema(void);
