@@ -24,7 +24,7 @@ void log_mensaje_error(char *error);
 
 void log_conexion_kernel(int32_t socket_kernel);
 void log_creacion_proceso(u_int32_t pid, u_int32_t tamanio);
-void log_destruccion_proceso(u_int32_t pid); // tiene más argumentos que de momento no entiendo y no se cómo tiparlos
+void log_destruccion_proceso(u_int32_t pid, int32_t accesos_tablas, u_int32_t instrucciones_solicitadas, u_int32_t paginas_en_swap, u_int32_t paginas_en_memoria, u_int32_t lecturas_mem, u_int32_t escrituras_mem);
 void log_obtencion_instruccion(u_int32_t pid, u_int32_t program_counter, char *instruccion);
 void log_acceso_espacio_usuario(u_int32_t pid, t_accion accion, u_int32_t direccion_fisica, u_int32_t tamanio);
 void log_memory_dump(u_int32_t pid);
