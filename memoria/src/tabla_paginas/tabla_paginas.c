@@ -19,20 +19,20 @@ t_proceso_tabla *crear_tabla_de_paginas(int32_t nivel_tabla_actual, int32_t nive
 {
     t_proceso_tabla *tabla = malloc(sizeof(t_proceso_tabla));
     tabla->nivel_de_tabla = nivel_tabla_actual;
-    tabla->entradas = malloc(sizeof(t_entrada_tabla *) * entradas_por_tabla);
+    tabla->entradas = list_create();
 
     for (int i = 0; i < entradas_por_tabla; i++)
     {
-        tabla->entradas[i] = malloc(sizeof(t_entrada_tabla));
-        tabla->entradas[i]->presente = 0;
-        tabla->entradas[i]->marco = -1;
-        tabla->entradas[i]->siguiente_nivel = NULL;
+        t_entrada_tabla *entrada = malloc(sizeof(t_entrada_tabla));
+        entrada->presente = 0;
+        entrada->marco = -1;
+        entrada->siguiente_nivel = NULL;
 
         if (nivel_tabla_actual < entradas_por_tabla - 1)
         {
-            tabla->entradas[i]->siguiente_nivel =
-                crear_tabla_de_paginas(nivel_tabla_actual + 1, nivel_total_tablas, entradas_por_tabla);
+            entrada->siguiente_nivel = crear_tabla_de_paginas(nivel_tabla_actual + 1, nivel_total_tablas, entradas_por_tabla);
         }
+        list_add(tabla->entradas, entrada);
     }
 
     return tabla;
@@ -51,4 +51,11 @@ void destruir_tabla_de_paginas_para_proceso(t_proceso_tabla *tabla, int32_t entr
     }
     free(tabla->entradas);
     free(tabla);
+}
+
+//TODO MIIIINNGGGGG!!!
+void destruir_entrada(void *entrada_liberar)
+{
+    t_entrada_tabla *entrada = (t_entrada_tabla *) entrada_liberar;
+    free()
 }

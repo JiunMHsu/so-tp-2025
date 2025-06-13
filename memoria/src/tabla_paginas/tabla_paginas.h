@@ -6,21 +6,22 @@
 
 typedef struct
 {
+    int32_t nivel_de_tabla;
+    t_list *entradas;
+    // t_entrada_tabla **entradas; // TODO Remplazar por listas de entradas
+
+} t_proceso_tabla;
+
+typedef struct
+{
     int32_t presente; // 1 si está cargada, 0 si no
 
     // Si no es el último nivel
-    struct t_proceso_tabla *siguiente_nivel;
+    t_proceso_tabla *siguiente_nivel;
 
     // Si es el último nivel
     int32_t marco; // -1 si no tiene asignado
 } t_entrada_tabla;
-
-typedef struct
-{
-    int32_t nivel_de_tabla;
-    t_entrada_tabla **entradas; // array dinámico de entradas
-
-} t_proceso_tabla;
 
 typedef struct
 {
