@@ -59,7 +59,6 @@ void finalizar_proceso(int32_t pid)
     t_list *instrucciones = dictionary_remove(procesos_instrucciones, key_pid);
     list_destroy_and_destroy_elements(instrucciones, free);
 
-    // TODO agregar el borrar tablas del proceso y diccionario de tablas
     if (dictionary_has_key(procesos_tablas, key_pid) == false)
     { // Ver si esta bien hacer esto otra vez
         log_mensaje_error("Se inteto finalizar un proceso inexistente.");
@@ -68,7 +67,8 @@ void finalizar_proceso(int32_t pid)
     }
 
     t_proceso_memoria *tabla_de_proceso = dictionary_remove(procesos_tablas, key_pid);
-    destruir_tabla_de_paginas_para_proceso(tabla_de_proceso->tabla_global, get_entradas_por_tabla());
+    destruir_tabla_de_paginas_para_proceso(tabla_de_proceso->tabla_global);
+    free(tabla_de_proceso);
 
     log_destruccion_proceso(pid, tabla_de_proceso->accesos_tablas, tabla_de_proceso->instrucciones_solicitadas, tabla_de_proceso->paginas_en_swap, tabla_de_proceso->paginas_en_memoria, tabla_de_proceso->lecturas_mem, tabla_de_proceso->escrituras_mem);
     free(key_pid);

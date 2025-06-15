@@ -28,7 +28,7 @@ t_proceso_tabla *crear_tabla_de_paginas(int32_t nivel_tabla_actual, int32_t nive
         entrada->marco = -1;
         entrada->siguiente_nivel = NULL;
 
-        if (nivel_tabla_actual < entradas_por_tabla - 1)
+        if (nivel_tabla_actual < nivel_total_tablas - 1)
         {
             entrada->siguiente_nivel = crear_tabla_de_paginas(nivel_tabla_actual + 1, nivel_total_tablas, entradas_por_tabla);
         }
@@ -38,24 +38,21 @@ t_proceso_tabla *crear_tabla_de_paginas(int32_t nivel_tabla_actual, int32_t nive
     return tabla;
 }
 
-void destruir_tabla_de_paginas_para_proceso(t_proceso_tabla *tabla, int32_t entradas_por_tabla)
+void destruir_tabla_de_paginas_para_proceso(t_proceso_tabla *tabla)
 {
-    for (int i = 0; i < entradas_por_tabla; i++)
-    {
-        if (tabla->entradas[i]->siguiente_nivel != NULL)
-        {
-            destruir_tabla_de_paginas_para_proceso(tabla->entradas[i]->siguiente_nivel, entradas_por_tabla);
-        }
+    list_destroy_and_destroy_elements(tabla->entradas, destruir_entrada);
 
-        free(tabla->entradas[i]);
-    }
-    free(tabla->entradas);
     free(tabla);
 }
 
-//TODO MIIIINNGGGGG!!!
 void destruir_entrada(void *entrada_liberar)
 {
-    t_entrada_tabla *entrada = (t_entrada_tabla *) entrada_liberar;
-    free()
+    t_entrada_tabla *entrada = (t_entrada_tabla *)entrada_liberar;
+
+    if (entrada->siguiente_nivel != NULL)
+    {
+        destruir_tabla_de_paginas_para_proceso(entrada->siguiente_nivel);
+    }
+
+    free(entrada);
 }
