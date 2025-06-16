@@ -53,6 +53,7 @@ t_pcb *crear_pcb(u_int32_t pid, u_int32_t tamanio, char *ejecutable, u_int64_t e
 
     pcb->ultima_estimacion_rafaga = est_rafaga_inicial;
     pcb->estimacion_rafaga = -1;
+    pcb->ultima_rafaga = 0;
 
     pthread_mutex_init(&(pcb->mutex), NULL);
 
@@ -91,6 +92,24 @@ t_state get_estado_pcb(t_pcb *pcb)
     return estado;
 }
 
+u_int64_t get_tiempo_estado_actual_pcb(t_pcb *pcb)
+{
+    pthread_mutex_lock(&(pcb->mutex));
+
+    if (pcb->temporal == NULL)
+    {
+        pthread_mutex_unlock(&(pcb->mutex));
+        return 0;
+    }
+
+    temporal_stop(pcb->temporal);
+    u_int64_t transcurrido = temporal_gettime(pcb->temporal);
+    temporal_start(pcb->temporal);
+
+    pthread_mutex_unlock(&(pcb->mutex));
+    return transcurrido;
+}
+
 u_int64_t get_ultima_estimacion_rafaga_pcb(t_pcb *pcb)
 {
     pthread_mutex_lock(&(pcb->mutex));
@@ -105,6 +124,14 @@ u_int64_t get_estimacion_rafaga_pcb(t_pcb *pcb)
     u_int64_t estimacion = pcb->estimacion_rafaga;
     pthread_mutex_unlock(&(pcb->mutex));
     return estimacion;
+}
+
+u_int64_t get_ultima_rafaga_pcb(t_pcb *pcb)
+{
+    pthread_mutex_lock(&(pcb->mutex));
+    u_int64_t ultima_rafaga = pcb->ultima_rafaga;
+    pthread_mutex_unlock(&(pcb->mutex));
+    return ultima_rafaga;
 }
 
 void set_program_counter_pcb(t_pcb *pcb, u_int32_t program_counter)
