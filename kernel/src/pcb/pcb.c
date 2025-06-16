@@ -104,7 +104,7 @@ u_int64_t get_tiempo_estado_actual_pcb(t_pcb *pcb)
 
     temporal_stop(pcb->temporal);
     u_int64_t transcurrido = temporal_gettime(pcb->temporal);
-    temporal_start(pcb->temporal);
+    temporal_resume(pcb->temporal);
 
     pthread_mutex_unlock(&(pcb->mutex));
     return transcurrido;
