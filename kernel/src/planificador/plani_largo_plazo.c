@@ -46,7 +46,6 @@ void insertar_proceso_nuevo(char *pseudocodigo, u_int32_t tamanio_proceso)
         push_proceso(q_new, pcb);
         break;
     case PMCP:
-        // TODO: Definir el criterio de ordenamiento
         ordered_insert_proceso(q_new, pcb, &_es_de_menor_tamanio_que);
         break;
     default: // caso SJF, SRT, no debería ocurrir nunca
@@ -81,8 +80,10 @@ static void *admitir_proceso(void *_)
     return NULL;
 }
 
-// TODO: Implementar inserción en EXIT
-void insertar_en_exit(t_pcb *proceso) {}
+void insertar_en_exit(t_pcb *proceso)
+{
+    push_proceso(q_exit, proceso);
+}
 
 static void *finalizar_proceso(void *_)
 {
