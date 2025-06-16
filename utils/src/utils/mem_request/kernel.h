@@ -9,6 +9,9 @@ typedef enum
 {
     INICIAR_PROCESO,
     FINALIZAR_PROCESO,
+    DUMP_PROCESO,
+    SWAP_OUT,
+    SWAP_IN,
 } kernel_req_operation;
 
 typedef struct
