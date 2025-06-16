@@ -16,4 +16,6 @@ void inicializar_planificador_mediano_plazo(q_estado *blocked,
                                             q_estado *q_susp_blocked,
                                             q_estado *q_susp_ready);
 
+void insertar_en_blocked(t_pcb *proceso);
+
 #endif // PLANIFICADOR_MEDIANO_PLAZO_H

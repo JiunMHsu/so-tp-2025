@@ -7,7 +7,6 @@ static void exit_proc(t_pcb *proceso);
 
 void manejar_syscall(t_pcb *proceso, char *syscall)
 {
-
     char **syscall_vec = string_split(syscall, " ");
     char *syscall_name = syscall_vec[0];
 
@@ -32,6 +31,8 @@ void manejar_syscall(t_pcb *proceso, char *syscall)
 
     if (string_is_equal(syscall_name, "DUMP_MEMORY"))
         dump_memory(proceso);
+
+    string_array_destroy(syscall_vec); // TODO: averiguar si se debe destruír aca
 }
 
 static void init_proc(char *pseudocodigo, u_int32_t tamanio_proceso)
@@ -43,14 +44,20 @@ static void init_proc(char *pseudocodigo, u_int32_t tamanio_proceso)
 static void dump_memory(t_pcb *proceso)
 {
     // hacer la peticion
+    int8_t respuesta = solicitar_dump_proceso(proceso->pid);
     // bloquear con plani mediano plazo
 }
 
-// TODO: Implementar llamada a IO
 static void io(t_pcb *proceso, char *dispositivo, u_int32_t tiempo)
 {
-    // hacer la peticion
-    // bloquear con plani mediano plazo
+    int32_t intento_de_consumo = bloquear_para_io(dispositivo, proceso, tiempo);
+    if (intento_de_consumo == -1)
+    {
+        insertar_en_exit(proceso);
+        return;
+    }
+
+    insertar_en_blocked(proceso);
 }
 
 static void exit_proc(t_pcb *proceso)
