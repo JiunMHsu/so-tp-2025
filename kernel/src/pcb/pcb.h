@@ -53,6 +53,7 @@ typedef struct
 
     u_int64_t ultima_estimacion_rafaga; // en milisegundos
     u_int64_t estimacion_rafaga;        // en milisegundos
+    u_int64_t ultima_rafaga;            // en milisegundos
 
     pthread_mutex_t mutex;
 } t_pcb;
@@ -63,8 +64,10 @@ t_pcb *crear_pcb(u_int32_t pid, u_int32_t tamanio, char *ejecutable, u_int64_t e
 void destruir_pcb(t_pcb *pcb);
 
 t_state get_estado_pcb(t_pcb *pcb);
+u_int64_t get_tiempo_estado_actual_pcb(t_pcb *pcb);
 u_int64_t get_ultima_estimacion_rafaga_pcb(t_pcb *pcb);
 u_int64_t get_estimacion_rafaga_pcb(t_pcb *pcb);
+u_int64_t get_ultima_rafaga_pcb(t_pcb *pcb);
 
 // TODO: get de las métricas de estado y tiempo (ojo el caso EXIT que no transita a otro)
 
