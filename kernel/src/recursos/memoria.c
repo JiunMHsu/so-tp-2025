@@ -35,7 +35,7 @@ static int8_t enviar_solicitud(t_kernel_mem_req *mem_request)
     enviar_kernel_mem_request(fd_memoria, mem_request);
     destruir_kernel_mem_request(mem_request);
 
-    return recibir_senial(fd_memoria);
+    int8_t respuesta = recibir_senial(fd_memoria);
     if (respuesta == -1)
     {
         log_mensaje_error("Error al recibir respuesta de memoria");
