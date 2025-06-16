@@ -29,6 +29,11 @@ char *recibir_mensaje_memoria()
     return recibir_mensaje(fd_memoria);
 }
 
+u_int32_t recibir_marco()
+{
+    return recibir_senial(fd_memoria);
+}
+
 void enviar_peticion_instruccion(u_int32_t pid, u_int32_t program_counter)
 {
     t_peticion_cpu *peticion_instruccion = crear_peticion_instruccion(pid, program_counter);
