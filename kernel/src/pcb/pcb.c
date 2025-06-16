@@ -39,22 +39,15 @@ t_pcb *crear_pcb(u_int32_t pid, u_int32_t tamanio, char *ejecutable, u_int64_t e
     pcb->estado = -1;
 
     pcb->metricas_estado = dictionary_create();
-    dictionary_put(pcb->metricas_estado, strdup(get_estado_string(NEW)), calloc(1, sizeof(u_int32_t)));
-    dictionary_put(pcb->metricas_estado, strdup(get_estado_string(READY)), calloc(1, sizeof(u_int32_t)));
-    dictionary_put(pcb->metricas_estado, strdup(get_estado_string(EXEC)), calloc(1, sizeof(u_int32_t)));
-    dictionary_put(pcb->metricas_estado, strdup(get_estado_string(BLOCKED)), calloc(1, sizeof(u_int32_t)));
-    dictionary_put(pcb->metricas_estado, strdup(get_estado_string(SUSPENDED_BLOCKED)), calloc(1, sizeof(u_int32_t)));
-    dictionary_put(pcb->metricas_estado, strdup(get_estado_string(SUSPENDED_READY)), calloc(1, sizeof(u_int32_t)));
-    dictionary_put(pcb->metricas_estado, strdup(get_estado_string(EXIT)), calloc(1, sizeof(u_int32_t)));
-
     pcb->metricas_tiempo = dictionary_create();
-    dictionary_put(pcb->metricas_estado, strdup(get_estado_string(NEW)), list_create());
-    dictionary_put(pcb->metricas_estado, strdup(get_estado_string(READY)), list_create());
-    dictionary_put(pcb->metricas_estado, strdup(get_estado_string(EXEC)), list_create());
-    dictionary_put(pcb->metricas_estado, strdup(get_estado_string(BLOCKED)), list_create());
-    dictionary_put(pcb->metricas_estado, strdup(get_estado_string(SUSPENDED_BLOCKED)), list_create());
-    dictionary_put(pcb->metricas_estado, strdup(get_estado_string(SUSPENDED_READY)), list_create());
-    dictionary_put(pcb->metricas_estado, strdup(get_estado_string(EXIT)), list_create());
+
+    t_state estados[7] = {NEW, READY, EXEC, BLOCKED, SUSPENDED_BLOCKED, SUSPENDED_READY, EXIT};
+    for (int i = 0; i < 7; i++)
+    {
+        char *estado_string = get_estado_string(estados[i]);
+        dictionary_put(pcb->metricas_estado, strdup(estado_string), calloc(1, sizeof(u_int32_t)));
+        dictionary_put(pcb->metricas_tiempo, strdup(estado_string), list_create());
+    }
 
     pcb->temporal = NULL;
 

@@ -3,6 +3,7 @@
 static q_estado *q_ready;
 static q_estado *q_executing;
 
+static sem_t *hay_cpu_libre;
 static sem_t *hay_proceso_ready;
 
 static double alpha;
@@ -21,6 +22,9 @@ void inicializar_planificador_corto_plazo(q_estado *q_ready, q_estado *q_executi
 {
     q_ready = q_ready;
     q_executing = q_executing;
+
+    hay_cpu_libre = malloc(sizeof(sem_t));
+    sem_init(hay_cpu_libre, 0, 1);
 
     hay_proceso_ready = malloc(sizeof(sem_t));
     sem_init(hay_proceso_ready, 0, 0);
@@ -56,7 +60,10 @@ void inicializar_planificador_corto_plazo(q_estado *q_ready, q_estado *q_executi
 }
 
 // TODO: Implementar inserción en READY
-void insertar_en_ready(t_pcb *proceso) {}
+void insertar_en_ready(t_pcb *proceso)
+{
+    // inserto a ready con los valores calculados
+}
 
 static double estimar_rafaga(double anterior_estimado, double real_anterior)
 {
@@ -73,6 +80,7 @@ static void *planificar_por_fifo(void *_)
 {
     while (1)
     {
+        sem_wait(hay_cpu_libre);
         t_pcb *proceso = pop_proceso(q_ready);
         ejecutar(proceso); // bloquante si no hay CPU libre
         push_proceso(q_executing, proceso);
@@ -85,6 +93,7 @@ static void *planificar_por_sjf(void *_)
 {
     while (1)
     {
+        sem_wait(hay_cpu_libre);
         t_pcb *proceso = pop_proceso_minimo(q_ready, &_es_de_menor_rafaga);
         ejecutar(proceso); // bloquante si no hay CPU libre
         push_proceso(q_executing, proceso);
@@ -112,6 +121,7 @@ static void *manejar_desalojado(void *_)
     while (1)
     {
         t_desalojo *desalojado = get_desalojado(); // bloquante si no hay finalizados
+        sem_post(hay_cpu_libre);
 
         t_pcb *proceso = remove_proceso(q_executing, desalojado->pid);
         proceso->program_counter = desalojado->program_counter;
