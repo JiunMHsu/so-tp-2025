@@ -6,6 +6,7 @@
 #include <utils/sockets/sockets.h>
 #include <utils/protocol/protocol.h>
 #include <utils/mem_request/kernel.h>
+#include <utils/mlist/mlist.h>
 
 #include "config/config.h"
 #include "logger/logger.h"

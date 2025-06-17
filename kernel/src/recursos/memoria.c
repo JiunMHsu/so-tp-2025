@@ -1,5 +1,7 @@
 #include "memoria.h"
 
+static t_mutex_list *dump_finalizados;
+
 static int32_t conectar_memoria(void);
 static void desconectar_memoria(int32_t fd_memoria);
 static int8_t enviar_solicitud(t_kernel_mem_req *mem_request);
