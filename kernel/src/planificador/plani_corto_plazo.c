@@ -87,6 +87,7 @@ static t_pcb *_es_de_menor_rafaga(t_pcb *proceso_a, t_pcb *proceso_b)
     return proceso_b;
 }
 
+
 static void *planificar_por_fifo(void *_)
 {
     while (1)
@@ -107,7 +108,7 @@ static void *planificar_por_sjf(void *_)
     while (1)
     {
         sem_wait(hay_cpu_libre);
-        sem_wait(hay_proceso_ready); // capaz es medio al pedo
+        sem_wait(hay_proceso_ready); // capaz es medio al pedo                  creo que si, pop ya tiene implementado un semaforo
         t_pcb *proceso = pop_proceso_minimo(q_ready, &_es_de_menor_rafaga);
 
         ejecutar(proceso); // bloquante si no hay CPU libre
@@ -117,13 +118,48 @@ static void *planificar_por_sjf(void *_)
     return NULL;
 }
 
+t_pcb *proceso_mayor_rafaga()
+{
+    pthread_mutex_lock(&q_executing->lista->mutex);
+
+    t_pcb *proceso_mas_largo = NULL;
+    double mayor_restante = -1;
+
+    for (int i = 0; i < list_size(q_executing->lista->elements); i++) {
+        t_pcb *pcb = list_get(q_executing->lista->elements, i);
+
+        u_int64_t tiempo_en_ejecucion = get_tiempo_estado_actual_pcb(pcb);
+
+        double restante = pcb->estimacion_rafaga - tiempo_en_ejecucion;
+
+        if (proceso_mas_largo == NULL || restante > mayor_restante) {
+            proceso_mas_largo = pcb;
+            mayor_restante = restante;
+        }
+    }
+
+    pthread_mutex_unlock(&q_executing->lista->mutex);
+
+    return proceso_mas_largo;
+}
+
+
 static void *planificar_por_srt(void *_)
 {
-    // TODO: Iniciar rutina de envío de interrupción
-
     while (1)
     {
         t_pcb *proceso = pop_proceso_minimo(q_ready, &_es_de_menor_rafaga);
+        t_pcb *proceso_mas_largo_ejecutando = proceso_mayor_rafaga();
+        t_pcb *proceso_mas_chico = _es_de_menor_rafaga(proceso, proceso_mas_largo_ejecutando);
+        
+        if(proceso_mas_chico == proceso) 
+        {
+            pop_proceso(q_executing, proceso_mas_largo_ejecutando);
+            //timer_stop(proceso_mas_largo_ejecutando);     no se si hace falta o enviar_interr ya para el tiempo
+            push_proceso(q_ready, proceso_mas_largo_ejecutando);
+            enviar_interrupcion(proceso_mas_largo_ejecutando->pid);
+        }
+        
         ejecutar(proceso); // bloquante si no hay CPU libre
         push_proceso(q_executing, proceso);
     }
