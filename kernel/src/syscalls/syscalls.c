@@ -32,7 +32,7 @@ void manejar_syscall(t_pcb *proceso, char *syscall)
     if (string_is_equal(syscall_name, "DUMP_MEMORY"))
         dump_memory(proceso);
 
-    string_array_destroy(syscall_vec); // TODO: averiguar si se debe destruír aca
+    string_array_destroy(syscall_vec); // TODO: averiguar si se debe destruir aca
 }
 
 static void init_proc(char *pseudocodigo, u_int32_t tamanio_proceso)
