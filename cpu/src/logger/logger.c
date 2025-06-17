@@ -65,6 +65,11 @@ void log_tlb_miss(u_int32_t pid, u_int32_t numero_pagina)
     log_trace(cpu_logger, "PID: %d - TLB MISS - Pagina: %d", pid, numero_pagina);
 }
 
+void log_pagina_ingresada_tlb(u_int32_t pid, u_int32_t numero_pagina)
+{
+    log_trace(cpu_logger, "PID: %d - TLB ADD - Pagina: %d", pid, numero_pagina);
+}
+
 void log_cache_hit(u_int32_t pid, u_int32_t numero_pagina)
 {
     log_trace(cpu_logger, "PID: %d - Cache Hit - Pagina: %d", pid, numero_pagina);
@@ -75,7 +80,7 @@ void log_cache_miss(u_int32_t pid, u_int32_t numero_pagina)
     log_trace(cpu_logger, "PID: %d - Cache Miss - Pagina: %d", pid, numero_pagina);
 }
 
-    void log_pagina_ingresada_cache(u_int32_t pid, u_int32_t numero_pagina)
+void log_pagina_ingresada_cache(u_int32_t pid, u_int32_t numero_pagina)
 {
     log_trace(cpu_logger, "PID: %d - Cache Add - Pagina: %d", pid, numero_pagina);
 }
