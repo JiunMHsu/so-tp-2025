@@ -193,3 +193,10 @@ void set_estimacion_rafaga_pcb(t_pcb *pcb, u_int64_t estimacion)
     pcb->estimacion_rafaga = estimacion;
     pthread_mutex_unlock(&(pcb->mutex));
 }
+
+void set_ultima_rafaga_pcb(t_pcb *pcb, u_int64_t rafaga)
+{
+    pthread_mutex_lock(&(pcb->mutex));
+    pcb->ultima_rafaga = rafaga;
+    pthread_mutex_unlock(&(pcb->mutex));
+}

@@ -75,6 +75,7 @@ void set_program_counter_pcb(t_pcb *pcb, u_int32_t program_counter);
 void set_estado_pcb(t_pcb *pcb, t_state estado);
 void set_ultima_estimacion_rafaga_pcb(t_pcb *pcb, u_int64_t ultima_estimacion);
 void set_estimacion_rafaga_pcb(t_pcb *pcb, u_int64_t estimacion);
+void set_ultima_rafaga_pcb(t_pcb *pcb, u_int64_t rafaga);
 
 void debug_pcb(t_pcb *pcb);
 

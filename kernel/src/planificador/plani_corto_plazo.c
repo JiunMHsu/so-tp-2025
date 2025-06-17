@@ -66,7 +66,8 @@ void inicializar_planificador_corto_plazo(q_estado *q_ready, q_estado *q_executi
 
 void insertar_en_ready(t_pcb *proceso)
 {
-    u_int64_t rafaga_estimacion = estimar_rafaga(proceso->ultima_estimacion_rafaga, proceso->ultima_rafaga);
+    u_int64_t rafaga_estimacion = estimar_rafaga(get_ultima_estimacion_rafaga_pcb(proceso),
+                                                 get_ultima_rafaga_pcb(proceso));
     set_estimacion_rafaga_pcb(proceso, rafaga_estimacion);
 
     push_proceso(q_ready, proceso);
@@ -138,8 +139,10 @@ static void *manejar_desalojado(void *_)
         sem_post(hay_cpu_libre);
 
         t_pcb *proceso = remove_proceso(q_executing, desalojado->pid);
-        proceso->program_counter = desalojado->program_counter;
-        // TODO: Actualizar métricas de tiempo
+
+        set_program_counter_pcb(proceso, desalojado->program_counter);
+        set_ultima_estimacion_rafaga_pcb(proceso, get_estimacion_rafaga_pcb(proceso));
+        set_ultima_rafaga_pcb(proceso, get_tiempo_estado_actual_pcb(proceso));
 
         switch (desalojado->motivo)
         {
