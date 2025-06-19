@@ -19,7 +19,7 @@ typedef struct
 }t_memoria;
 
 void inicializar_memoria_principal(t_memoria *memoria);
-void asignar_marco();
-void liberar_marco();
+int32_t asignar_marco(t_memoria *memoria);
+void liberar_marco(t_memoria *memoria, int32_t marco_a_liberar);
 
 #endif // MEMORIA_USUARIO_H
