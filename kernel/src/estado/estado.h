@@ -69,6 +69,15 @@ t_pcb *pop_proceso_minimo(q_estado *estado, t_pcb *(*minimo)(t_pcb *, t_pcb *));
 t_pcb *peek_proceso(q_estado *estado);
 
 /**
+ * @brief Devuelve el primer proceso encolado en el estado dado, según un criterio de mínimo.
+ *        El puntero retornado nunca será NULL.
+ *
+ * @param estado
+ * @return `t_pcb*`
+ */
+t_pcb *peek_proceso_minimo(q_estado *estado, t_pcb *(*minimo)(t_pcb *, t_pcb *));
+
+/**
  * @brief
  *
  * @param estado
