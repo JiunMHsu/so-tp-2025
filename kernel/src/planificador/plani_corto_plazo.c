@@ -114,32 +114,17 @@ static void *planificar_por_sjf(void *_)
     return NULL;
 }
 
-// TODO: Refactor
-t_pcb *proceso_mayor_rafaga()
+static t_pcb *es_de_mayor_rafaga(t_pcb *proceso_a, t_pcb *proceso_b)
 {
-    pthread_mutex_lock(&q_executing->lista->mutex);
+    if ((get_estimacion_rafaga_pcb(proceso_a) - get_tiempo_estado_actual_pcb(proceso_a)) > (get_estimacion_rafaga_pcb(proceso_b) - get_tiempo_estado_actual_pcb(proceso_b)))
+        return proceso_a;
 
-    t_pcb *proceso_mas_largo = NULL;
-    double mayor_restante = -1;
+    return proceso_b;
+}
 
-    for (int i = 0; i < list_size(q_executing->lista->elements); i++)
-    {
-        t_pcb *pcb = list_get(q_executing->lista->elements, i);
-
-        u_int64_t tiempo_en_ejecucion = get_tiempo_estado_actual_pcb(pcb);
-
-        double restante = pcb->estimacion_rafaga - tiempo_en_ejecucion;
-
-        if (proceso_mas_largo == NULL || restante > mayor_restante)
-        {
-            proceso_mas_largo = pcb;
-            mayor_restante = restante;
-        }
-    }
-
-    pthread_mutex_unlock(&q_executing->lista->mutex);
-
-    return proceso_mas_largo;
+bool es_menor(t_pcb *proceso_a, t_pcb *proceso_b)
+{
+   return _es_de_menor_rafaga(t_pcb *proceso_a, t_pcb *proceso_b) == proceso_a;
 }
 
 static void *planificar_por_srt(void *_)
@@ -160,7 +145,7 @@ static void *planificar_por_srt(void *_)
             continue;
         }
 
-        t_pcb *proceso_mas_largo_ejecutando = proceso_mayor_rafaga();
+        t_pcb *proceso_mas_largo_ejecutando = peek_proceso_maximo(q_executing, &es_de_mayor_rafaga);
         t_pcb *proceso_mas_chico = _es_de_menor_rafaga(proceso, proceso_mas_largo_ejecutando);
 
         if (proceso_mas_chico == proceso_mas_largo_ejecutando)

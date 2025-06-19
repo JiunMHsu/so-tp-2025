@@ -40,11 +40,20 @@ t_pcb *pop_proceso(q_estado *estado)
     return (t_pcb *)mlist_pop_as_queue(estado->lista);
 }
 
-// TODO: Fixear para que se popee (remueva)
 t_pcb *pop_proceso_minimo(q_estado *estado, t_pcb *(*minimo)(t_pcb *, t_pcb *))
 {
     sem_wait(estado->hay_proceso);
-    return (t_pcb *)mlist_get_minimum(estado->lista, (void *)minimo);
+    t_pcb *proceso_minimo = mlist_get_minimum(estado->lista, (void *)minimo);
+    list_remove_element(estado->lista, proceso_minimo);
+    return proceso_minimo;
+}
+
+t_pcb *peek_proceso_maximo(q_estado *estado, t_pcb *(*maximo)(t_pcb *, t_pcb *))
+{
+    sem_wait(estado->hay_proceso);
+    t_pcb *proceso_maximo = mlist_get_maximum(estado->lista, (void *)maximo);
+    sem_post(estado->hay_proceso);
+    return proceso_maximo;
 }
 
 t_pcb *peek_proceso(q_estado *estado)
