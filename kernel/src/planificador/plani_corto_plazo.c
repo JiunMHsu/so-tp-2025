@@ -114,6 +114,7 @@ static void *planificar_por_sjf(void *_)
     return NULL;
 }
 
+// TODO: Refactor
 t_pcb *proceso_mayor_rafaga()
 {
     pthread_mutex_lock(&q_executing->lista->mutex);
@@ -148,7 +149,7 @@ static void *planificar_por_srt(void *_)
 
     while (1)
     {
-        sem_wait(puede_replanificar); // ver bien si no hay bug
+        sem_wait(puede_replanificar); // TODO: ver bien si no hay bug
         t_pcb *proceso = peek_proceso_minimo(q_ready, &_es_de_menor_rafaga);
 
         if (hay_cpu())
