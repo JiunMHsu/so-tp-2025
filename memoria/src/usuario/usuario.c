@@ -32,12 +32,35 @@ void inicializar_memoria_principal(t_memoria* memoria)
     memoria->asignacion_marcos = bitarray_create_with_mode(buffer, bytes_asignacion_marcos, LSB_FIRST);
 }
 
-void asignar_marco()
+int32_t asignar_marco(t_memoria *memoria)
 {
+    for (int32_t i = 0; i < memoria->cantidad_marcos; i++)
+    {
+        int32_t bit_asignacion = bitarray_test_bit(memoria->asignacion_marcos, i);
 
+        if (bit_asignacion == 0)
+        {
+            bitarray_set_bit(memoria->asignacion_marcos, i);
+
+            return i;
+        }
+    }
+
+    // Caso en el que todos los marcos esten ocupados
+
+    return -1;
 }
 
-void liberar_marco()
+void liberar_marco(t_memoria *memoria, int32_t marco_a_liberar)
 {
+    int32_t bit_asignacion = bitarray_test_bit(memoria->asignacion_marcos, marco_a_liberar);
+    if (marco_a_liberar < 0 || marco_a_liberar >= memoria->cantidad_marcos)
+    {
+    }
 
+    if (bit_asignacion == 0)
+    {
+    }
+
+    bitarray_clean_bit(memoria->asignacion_marcos, marco_a_liberar);
 }
