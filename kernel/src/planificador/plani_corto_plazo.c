@@ -124,7 +124,7 @@ static t_pcb *es_de_mayor_rafaga(t_pcb *proceso_a, t_pcb *proceso_b)
 
 bool es_menor(t_pcb *proceso_a, t_pcb *proceso_b)
 {
-   return _es_de_menor_rafaga(t_pcb *proceso_a, t_pcb *proceso_b) == proceso_a;
+    return _es_de_menor_rafaga(t_pcb * proceso_a, t_pcb * proceso_b) == proceso_a;
 }
 
 static void *planificar_por_srt(void *_)

@@ -48,14 +48,6 @@ t_pcb *pop_proceso_minimo(q_estado *estado, t_pcb *(*minimo)(t_pcb *, t_pcb *))
     return proceso_minimo;
 }
 
-t_pcb *peek_proceso_maximo(q_estado *estado, t_pcb *(*maximo)(t_pcb *, t_pcb *))
-{
-    sem_wait(estado->hay_proceso);
-    t_pcb *proceso_maximo = mlist_get_maximum(estado->lista, (void *)maximo);
-    sem_post(estado->hay_proceso);
-    return proceso_maximo;
-}
-
 t_pcb *peek_proceso(q_estado *estado)
 {
     sem_wait(estado->hay_proceso);
@@ -67,7 +59,17 @@ t_pcb *peek_proceso(q_estado *estado)
 t_pcb *peek_proceso_minimo(q_estado *estado, t_pcb *(*minimo)(t_pcb *, t_pcb *))
 {
     sem_wait(estado->hay_proceso);
-    return (t_pcb *)mlist_get_minimum(estado->lista, (void *)minimo);
+    t_pcb *proceso_minimo = (t_pcb *)mlist_get_minimum(estado->lista, (void *)minimo);
+    sem_post(estado->hay_proceso);
+    return proceso_minimo;
+}
+
+t_pcb *peek_proceso_maximo(q_estado *estado, t_pcb *(*maximo)(t_pcb *, t_pcb *))
+{
+    sem_wait(estado->hay_proceso);
+    t_pcb *proceso_maximo = mlist_get_maximum(estado->lista, (void *)maximo);
+    sem_post(estado->hay_proceso);
+    return proceso_maximo;
 }
 
 t_pcb *remove_proceso(q_estado *estado, u_int32_t pid)
