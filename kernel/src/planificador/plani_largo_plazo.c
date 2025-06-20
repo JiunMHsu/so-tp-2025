@@ -54,6 +54,7 @@ void insertar_proceso_nuevo(char *pseudocodigo, u_int32_t tamanio_proceso)
     }
 
     log_creacion_proceso(pcb->pid);
+    puede_admitir_proceso_nuevo();
 }
 
 void puede_admitir_proceso_nuevo()
@@ -78,19 +79,20 @@ static void *admitir_proceso(void *_)
             pcb = desuspender_proceso_ready();
             if (pcb == NULL) // si no se pudo desuspender, no hay nada que hacer
                 continue;
-        }
-        else
-        {
-            pcb = peek_proceso(q_new);
-            int32_t solicitud = solicitar_creacion_proceso(pcb->pid, pcb->tamanio, pcb->ejecutable);
 
-            // caso 0 o -1 (ver si hacer alguna direfencia y que el sistema paniquee)
-            if (solicitud < 1)
-                continue;
-
-            pcb = remove_proceso(q_new, pcb->pid); // porque peek no remueve de la lista
+            insertar_en_ready(pcb);
+            sem_post(puede_crearse_proceso);
+            continue;
         }
 
+        pcb = peek_proceso(q_new);
+        int32_t solicitud = solicitar_creacion_proceso(pcb->pid, pcb->tamanio, pcb->ejecutable);
+
+        // caso 0 o -1 (ver si hacer alguna direfencia y que el sistema paniquee)
+        if (solicitud < 1)
+            continue;
+
+        pcb = remove_proceso(q_new, pcb->pid);
         insertar_en_ready(pcb);
         sem_post(puede_crearse_proceso);
     }
