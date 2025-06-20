@@ -56,6 +56,11 @@ void insertar_proceso_nuevo(char *pseudocodigo, u_int32_t tamanio_proceso)
     log_creacion_proceso(pcb->pid);
 }
 
+void puede_admitir_proceso_nuevo()
+{
+    sem_post(puede_crearse_proceso);
+}
+
 static int32_t _es_de_menor_tamanio_que(t_pcb *proceso_a, t_pcb *proceso_b)
 {
     return proceso_a->tamanio <= proceso_b->tamanio;
@@ -66,13 +71,26 @@ static void *admitir_proceso(void *_)
     while (1)
     {
         sem_wait(puede_crearse_proceso);
-        t_pcb *pcb = peek_proceso(q_new);
-        int32_t solicitud = solicitar_creacion_proceso(pcb->pid, pcb->tamanio, pcb->ejecutable);
+        t_pcb *pcb = NULL;
 
-        if (solicitud < 1) // caso 0 o -1 (ver si hacer alguna direfencia y que el sistema paniquee)
-            continue;
+        if (hay_proceso_susp_ready())
+        {
+            pcb = desuspender_proceso_ready();
+            if (pcb == NULL) // si no se pudo desuspender, no hay nada que hacer
+                continue;
+        }
+        else
+        {
+            pcb = peek_proceso(q_new);
+            int32_t solicitud = solicitar_creacion_proceso(pcb->pid, pcb->tamanio, pcb->ejecutable);
 
-        pcb = remove_proceso(q_new, pcb->pid); // porque peek no remueve de la lista
+            // caso 0 o -1 (ver si hacer alguna direfencia y que el sistema paniquee)
+            if (solicitud < 1)
+                continue;
+
+            pcb = remove_proceso(q_new, pcb->pid); // porque peek no remueve de la lista
+        }
+
         insertar_en_ready(pcb);
         sem_post(puede_crearse_proceso);
     }
@@ -97,7 +115,7 @@ static void *finalizar_proceso(void *_)
         // si la memoria no pudo finalizar el proceso.
         if (res_solicitud == 1)
         {
-            sem_post(puede_crearse_proceso);
+            puede_admitir_proceso_nuevo();
             proceso = remove_proceso(q_exit, proceso->pid);
 
             log_metricas_proceso(proceso->pid,
