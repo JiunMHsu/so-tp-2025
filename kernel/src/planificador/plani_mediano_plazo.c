@@ -20,7 +20,6 @@ void inicializar_planificador_mediano_plazo(q_estado *q_susp_ready,
                                             q_estado *q_susp_blocked,
                                             q_estado *q_blocked)
 {
-
     q_susp_ready = q_susp_ready;
     q_susp_blocked = q_susp_blocked;
     q_blocked = q_blocked;
@@ -39,6 +38,7 @@ static bool _cronometro_libre(void *_cronometro)
 
 void insertar_en_blocked(t_pcb *proceso)
 {
+    push_proceso(q_blocked, proceso);
     t_cronometro *cronometro = NULL;
 
     pthread_mutex_lock(&timer_pool_mutex);
@@ -57,13 +57,15 @@ void insertar_en_blocked(t_pcb *proceso)
     cronometro->esta_libre = 0;
     sem_post(cronometro->hay_proceso);
     pthread_mutex_unlock(&timer_pool_mutex);
-
-    push_proceso(q_blocked, proceso);
 }
 
 void desbloquear_proceso(u_int32_t pid, int8_t resultado) {}
 
-static void suspender_proceso(t_pcb *proceso) {}
+static void suspender_proceso(t_pcb *proceso)
+{
+    // push a suspended blocked
+    // peticion a memoria
+}
 
 static void desuspender_proceso(t_pcb *proceso) {}
 
@@ -72,8 +74,8 @@ static t_cronometro *crear_cronometro(u_int64_t tiempo_espera)
     t_cronometro *cronometro = malloc(sizeof(t_cronometro));
     cronometro->hay_proceso = malloc(sizeof(sem_t));
     sem_init(cronometro->hay_proceso, 0, 0);
-    cronometro->pid = 0;                // Inicialmente no tiene PID asociado
-    cronometro->tiempo = tiempo_espera; // Tiempo de espera en milisegundos
+    cronometro->pid = 0;
+    cronometro->tiempo = tiempo_espera;
     cronometro->esta_libre = 1;
     cronometro->rutina_consumo = 0;
 
@@ -89,9 +91,10 @@ static void *cronometrar(void *_cronometro)
         sem_wait(cronometro->hay_proceso);
         usleep(cronometro->tiempo * 1000); // Convertir a microsegundos
 
-        // TODO: ver si el proceso sigue en blocked. si sigue, suspenderlo
+        t_pcb *proceso = remove_proceso(q_blocked, cronometro->pid);
+        if (proceso != NULL)
+            suspender_proceso(proceso);
 
-        cronometro->pid = 0; // Resetear PID
         cronometro->esta_libre = 1;
     }
 
