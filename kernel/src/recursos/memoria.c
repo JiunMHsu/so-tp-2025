@@ -1,10 +1,16 @@
 #include "memoria.h"
 
-static t_mutex_list *dump_finalizados;
-
 static int32_t conectar_memoria(void);
 static void desconectar_memoria(int32_t fd_memoria);
-static int8_t enviar_solicitud(t_kernel_mem_req *mem_request);
+
+/**
+ * @brief Envía una solicitud a la memoria, y espera por la respuesta.
+ *
+ * @param mem_request
+ * @return int32_t
+ * @note Función bloqueante.
+ */
+static int32_t enviar_solicitud(t_kernel_mem_req *mem_request);
 
 static int32_t conectar_memoria()
 {
@@ -30,14 +36,14 @@ static void desconectar_memoria(int32_t fd_memoria)
     }
 }
 
-static int8_t enviar_solicitud(t_kernel_mem_req *mem_request)
+static int32_t enviar_solicitud(t_kernel_mem_req *mem_request)
 {
     int32_t fd_memoria = conectar_memoria();
 
     enviar_kernel_mem_request(fd_memoria, mem_request);
     destruir_kernel_mem_request(mem_request);
 
-    int8_t respuesta = recibir_senial(fd_memoria);
+    int32_t respuesta = recibir_senial(fd_memoria);
     if (respuesta == -1)
     {
         log_mensaje_error("Error al recibir respuesta de memoria");
@@ -49,31 +55,31 @@ static int8_t enviar_solicitud(t_kernel_mem_req *mem_request)
     return respuesta;
 }
 
-int8_t solicitar_creacion_proceso(u_int32_t pid, u_int32_t tamanio, char *ruta_codigo)
+int32_t solicitar_creacion_proceso(u_int32_t pid, u_int32_t tamanio, char *ruta_codigo)
 {
     t_kernel_mem_req *mem_request = crear_kernel_mem_request(INICIAR_PROCESO, pid, ruta_codigo);
     return enviar_solicitud(mem_request);
 }
 
-int8_t solicitar_finalizacion_proceso(u_int32_t pid)
+int32_t solicitar_finalizacion_proceso(u_int32_t pid)
 {
     t_kernel_mem_req *mem_request = crear_kernel_mem_request(FINALIZAR_PROCESO, pid, NULL);
     return enviar_solicitud(mem_request);
 }
 
-int8_t solicitar_dump_proceso(u_int32_t pid)
+int32_t solicitar_dump_proceso(u_int32_t pid)
 {
     t_kernel_mem_req *mem_request = crear_kernel_mem_request(DUMP_PROCESO, pid, NULL);
     return enviar_solicitud(mem_request);
 }
 
-int8_t solicitar_swap_out(u_int32_t pid)
+int32_t solicitar_swap_out(u_int32_t pid)
 {
     t_kernel_mem_req *mem_request = crear_kernel_mem_request(SWAP_OUT, pid, NULL);
     return enviar_solicitud(mem_request);
 }
 
-int8_t solicitar_swap_in(u_int32_t pid)
+int32_t solicitar_swap_in(u_int32_t pid)
 {
     t_kernel_mem_req *mem_request = crear_kernel_mem_request(SWAP_IN, pid, NULL);
     return enviar_solicitud(mem_request);

@@ -15,6 +15,7 @@
 #include "config/config.h"
 #include "logger/logger.h"
 #include "pcb/pcb.h"
+#include "planificador/plani_mediano_plazo.h"
 
 typedef struct
 {
@@ -67,8 +68,8 @@ t_fin_de_io *get_finalizado(void);
 
 /**
  * @brief Destruye el puntero a fin_de_io. No destruye el proceso.
- * 
- * @param fin_de_io 
+ *
+ * @param fin_de_io
  */
 void destruir_fin_de_io(t_fin_de_io *fin_de_io);
 

@@ -2,6 +2,7 @@
 
 static void init_proc(char *pseudocodigo, u_int32_t tamanio_proceso);
 static void dump_memory(t_pcb *proceso);
+static void *_dump_memory(void *_pid);
 static void io(t_pcb *proceso, char *dispositivo, u_int32_t tiempo);
 static void exit_proc(t_pcb *proceso);
 
@@ -44,8 +45,25 @@ static void init_proc(char *pseudocodigo, u_int32_t tamanio_proceso)
 static void dump_memory(t_pcb *proceso)
 {
     // hacer la peticion
-    int8_t respuesta = solicitar_dump_proceso(proceso->pid);
-    // bloquear con plani mediano plazo
+    u_int32_t *pid = malloc(sizeof(u_int32_t));
+    *pid = proceso->pid;
+
+    insertar_en_blocked(proceso);
+
+    pthread_t thread_dump;
+    pthread_create(&thread_dump, NULL, &_dump_memory, pid);
+    pthread_detach(thread_dump);
+}
+
+static void *_dump_memory(void *_pid)
+{
+    u_int32_t pid = *(u_int32_t *)_pid;
+    free(_pid);
+
+    int8_t respuesta = solicitar_dump_proceso(pid);
+    // de alguna forma notificar al plani mediano plazo que ya termino el dump
+
+    return NULL;
 }
 
 static void io(t_pcb *proceso, char *dispositivo, u_int32_t tiempo)

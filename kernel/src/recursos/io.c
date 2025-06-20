@@ -184,4 +184,23 @@ static void _encolar_a_finalizados(void *_peticion_consumo)
     t_peticion_consumo *peticion_consumo = (t_peticion_consumo *)_peticion_consumo;
     finalizar_consumo_para(peticion_consumo->proceso, DISCONNECTED);
     destruir_peticion_consumo(peticion_consumo);
-};
+}
+
+void *manejar_finalizados(void *_)
+{
+    while (1)
+    {
+        t_fin_de_io *fin_de_io = get_finalizado();
+        if (fin_de_io == NULL)
+            continue;
+
+        if (fin_de_io->motivo == EXECUTED)
+            desbloquear_proceso(fin_de_io->proceso->pid, 0);
+        else
+            desbloquear_proceso(fin_de_io->proceso->pid, -1);
+
+        destruir_fin_de_io(fin_de_io);
+    }
+
+    return NULL;
+}
