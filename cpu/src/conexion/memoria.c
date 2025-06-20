@@ -41,11 +41,9 @@ void enviar_peticion_instruccion(u_int32_t pid, u_int32_t program_counter)
     destruir_peticion_cpu(peticion_instruccion);
 }
 
-void enviar_peticion_marco(u_int32_t pid, u_int32_t cantidad_niveles, u_int32_t *entradas_por_nivel)
+void enviar_peticion_marco(u_int32_t pid, char *entradas_por_nivel)
 {
-    // TODO revisar implementacion de crear_peticion_nro_marco en mem_request
-    // TODO Cuando deberia liberarse entradas por nivel
-    t_peticion_cpu *peticion_marco = crear_peticion_nro_marco(pid, cantidad_niveles, entradas_por_nivel);
+    t_peticion_cpu *peticion_marco = crear_peticion_nro_marco(pid, entradas_por_nivel);
     enviar_peticion_cpu(fd_memoria, peticion_marco);
     destruir_peticion_cpu(peticion_marco);
 }

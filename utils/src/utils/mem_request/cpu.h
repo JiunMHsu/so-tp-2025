@@ -22,14 +22,14 @@ typedef struct
     operacion_cpu_memoria operacion;
     u_int32_t pid;
     u_int32_t program_counter; // Presente solo para FETCH_INSTRUCCION
-    u_int32_t nro_pag;         // Presente solo para OBTENER_MARCO // TODO: Revisar
+    char *entradas_por_nivel;  // Presente solo para OBTENER_MARCO // TODO: Revisar
     char *direcciones_fisicas; // Presente para LEER y ESCRIBIR
     u_int32_t tamanio_buffer;  // Presente para LEER y ESCRIBIR
     void *buffer;              // Presente solo para ESCRIBIR
 } t_peticion_cpu;
 
 t_peticion_cpu *crear_peticion_instruccion(u_int32_t pid, u_int32_t program_counter);
-t_peticion_cpu *crear_peticion_nro_marco(u_int32_t pid, u_int32_t nro_pag); // TODO: Revisar
+t_peticion_cpu *crear_peticion_nro_marco(u_int32_t pid, char *entradas_por_nivel); // TODO: Revisar
 t_peticion_cpu *crear_peticion_lectura(u_int32_t pid, char *direcciones_fisicas, u_int32_t tamanio_buffer);
 t_peticion_cpu *crear_peticion_escritura(u_int32_t pid, char *direcciones_fisicas, u_int32_t tamanio_buffer, void *buffer);
 

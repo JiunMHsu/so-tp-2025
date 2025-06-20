@@ -5,7 +5,7 @@ static t_peticion_cpu *crear_peticion_cpu(operacion_cpu_memoria, u_int32_t, u_in
 static t_peticion_cpu *crear_peticion_cpu(operacion_cpu_memoria operacion,
                                           u_int32_t pid,
                                           u_int32_t program_counter,
-                                          u_int32_t nro_pag,
+                                          char *entradas_por_nivel,
                                           char *direcciones_fisicas,
                                           u_int32_t tamanio_buffer,
                                           void *buffer)
@@ -13,6 +13,7 @@ static t_peticion_cpu *crear_peticion_cpu(operacion_cpu_memoria operacion,
     t_peticion_cpu *peticion = malloc(sizeof(t_peticion_cpu));
     peticion->operacion = operacion;
     peticion->pid = pid;
+    peticion->entradas_por_nivel = NULL;
     peticion->direcciones_fisicas = NULL;
     peticion->buffer = NULL;
 
@@ -22,7 +23,7 @@ static t_peticion_cpu *crear_peticion_cpu(operacion_cpu_memoria operacion,
         peticion->program_counter = program_counter;
         break;
     case OBTENER_MARCO:
-        peticion->nro_pag = nro_pag;
+        peticion->entradas_por_nivel = strdup(entradas_por_nivel);
         break;
     case LEER:
         peticion->direcciones_fisicas = strdup(direcciones_fisicas);
@@ -44,9 +45,9 @@ t_peticion_cpu *crear_peticion_instruccion(u_int32_t pid, u_int32_t program_coun
     return crear_peticion_cpu(FETCH_INSTRUCCION, pid, program_counter, 0, NULL, 0, NULL);
 }
 
-t_peticion_cpu *crear_peticion_nro_marco(u_int32_t pid, u_int32_t nro_pag)
+t_peticion_cpu *crear_peticion_nro_marco(u_int32_t pid, char *entradas_por_nivel)
 {
-    return crear_peticion_cpu(OBTENER_MARCO, pid, 0, nro_pag, NULL, 0, NULL);
+    return crear_peticion_cpu(OBTENER_MARCO, pid, 0, entradas_por_nivel, NULL, 0, NULL);
 }
 
 t_peticion_cpu *crear_peticion_lectura(u_int32_t pid, char *direcciones_fisicas, u_int32_t tamanio_buffer)
@@ -72,7 +73,7 @@ void enviar_peticion_cpu(int32_t fd_memoria, t_peticion_cpu *peticion)
         agregar_a_paquete(paquete, &(peticion->program_counter), sizeof(u_int32_t));
         break;
     case OBTENER_MARCO:
-        agregar_a_paquete(paquete, &(peticion->nro_pag), sizeof(u_int32_t));
+        agregar_a_paquete(paquete, peticion->entradas_por_nivel, strlen(peticion->entradas_por_nivel) + 1);
         break;
     case LEER:
         agregar_a_paquete(paquete, peticion->direcciones_fisicas, strlen(peticion->direcciones_fisicas) + 1);
@@ -105,7 +106,7 @@ t_peticion_cpu *recibir_peticion_cpu(int32_t fd_conexion)
         peticion->program_counter = *(u_int32_t *)list_get(paquete, 2);
         break;
     case OBTENER_MARCO:
-        peticion->nro_pag = *(u_int32_t *)list_get(paquete, 2);
+        peticion->entradas_por_nivel = strdup(list_get(paquete, 2));
         break;
     case LEER:
         peticion->direcciones_fisicas = strdup(list_get(paquete, 2));
@@ -130,6 +131,9 @@ void destruir_peticion_cpu(t_peticion_cpu *peticion)
 
     switch (peticion->operacion)
     {
+    case OBTENER_MARCO:
+        free(peticion->entradas_por_nivel);
+        break;
     case LEER:
         free(peticion->direcciones_fisicas);
         break;
