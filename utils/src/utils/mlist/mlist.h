@@ -79,6 +79,15 @@ void *mlist_get(t_mutex_list *lista_mutex, u_int32_t index);
 void *mlist_get_minimum(t_mutex_list *lista_mutex, void *(*minimo)(void *, void *));
 
 /**
+ * @brief Obtiene el elemento máximo de la lista según un criterio dado.
+ *
+ * @param lista_mutex
+ * @param maximo
+ * @return void*
+ */
+void *mlist_get_maximum(t_mutex_list *lista_mutex, void *(*maximo)(void *, void *));
+
+/**
  * @brief
  *
  * @param lista_mutex
