@@ -69,9 +69,9 @@ double get_estimacion_inicial(void);
  * @brief Tiempo en milisegundos que se debe esperar
  * antes de mover un proceso al estado SUSP. BLOCKED.
  *
- * @return u_int32_t (milisegundos)
+ * @return u_int64_t (milisegundos)
  */
-u_int32_t get_tiempo_suspension(void);
+u_int64_t get_tiempo_suspension(void);
 t_log_level get_log_level(void);
 
 #endif // KERNEL_CONFIG_H

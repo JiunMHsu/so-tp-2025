@@ -11,6 +11,16 @@
 #include "estado/estado.h"
 #include "pcb/pcb.h"
 #include "plani_corto_plazo.h"
+#include "plani_largo_plazo.h"
+
+typedef struct
+{
+    sem_t *hay_proceso;
+    u_int32_t pid;       // PID del proceso asociado
+    u_int8_t esta_libre; // 1 si está libre, 0 si está ocupado
+    u_int64_t tiempo;    // Tiempo de espera en milisegundos
+    pthread_t rutina_consumo;
+} t_cronometro;
 
 void inicializar_planificador_mediano_plazo(q_estado *blocked,
                                             q_estado *q_susp_blocked,
