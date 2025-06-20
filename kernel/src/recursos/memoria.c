@@ -57,30 +57,33 @@ static int32_t enviar_solicitud(t_kernel_mem_req *mem_request)
 
 int32_t solicitar_creacion_proceso(u_int32_t pid, u_int32_t tamanio, char *ruta_codigo)
 {
-    t_kernel_mem_req *mem_request = crear_kernel_mem_request(INICIAR_PROCESO, pid, ruta_codigo);
+    t_kernel_mem_req *mem_request = crear_kernel_mem_request(INICIAR_PROCESO,
+                                                             pid,
+                                                             tamanio,
+                                                             ruta_codigo);
     return enviar_solicitud(mem_request);
 }
 
 int32_t solicitar_finalizacion_proceso(u_int32_t pid)
 {
-    t_kernel_mem_req *mem_request = crear_kernel_mem_request(FINALIZAR_PROCESO, pid, NULL);
+    t_kernel_mem_req *mem_request = crear_kernel_mem_request(FINALIZAR_PROCESO, pid, 0, NULL);
     return enviar_solicitud(mem_request);
 }
 
 int32_t solicitar_dump_proceso(u_int32_t pid)
 {
-    t_kernel_mem_req *mem_request = crear_kernel_mem_request(DUMP_PROCESO, pid, NULL);
+    t_kernel_mem_req *mem_request = crear_kernel_mem_request(DUMP_PROCESO, pid, 0, NULL);
     return enviar_solicitud(mem_request);
 }
 
 int32_t solicitar_swap_out(u_int32_t pid)
 {
-    t_kernel_mem_req *mem_request = crear_kernel_mem_request(SWAP_OUT, pid, NULL);
+    t_kernel_mem_req *mem_request = crear_kernel_mem_request(SWAP_OUT, pid, 0, NULL);
     return enviar_solicitud(mem_request);
 }
 
 int32_t solicitar_swap_in(u_int32_t pid)
 {
-    t_kernel_mem_req *mem_request = crear_kernel_mem_request(SWAP_IN, pid, NULL);
+    t_kernel_mem_req *mem_request = crear_kernel_mem_request(SWAP_IN, pid, 0, NULL);
     return enviar_solicitud(mem_request);
 }

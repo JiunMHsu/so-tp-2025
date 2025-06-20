@@ -3,7 +3,7 @@
 static q_estado *q_new;
 static q_estado *q_exit;
 
-static u_int16_t pid_count;
+static u_int32_t pid_count;
 
 static algoritmo_planificacion algoritmo;
 
