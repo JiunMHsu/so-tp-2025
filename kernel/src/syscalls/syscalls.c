@@ -33,7 +33,7 @@ void manejar_syscall(t_pcb *proceso, char *syscall)
     if (string_is_equal(syscall_name, "DUMP_MEMORY"))
         dump_memory(proceso);
 
-    string_array_destroy(syscall_vec); // TODO: averiguar si se debe destruir aca
+    string_array_destroy(syscall_vec); // TODO: ver si se debe destruir aca
 }
 
 static void init_proc(char *pseudocodigo, u_int32_t tamanio_proceso)
@@ -41,10 +41,8 @@ static void init_proc(char *pseudocodigo, u_int32_t tamanio_proceso)
     insertar_proceso_nuevo(pseudocodigo, tamanio_proceso);
 }
 
-// TODO: Implementar dump_memory
 static void dump_memory(t_pcb *proceso)
 {
-    // hacer la peticion
     u_int32_t *pid = malloc(sizeof(u_int32_t));
     *pid = proceso->pid;
 
@@ -61,7 +59,8 @@ static void *_dump_memory(void *_pid)
     free(_pid);
 
     int8_t respuesta = solicitar_dump_proceso(pid);
-    // de alguna forma notificar al plani mediano plazo que ya termino el dump
+    int32_t resultado = (respuesta == 0) ? respuesta : -1;
+    desbloquear_proceso(pid, resultado);
 
     return NULL;
 }

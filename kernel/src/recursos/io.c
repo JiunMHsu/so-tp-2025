@@ -18,12 +18,21 @@ static void finalizar_consumo_para(t_pcb *proceso, motivo_fin_io motivo);
 static void desconectar_io(char *nombre_io);
 static void _encolar_a_finalizados(void *_peticion_consumo);
 
+static t_fin_de_io *get_finalizado(void);
+static void destruir_fin_de_io(t_fin_de_io *fin_de_io);
+
+static void *manejar_finalizados(void *_);
+
 void inicializar_io()
 {
     ios = mlist_create();
     finalizados = mqueue_create();
     hay_finalizado = malloc(sizeof(sem_t));
     sem_init(hay_finalizado, 0, 0);
+
+    pthread_t rutina_manejo_finalizados;
+    pthread_create(&rutina_manejo_finalizados, NULL, &manejar_finalizados, NULL);
+    pthread_detach(rutina_manejo_finalizados);
 }
 
 void conectar_io(char *nombre_io, int32_t fd_io)
@@ -48,13 +57,13 @@ int32_t bloquear_para_io(char *nombre_io, t_pcb *proceso, u_int32_t tiempo)
     return 0;
 }
 
-t_fin_de_io *get_finalizado()
+static t_fin_de_io *get_finalizado()
 {
     sem_wait(hay_finalizado);
     return (t_fin_de_io *)mqueue_pop(finalizados);
 }
 
-void destruir_fin_de_io(t_fin_de_io *fin_de_io)
+static void destruir_fin_de_io(t_fin_de_io *fin_de_io)
 {
     if (fin_de_io == NULL)
         return;
@@ -186,13 +195,11 @@ static void _encolar_a_finalizados(void *_peticion_consumo)
     destruir_peticion_consumo(peticion_consumo);
 }
 
-void *manejar_finalizados(void *_)
+static void *manejar_finalizados(void *_)
 {
     while (1)
     {
         t_fin_de_io *fin_de_io = get_finalizado();
-        if (fin_de_io == NULL)
-            continue;
 
         if (fin_de_io->motivo == EXECUTED)
             desbloquear_proceso(fin_de_io->proceso->pid, 0);

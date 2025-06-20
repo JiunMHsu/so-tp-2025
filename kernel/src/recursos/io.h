@@ -56,21 +56,4 @@ void conectar_io(char *nombre_io, int32_t fd_io);
  */
 int32_t bloquear_para_io(char *nombre_io, t_pcb *proceso, u_int32_t tiempo);
 
-/**
- * @brief Escucha constantemente si hay procesos que terminaron su IO.
- *
- * @return t_fin_de_io*
- *
- * @note Es bloqueante.
- * @note Se debe liberar la estructura retornada con `destruir_fin_de_io`.
- */
-t_fin_de_io *get_finalizado(void);
-
-/**
- * @brief Destruye el puntero a fin_de_io. No destruye el proceso.
- *
- * @param fin_de_io
- */
-void destruir_fin_de_io(t_fin_de_io *fin_de_io);
-
 #endif // RECURSOS_IO_H
