@@ -59,8 +59,7 @@ void ejecutar(t_pcb *proceso)
     sem_post(cpu_libre->hay_proceso);
 }
 
-// TODO: Revisar
-int32_t hay_cpu()
+int8_t hay_cpu()
 {
     int32_t ret = 0;
     sem_getvalue(hay_cpu_libre, &ret);
