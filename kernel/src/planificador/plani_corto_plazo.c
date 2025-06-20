@@ -11,7 +11,7 @@ static double estimacion_inicial;
 
 static algoritmo_planificacion algoritmo_en_uso;
 
-static double estimar_rafaga(double anterior_estimado, double real_anterior);
+static double estimar_rafaga(double anterior_estimado, u_int64_t real_anterior);
 
 static int64_t get_rafaga_restante_estimado(t_pcb *pcb);
 static t_pcb *_es_de_menor_rafaga(t_pcb *proceso_a, t_pcb *proceso_b);
@@ -63,8 +63,8 @@ void inicializar_planificador_corto_plazo(q_estado *q_ready, q_estado *q_executi
 
 void insertar_en_ready(t_pcb *proceso)
 {
-    u_int64_t rafaga_estimacion = estimar_rafaga(get_ultima_estimacion_rafaga_pcb(proceso),
-                                                 get_ultima_rafaga_pcb(proceso));
+    double rafaga_estimacion = estimar_rafaga(get_estimacion_rafaga_pcb(proceso),
+                                              get_rafaga_ejecutada_pcb(proceso));
     set_estimacion_rafaga_pcb(proceso, rafaga_estimacion);
 
     push_proceso(q_ready, proceso);
@@ -73,7 +73,7 @@ void insertar_en_ready(t_pcb *proceso)
         sem_wait(puede_replanificar);
 }
 
-static double estimar_rafaga(double anterior_estimado, double real_anterior)
+static double estimar_rafaga(double anterior_estimado, u_int64_t real_anterior)
 {
     return alpha * real_anterior + (1 - alpha) * anterior_estimado;
 }
@@ -179,8 +179,7 @@ static void *manejar_desalojado(void *_)
         t_pcb *proceso = remove_proceso(q_executing, desalojado->pid);
 
         set_program_counter_pcb(proceso, desalojado->program_counter);
-        set_ultima_estimacion_rafaga_pcb(proceso, get_estimacion_rafaga_pcb(proceso));
-        set_ultima_rafaga_pcb(proceso, get_tiempo_estado_actual_pcb(proceso));
+        set_rafaga_ejecutada_pcb(proceso, get_tiempo_estado_actual_pcb(proceso));
 
         switch (desalojado->motivo)
         {
