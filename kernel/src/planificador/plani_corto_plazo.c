@@ -3,8 +3,7 @@
 static q_estado *q_ready;
 static q_estado *q_executing;
 
-static sem_t *hay_cpu_libre;
-
+static sem_t *hay_cpu_libre;      // solo usado en SJF
 static sem_t *puede_replanificar; // solo usado en SRT
 
 static double alpha;
@@ -13,7 +12,10 @@ static double estimacion_inicial;
 static algoritmo_planificacion algoritmo_en_uso;
 
 static double estimar_rafaga(double anterior_estimado, double real_anterior);
-static t_pcb *_es_de_menor_rafaga(t_pcb *a, t_pcb *b);
+
+static int64_t get_rafaga_restante_estimado(t_pcb *pcb);
+static t_pcb *_es_de_menor_rafaga(t_pcb *proceso_a, t_pcb *proceso_b);
+static t_pcb *_mayor_rafaga_restante(t_pcb *a, t_pcb *b);
 
 static void *planificar_por_fifo(void *_);
 static void *planificar_por_sjf(void *_);
@@ -114,17 +116,18 @@ static void *planificar_por_sjf(void *_)
     return NULL;
 }
 
-static t_pcb *es_de_mayor_rafaga(t_pcb *proceso_a, t_pcb *proceso_b)
+static int64_t get_rafaga_restante_estimado(t_pcb *pcb)
 {
-    if ((get_estimacion_rafaga_pcb(proceso_a) - get_tiempo_estado_actual_pcb(proceso_a)) > (get_estimacion_rafaga_pcb(proceso_b) - get_tiempo_estado_actual_pcb(proceso_b)))
+    int64_t tiempo_ejecutando = get_tiempo_estado_actual_pcb(pcb);
+    return get_estimacion_rafaga_pcb(pcb) - tiempo_ejecutando;
+}
+
+static t_pcb *_mayor_rafaga_restante(t_pcb *proceso_a, t_pcb *proceso_b)
+{
+    if (get_rafaga_restante_estimado(proceso_a) >= get_rafaga_restante_estimado(proceso_b))
         return proceso_a;
 
     return proceso_b;
-}
-
-bool es_menor(t_pcb *proceso_a, t_pcb *proceso_b)
-{
-    return _es_de_menor_rafaga(t_pcb * proceso_a, t_pcb * proceso_b) == proceso_a;
 }
 
 static void *planificar_por_srt(void *_)
@@ -145,13 +148,13 @@ static void *planificar_por_srt(void *_)
             continue;
         }
 
-        t_pcb *proceso_mas_largo_ejecutando = peek_proceso_maximo(q_executing, &es_de_mayor_rafaga);
-        t_pcb *proceso_mas_chico = _es_de_menor_rafaga(proceso, proceso_mas_largo_ejecutando);
+        t_pcb *proceso_mayor_rafaga_restante = peek_proceso_maximo(q_executing, &_mayor_rafaga_restante);
 
-        if (proceso_mas_chico == proceso_mas_largo_ejecutando)
+        // dado que el algoritmo compara las ráfagas "a ejecutar", se hace la comparación del restante estimado.
+        if (get_estimacion_rafaga_pcb(proceso) > get_rafaga_restante_estimado(proceso_mayor_rafaga_restante))
             continue;
 
-        enviar_interrupcion(proceso_mas_largo_ejecutando->pid);
+        enviar_interrupcion(proceso_mayor_rafaga_restante->pid);
         proceso = remove_proceso(q_ready, proceso->pid);
         ejecutar(proceso); // bloquante si no hay CPU libre
         push_proceso(q_executing, proceso);
