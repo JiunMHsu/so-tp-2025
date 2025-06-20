@@ -92,6 +92,9 @@ static void *finalizar_proceso(void *_)
         t_pcb *proceso = peek_proceso(q_exit);
         int32_t res_solicitud = solicitar_finalizacion_proceso(proceso->pid);
 
+        // capaz es medio al pedo la validación,
+        // porque tampoco se define lo que debería suceder
+        // si la memoria no pudo finalizar el proceso.
         if (res_solicitud == 1)
         {
             sem_post(puede_crearse_proceso);

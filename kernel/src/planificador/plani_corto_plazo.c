@@ -150,8 +150,9 @@ static void *planificar_por_srt(void *_)
 
         t_pcb *proceso_mayor_rafaga_restante = peek_proceso_maximo(q_executing, &_mayor_rafaga_restante);
 
-        // dado que el algoritmo compara las ráfagas "a ejecutar", se hace la comparación del restante estimado.
-        if (get_estimacion_rafaga_pcb(proceso) > get_rafaga_restante_estimado(proceso_mayor_rafaga_restante))
+        // dado que el algoritmo compara las ráfagas "a ejecutar",
+        // se hace la comparación del restante estimado.
+        if (get_estimacion_rafaga_pcb(proceso) >= get_rafaga_restante_estimado(proceso_mayor_rafaga_restante))
             continue;
 
         enviar_interrupcion(proceso_mayor_rafaga_restante->pid);
