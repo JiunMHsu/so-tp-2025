@@ -23,7 +23,7 @@ void destruir_peticion_ejecucion(t_peticion_ejecucion *peticion)
 void enviar_peticion_ejecucion(int32_t fd_dispatch, t_peticion_ejecucion *peticion)
 {
     t_packet *packet = empaquetar_peticion_ejecucion(peticion);
-    enviar_paquete(fd_dispatch, packet);
+    enviar_paquete(packet, fd_dispatch);
     eliminar_paquete(packet);
 }
 

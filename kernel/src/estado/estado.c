@@ -44,8 +44,9 @@ t_pcb *pop_proceso_minimo(q_estado *estado, t_pcb *(*minimo)(t_pcb *, t_pcb *))
 {
     sem_wait(estado->hay_proceso);
     t_pcb *proceso_minimo = mlist_get_minimum(estado->lista, (void *)minimo);
-    list_remove_element(estado->lista, proceso_minimo);
-    return proceso_minimo;
+    sem_post(estado->hay_proceso);
+
+    return remove_proceso(estado, proceso_minimo->pid);
 }
 
 t_pcb *peek_proceso(q_estado *estado)

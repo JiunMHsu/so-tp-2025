@@ -60,9 +60,9 @@ void ejecutar(t_pcb *proceso)
 }
 
 // TODO: Revisar
-int8_t hay_cpu()
+int32_t hay_cpu()
 {
-    int8_t ret = 0;
+    int32_t ret = 0;
     sem_getvalue(hay_cpu_libre, &ret);
     return ret > 0;
 }
