@@ -77,7 +77,7 @@ static void *admitir_proceso(void *_)
         if (hay_proceso_susp_ready())
         {
             pcb = desuspender_proceso_ready();
-            if (pcb == NULL) // si no se pudo desuspender, no hay nada que hacer
+            if (pcb == NULL) // si no se pudo desuspender
                 continue;
 
             insertar_en_ready(pcb);
