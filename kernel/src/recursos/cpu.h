@@ -68,4 +68,6 @@ void enviar_interrupcion(u_int32_t pid);
  */
 t_desalojo *get_desalojado(void);
 
+int8_t hay_cpu(void);
+
 #endif // RECURSOS_CPU_H
