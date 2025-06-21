@@ -16,6 +16,6 @@ void cerrar_conexion_memoria(void);
 char *recibir_mensaje_memoria();
 u_int32_t recibir_marco();
 void enviar_peticion_instruccion(u_int32_t pid, u_int32_t program_counter);
-void enviar_peticion_marco(u_int32_t pid, u_int32_t cantidad_niveles, u_int32_t *entradas_por_nivel);
+void enviar_peticion_marco(u_int32_t pid, char *entradas_por_nivel);
 
 #endif // CONEXION_MEMORIA_H
