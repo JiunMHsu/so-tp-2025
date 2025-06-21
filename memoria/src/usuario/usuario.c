@@ -12,3 +12,9 @@ void inicializar_memoria_usuario()
 
     incializar_bitmap();
 }
+
+void destruir_memoria_usuario()
+{
+    free(memoria_usuario);
+    destruir_bitmap();
+}
