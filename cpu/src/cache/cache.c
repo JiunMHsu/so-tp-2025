@@ -1,6 +1,7 @@
 #include "cache.h"
 
 entrada_cache *memoria_cache;
+algoritmo_sustitucion algoritmo;
 
 u_int32_t inicializar_cache()
 {
@@ -10,6 +11,8 @@ u_int32_t inicializar_cache()
         return 0;
 
     memoria_cache = malloc(cantidad_entradas * sizeof(entrada_cache));
+
+    algoritmo = get_algoritmo_sustitucion_cache();
 
     return 1;
 }
