@@ -28,7 +28,7 @@ char *get_estado_string(t_state estado)
     }
 }
 
-t_pcb *crear_pcb(u_int32_t pid, u_int32_t tamanio, char *ejecutable, u_int64_t est_rafaga_inicial)
+t_pcb *crear_pcb(u_int32_t pid, u_int32_t tamanio, char *ejecutable, double est_rafaga_inicial)
 {
     t_pcb *pcb = malloc(sizeof(t_pcb));
 
@@ -39,27 +39,20 @@ t_pcb *crear_pcb(u_int32_t pid, u_int32_t tamanio, char *ejecutable, u_int64_t e
     pcb->estado = -1;
 
     pcb->metricas_estado = dictionary_create();
-    dictionary_put(pcb->metricas_estado, strdup(get_estado_string(NEW)), calloc(1, sizeof(u_int32_t)));
-    dictionary_put(pcb->metricas_estado, strdup(get_estado_string(READY)), calloc(1, sizeof(u_int32_t)));
-    dictionary_put(pcb->metricas_estado, strdup(get_estado_string(EXEC)), calloc(1, sizeof(u_int32_t)));
-    dictionary_put(pcb->metricas_estado, strdup(get_estado_string(BLOCKED)), calloc(1, sizeof(u_int32_t)));
-    dictionary_put(pcb->metricas_estado, strdup(get_estado_string(SUSPENDED_BLOCKED)), calloc(1, sizeof(u_int32_t)));
-    dictionary_put(pcb->metricas_estado, strdup(get_estado_string(SUSPENDED_READY)), calloc(1, sizeof(u_int32_t)));
-    dictionary_put(pcb->metricas_estado, strdup(get_estado_string(EXIT)), calloc(1, sizeof(u_int32_t)));
-
     pcb->metricas_tiempo = dictionary_create();
-    dictionary_put(pcb->metricas_estado, strdup(get_estado_string(NEW)), list_create());
-    dictionary_put(pcb->metricas_estado, strdup(get_estado_string(READY)), list_create());
-    dictionary_put(pcb->metricas_estado, strdup(get_estado_string(EXEC)), list_create());
-    dictionary_put(pcb->metricas_estado, strdup(get_estado_string(BLOCKED)), list_create());
-    dictionary_put(pcb->metricas_estado, strdup(get_estado_string(SUSPENDED_BLOCKED)), list_create());
-    dictionary_put(pcb->metricas_estado, strdup(get_estado_string(SUSPENDED_READY)), list_create());
-    dictionary_put(pcb->metricas_estado, strdup(get_estado_string(EXIT)), list_create());
+
+    t_state estados[7] = {NEW, READY, EXEC, BLOCKED, SUSPENDED_BLOCKED, SUSPENDED_READY, EXIT};
+    for (int i = 0; i < 7; i++)
+    {
+        char *estado_string = get_estado_string(estados[i]);
+        dictionary_put(pcb->metricas_estado, strdup(estado_string), calloc(1, sizeof(u_int32_t)));
+        dictionary_put(pcb->metricas_tiempo, strdup(estado_string), list_create());
+    }
 
     pcb->temporal = NULL;
 
-    pcb->ultima_estimacion_rafaga = est_rafaga_inicial;
-    pcb->estimacion_rafaga = -1;
+    pcb->estimacion_rafaga = est_rafaga_inicial;
+    pcb->rafaga_ejecutada = 0;
 
     pthread_mutex_init(&(pcb->mutex), NULL);
 
@@ -98,20 +91,38 @@ t_state get_estado_pcb(t_pcb *pcb)
     return estado;
 }
 
-u_int64_t get_ultima_estimacion_rafaga_pcb(t_pcb *pcb)
+u_int64_t get_tiempo_estado_actual_pcb(t_pcb *pcb)
 {
     pthread_mutex_lock(&(pcb->mutex));
-    u_int64_t ultima_estimacion = pcb->ultima_estimacion_rafaga;
+
+    if (pcb->temporal == NULL)
+    {
+        pthread_mutex_unlock(&(pcb->mutex));
+        return 0;
+    }
+
+    temporal_stop(pcb->temporal);
+    u_int64_t transcurrido = temporal_gettime(pcb->temporal);
+    temporal_resume(pcb->temporal);
+
     pthread_mutex_unlock(&(pcb->mutex));
-    return ultima_estimacion;
+    return transcurrido;
 }
 
-u_int64_t get_estimacion_rafaga_pcb(t_pcb *pcb)
+double get_estimacion_rafaga_pcb(t_pcb *pcb)
 {
     pthread_mutex_lock(&(pcb->mutex));
-    u_int64_t estimacion = pcb->estimacion_rafaga;
+    double estimacion = pcb->estimacion_rafaga;
     pthread_mutex_unlock(&(pcb->mutex));
     return estimacion;
+}
+
+u_int64_t get_rafaga_ejecutada_pcb(t_pcb *pcb)
+{
+    pthread_mutex_lock(&(pcb->mutex));
+    u_int64_t rafaga_ejecutada = pcb->rafaga_ejecutada;
+    pthread_mutex_unlock(&(pcb->mutex));
+    return rafaga_ejecutada;
 }
 
 void set_program_counter_pcb(t_pcb *pcb, u_int32_t program_counter)
@@ -160,16 +171,16 @@ static void actualizar_metricas_tiempo(t_pcb *pcb)
     pcb->temporal = temporal_create();
 }
 
-void set_ultima_estimacion_rafaga_pcb(t_pcb *pcb, u_int64_t ultima_estimacion)
-{
-    pthread_mutex_lock(&(pcb->mutex));
-    pcb->ultima_estimacion_rafaga = ultima_estimacion;
-    pthread_mutex_unlock(&(pcb->mutex));
-}
-
-void set_estimacion_rafaga_pcb(t_pcb *pcb, u_int64_t estimacion)
+void set_estimacion_rafaga_pcb(t_pcb *pcb, double estimacion)
 {
     pthread_mutex_lock(&(pcb->mutex));
     pcb->estimacion_rafaga = estimacion;
+    pthread_mutex_unlock(&(pcb->mutex));
+}
+
+void set_rafaga_ejecutada_pcb(t_pcb *pcb, u_int64_t rafaga)
+{
+    pthread_mutex_lock(&(pcb->mutex));
+    pcb->rafaga_ejecutada = rafaga;
     pthread_mutex_unlock(&(pcb->mutex));
 }

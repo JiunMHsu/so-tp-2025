@@ -73,6 +73,18 @@ void *mlist_get_minimum(t_mutex_list *lista_mutex, void *(*minimo)(void *, void 
     return elemento;
 }
 
+void *mlist_get_maximum(t_mutex_list *lista_mutex, void *(*maximo)(void *, void *))
+{
+    if (mlist_is_empty(lista_mutex))
+        return NULL;
+
+    pthread_mutex_lock(&(lista_mutex->mutex));
+    void *elemento = list_get_maximum(lista_mutex->list, maximo);
+    pthread_mutex_unlock(&(lista_mutex->mutex));
+
+    return elemento;
+}
+
 void *mlist_get_last(t_mutex_list *lista_mutex)
 {
     return mlist_get(lista_mutex, mlist_size(lista_mutex) - 1);

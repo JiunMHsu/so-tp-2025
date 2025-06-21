@@ -60,6 +60,15 @@ t_pcb *pop_proceso(q_estado *estado);
 t_pcb *pop_proceso_minimo(q_estado *estado, t_pcb *(*minimo)(t_pcb *, t_pcb *));
 
 /**
+ * @brief Devuelve el proceso con rafaga mas grande.
+ *
+ * @param estado
+ * @param maximo
+ * @return t_pcb*
+ */
+t_pcb *peek_proceso_maximo(q_estado *estado, t_pcb *(*maximo)(t_pcb *, t_pcb *));
+
+/**
  * @brief Devuelve el primer proceso encolado en el estado dado.
  *        El puntero retornado nunca será NULL.
  *
@@ -67,6 +76,15 @@ t_pcb *pop_proceso_minimo(q_estado *estado, t_pcb *(*minimo)(t_pcb *, t_pcb *));
  * @return `t_pcb*`
  */
 t_pcb *peek_proceso(q_estado *estado);
+
+/**
+ * @brief Devuelve el primer proceso encolado en el estado dado, según un criterio de mínimo.
+ *        El puntero retornado nunca será NULL.
+ *
+ * @param estado
+ * @return `t_pcb*`
+ */
+t_pcb *peek_proceso_minimo(q_estado *estado, t_pcb *(*minimo)(t_pcb *, t_pcb *));
 
 /**
  * @brief

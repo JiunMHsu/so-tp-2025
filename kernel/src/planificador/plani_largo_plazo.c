@@ -3,7 +3,7 @@
 static q_estado *q_new;
 static q_estado *q_exit;
 
-static u_int16_t pid_count;
+static u_int32_t pid_count;
 
 static algoritmo_planificacion algoritmo;
 
@@ -46,7 +46,6 @@ void insertar_proceso_nuevo(char *pseudocodigo, u_int32_t tamanio_proceso)
         push_proceso(q_new, pcb);
         break;
     case PMCP:
-        // TODO: Definir el criterio de ordenamiento
         ordered_insert_proceso(q_new, pcb, &_es_de_menor_tamanio_que);
         break;
     default: // caso SJF, SRT, no debería ocurrir nunca
@@ -81,8 +80,10 @@ static void *admitir_proceso(void *_)
     return NULL;
 }
 
-// TODO: Implementar inserción en EXIT
-void insertar_en_exit(t_pcb *proceso) {}
+void insertar_en_exit(t_pcb *proceso)
+{
+    push_proceso(q_exit, proceso);
+}
 
 static void *finalizar_proceso(void *_)
 {
@@ -91,6 +92,9 @@ static void *finalizar_proceso(void *_)
         t_pcb *proceso = peek_proceso(q_exit);
         int32_t res_solicitud = solicitar_finalizacion_proceso(proceso->pid);
 
+        // capaz es medio al pedo la validación,
+        // porque tampoco se define lo que debería suceder
+        // si la memoria no pudo finalizar el proceso.
         if (res_solicitud == 1)
         {
             sem_post(puede_crearse_proceso);
