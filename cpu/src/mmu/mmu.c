@@ -31,6 +31,10 @@ u_int32_t get_direccion_fisica(u_int32_t pid, u_int32_t direccion_logica)
     //TODO esta mal conceptualmente
     marco = cache_habilitada ? get_marco_cache(numero_pagina) : -1;
 
+    //TODO no se si es aca donde se consulta la cache => eso creo que deberia estar pasando por fuera de la mmu
+    //la mmu capaz tendria que exponer funciones q obtengan los datos de la dir logica por separado y esta funcion en particular
+    //capaz tendria que ser obtener marco nada mas
+
     if (marco != -1)
     {
         pagina_en_cache = 1;
