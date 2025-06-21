@@ -1,6 +1,6 @@
 #include "cpu.h"
 
-static t_peticion_cpu *crear_peticion_cpu(operacion_cpu_memoria, u_int32_t, u_int32_t, u_int32_t, char *, u_int32_t, void *);
+static t_peticion_cpu *crear_peticion_cpu(operacion_cpu_memoria, u_int32_t, u_int32_t, char *, char *, u_int32_t, void *);
 
 static t_peticion_cpu *crear_peticion_cpu(operacion_cpu_memoria operacion,
                                           u_int32_t pid,
