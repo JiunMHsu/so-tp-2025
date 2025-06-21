@@ -66,3 +66,8 @@ void log_memory_dump(u_int32_t pid)
 {
     log_info(memoria_logger, "## PID: %d - Memory Dump solicitado", pid);
 }
+
+log_mensaje_advertencia(char *advertencia)
+{
+    log_warning(memoria_logger, "%s", advertencia);
+}
