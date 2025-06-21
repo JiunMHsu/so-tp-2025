@@ -31,7 +31,8 @@ typedef enum
 
 void iniciar_config(void);
 void destruir_config(void);
-u_int32_t get_entradas_tlb();
+u_int32_t get_entradas_tlb(void);
+u_int32_t get_entradas_cache(void);
 algoritmo_sustitucion get_algoritmo_sustitucion_tlb();
 kernel_address get_kernel_address();
 mem_address get_memoria_address();

@@ -45,6 +45,11 @@ u_int32_t get_entradas_tlb()
     return config_get_int_value(cpu_config, "ENTRADAS_TLB");
 }
 
+u_int32_t get_entradas_cache()
+{
+    return config_get_int_value(cpu_config, "ENTRADAS_CACHE");
+}
+
 algoritmo_sustitucion get_algoritmo_sustitucion_tlb()
 {
     char *algoritmo = config_get_string_value(cpu_config, "REEMPLAZO_TLB");
