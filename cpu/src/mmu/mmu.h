@@ -10,6 +10,7 @@
 #include "logger/logger.h"
 #include "config/config.h"
 #include "tlb/tlb.h"
+#include "cache/cache.h"
 
 void inicializar_mmu();
 u_int32_t get_direccion_fisica(u_int32_t pid, u_int32_t direccion_logica);

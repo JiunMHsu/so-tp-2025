@@ -5,10 +5,13 @@ u_int32_t cache_habilitada;
 u_int32_t cantidad_niveles;
 u_int32_t cantidad_entradas_tp;
 u_int32_t tamanio_pagina;
+u_int32_t pagina_en_cache;
 
 void inicializar_mmu()
 {
     tlb_habilitada = inicializar_tlb();
+    cache_habilitada = inicializar_cache();
+    pagina_en_cache = 0;
 
     cantidad_niveles = get_cantidad_niveles();
     cantidad_entradas_tp = get_cantidad_entradas_tp();
@@ -21,43 +24,46 @@ u_int32_t get_direccion_fisica(u_int32_t pid, u_int32_t direccion_logica)
     u_int32_t offset = direccion_logica % tamanio_pagina;
     int32_t marco;
 
-    // revisar cache => si hay cache miss loggear => si hay cache hit devolver direccion fisica (marco * tamaño de pagina + offset)
-    // hubo cache miss => revisar tlb => si hay tlb miss loggear => si hay tlb hit devolver direccion fisica (marco * tamaño de pagina + offset)
-    // hubo tlb miss => pedir a memoria => devolver direccion fisica (marco * tamaño de pagina + offset)
+    // revisar cache => si hay cache miss loggear => si hay cache hit escribir/leer ahi mismo (dejar como modificado si esta escrito)
+    // hubo cache miss => revisar tlb => si hay tlb miss loggear => si hay tlb hit agregar pagina a cache (si esta habilitada) => pedir pagina a memoria => agregar => si no, pedir marco a memoria calcular direccion => operacion
+    // hubo tlb miss => pedir a memoria => agregar pagina a cache (si esta habilitada) => escribir ahi => si no, obtener marco => direccion => operacion
 
+    //TODO esta mal conceptualmente
     marco = cache_habilitada ? get_marco_cache(numero_pagina) : -1;
 
-    // TODO revisar si esta bien la logica de agregado a cache
+    if (marco != -1)
+    {
+        pagina_en_cache = 1;
+        log_cache_hit(pid, numero_pagina);
+        return marco * tamanio_pagina + offset;
+    }
+
+    pagina_en_cache = 0;
+    log_cache_miss(pid, numero_pagina);
+
+    marco = tlb_habilitada ? get_marco_tlb(numero_pagina) : -1;
+
     if (marco == -1)
     {
-        log_cache_miss(pid, numero_pagina);
-        marco = tlb_habilitada ? get_marco_tlb(numero_pagina) : -1;
+        log_tlb_miss(pid, numero_pagina);
+        marco = obtener_marco_de_memoria(cantidad_niveles, numero_pagina, cantidad_entradas_tp);
 
-        if (marco == -1)
+        if (tlb_habilitada)
         {
-            log_tlb_miss(pid, numero_pagina);
-            marco = obtener_marco_de_memoria(cantidad_niveles, numero_pagina, cantidad_entradas_tp);
-
-            if (tlb_habilitada)
-            {
-                agregar_entrada_tlb(numero_pagina, marco);
-                log_pagina_ingresada_tlb(numero_pagina, marco);
-            }
-        }
-        else
-        {
-            log_tlb_hit(pid, numero_pagina);
-
-            if (cache_habilitada)
-            {
-                agregar_entrada_cache(numero_pagina, marco);
-                log_pagina_ingresada_cache(pid, numero_pagina);
-            }
+            agregar_entrada_tlb(numero_pagina, marco);
+            log_pagina_ingresada_tlb(numero_pagina, marco);
         }
     }
     else
     {
-        log_cache_hit(pid, numero_pagina);
+        log_tlb_hit(pid, numero_pagina);
+
+        if (cache_habilitada)
+        {
+            agregar_entrada_cache(numero_pagina, marco);
+            pagina_en_cache = 1; 
+            log_pagina_ingresada_cache(pid, numero_pagina);
+        }
     }
 
     log_obtener_marco(pid, numero_pagina, marco);
@@ -74,15 +80,10 @@ u_int32_t obtener_marco_de_memoria(u_int32_t pid, u_int32_t cantidad_niveles, u_
     {
         entrada_nivel_x = floor(numero_pagina / potencia(cantidad_entradas_tp, (cantidad_niveles - nivel))) % cantidad_entradas_tp;
 
-        // si no queda un espacion al final => al hacer split queda un elemento "" al final
+        string_append_with_format(&entradas_por_nivel, "%d", entrada_nivel_x);
+
         if (nivel < cantidad_niveles)
-        {
-            string_append_with_format(&entradas_por_nivel, "%d ", entrada_nivel_x);
-        }
-        else
-        {
-            string_append_with_format(&entradas_por_nivel, "%d", entrada_nivel_x);
-        }
+            string_append(&entradas_por_nivel, " ");
     }
 
     enviar_peticion_marco(pid, entradas_por_nivel);
@@ -96,7 +97,6 @@ u_int32_t obtener_marco_de_memoria(u_int32_t pid, u_int32_t cantidad_niveles, u_
     return marco;
 }
 
-// No tengo ganas de romperme la cabeza con problemas de tipo => pow recibe doubles y devuelve doubles
 u_int32_t potencia(u_int32_t base, u_int32_t exponente)
 {
     u_int32_t resultado = 1;
