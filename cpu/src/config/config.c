@@ -55,28 +55,18 @@ algoritmo_sustitucion get_algoritmo_sustitucion_tlb()
     char *algoritmo = config_get_string_value(cpu_config, "REEMPLAZO_TLB");
 
     if (strcmp(algoritmo, "FIFO") == 0)
-    {
-        free(algoritmo);
         return FIFO;
-    }
-
-    free(algoritmo);
 
     return LRU;
 }
 
-//TODO claramente logica repetida => refactor
+// TODO claramente logica repetida => refactor
 algoritmo_sustitucion get_algoritmo_sustitucion_cache()
 {
     char *algoritmo = config_get_string_value(cpu_config, "REEMPLAZO_CACHE");
 
     if (strcmp(algoritmo, "CLOCK") == 0)
-    {
-        free(algoritmo);
         return CLOCK;
-    }
-
-    free(algoritmo);
 
     return CLOCK_M;
 }

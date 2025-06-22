@@ -3,6 +3,7 @@
 static entrada_tlb *tlb;
 static algoritmo_sustitucion algoritmo;
 static u_int32_t entrada_libre;
+static u_int32_t cantidad_entradas;
 
 static int32_t obtener_indice(u_int32_t pagina);
 static entrada_tlb get_entrada(u_int32_t indice_entrada);
@@ -12,7 +13,7 @@ static entrada_tlb remover_entrada(u_int32_t indice_pagina);
 
 u_int32_t inicializar_tlb()
 {
-    u_int32_t cantidad_entradas = get_entradas_tlb();
+    cantidad_entradas = get_entradas_tlb();
 
     if (cantidad_entradas == 0)
         return 0;
@@ -113,7 +114,7 @@ static entrada_tlb crear_entrada(u_int32_t pagina, u_int32_t marco)
     return nueva_entrada;
 }
 
-void tlb_destroy()
+void destruir_tlb()
 {
-    free(tlb); // por ahora no tiene info a liberar dentro
+    free(tlb); // TODO: por ahora no tiene info a liberar dentro
 }

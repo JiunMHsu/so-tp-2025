@@ -36,11 +36,20 @@ u_int32_t recibir_marco()
 
 // TODO: Implementar get_cantidad_niveles, get_cantidad_entradas_tp y get_tamanio_pagina
 
-u_int32_t get_cantidad_niveles() {}
+u_int32_t get_cantidad_niveles()
+{
+    return 0;
+}
 
-u_int32_t get_cantidad_entradas_tp() {}
+u_int32_t get_cantidad_entradas_tp()
+{
+    return 0;
+}
 
-u_int32_t get_tamanio_pagina() {}
+u_int32_t get_tamanio_pagina()
+{
+    return 0;
+}
 
 void enviar_peticion_instruccion(u_int32_t pid, u_int32_t program_counter)
 {
