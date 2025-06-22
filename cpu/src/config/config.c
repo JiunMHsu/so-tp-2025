@@ -39,3 +39,34 @@ t_log_level get_log_level()
 
     return log_level_from_string(log_level_str);
 }
+
+u_int32_t get_entradas_tlb()
+{
+    return config_get_int_value(cpu_config, "ENTRADAS_TLB");
+}
+
+u_int32_t get_entradas_cache()
+{
+    return config_get_int_value(cpu_config, "ENTRADAS_CACHE");
+}
+
+algoritmo_sustitucion get_algoritmo_sustitucion_tlb()
+{
+    char *algoritmo = config_get_string_value(cpu_config, "REEMPLAZO_TLB");
+
+    if (strcmp(algoritmo, "FIFO") == 0)
+        return FIFO;
+
+    return LRU;
+}
+
+// TODO claramente logica repetida => refactor
+algoritmo_sustitucion get_algoritmo_sustitucion_cache()
+{
+    char *algoritmo = config_get_string_value(cpu_config, "REEMPLAZO_CACHE");
+
+    if (strcmp(algoritmo, "CLOCK") == 0)
+        return CLOCK;
+
+    return CLOCK_M;
+}

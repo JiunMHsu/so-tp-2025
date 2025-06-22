@@ -37,10 +37,33 @@ static void noop(char **_)
 
 static void _write(char **parametros)
 {
+    // descomponer parametros
+    // 1. direccion logica
+    // 2. dato a escribir en memoria principal (o memoria cache si es que la pagina se encuentra en ella)
+
+    //fijarse si hay cache habilitada
+    //si esta habilitada => operar en cache
+    //si NO esta habilitada => operar en memoria => traduccion de direccion logica a fisica
+
+    // operacion en cache_
+    // pagina en cache => operar directamente
+    // pagina NO esta en cache:
+    // CASO 1: tlb habilitada => buscar marco en tlb => pedir a memoria la pagina de ese marco => cargarla en cache => operar en cache
+    // CASO 2: tlb NO habilitada => buscar pagina directamente en memoria y cargarla => operar en cache
 }
 
 static void _read(char **parametros)
 {
+    //descomponer parametros
+    //1. direccion logica
+    //2. tamaño de dato a leer
+
+    // fijarse si hay cache habilitada
+    // si esta habilitada => operar en cache
+    // si NO esta habilitada => operar en memoria => traduccion de direccion logica a fisica
+
+    //printear el dato leido
+    //loggearlo
 }
 
 static void go_to(char **parametros)

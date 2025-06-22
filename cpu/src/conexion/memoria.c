@@ -1,6 +1,6 @@
 #include "memoria.h"
 
-int32_t fd_memoria;
+static int32_t fd_memoria;
 
 int8_t conectar_memoria()
 {
@@ -29,9 +29,38 @@ char *recibir_mensaje_memoria()
     return recibir_mensaje(fd_memoria);
 }
 
+u_int32_t recibir_marco()
+{
+    return recibir_senial(fd_memoria);
+}
+
+// TODO: Implementar get_cantidad_niveles, get_cantidad_entradas_tp y get_tamanio_pagina
+
+u_int32_t get_cantidad_niveles()
+{
+    return 0;
+}
+
+u_int32_t get_cantidad_entradas_tp()
+{
+    return 0;
+}
+
+u_int32_t get_tamanio_pagina()
+{
+    return 0;
+}
+
 void enviar_peticion_instruccion(u_int32_t pid, u_int32_t program_counter)
 {
     t_peticion_cpu *peticion_instruccion = crear_peticion_instruccion(pid, program_counter);
     enviar_peticion_cpu(fd_memoria, peticion_instruccion);
     destruir_peticion_cpu(peticion_instruccion);
+}
+
+void enviar_peticion_marco(u_int32_t pid, char *entradas_por_nivel)
+{
+    t_peticion_cpu *peticion_marco = crear_peticion_nro_marco(pid, entradas_por_nivel);
+    enviar_peticion_cpu(fd_memoria, peticion_marco);
+    destruir_peticion_cpu(peticion_marco);
 }

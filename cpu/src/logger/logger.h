@@ -25,7 +25,9 @@ void log_operacion_acceso_memoria(u_int32_t pid, t_operacion_acceso accion, u_in
 void log_obtener_marco(u_int32_t pid, u_int32_t numero_pagina, u_int32_t numero_marco);
 void log_tlb_hit(u_int32_t pid, u_int32_t numero_pagina);
 void log_tlb_miss(u_int32_t pid, u_int32_t numero_pagina);
-void log_pagina_encontrada_cache(u_int32_t pid, u_int32_t numero_pagina);
+void log_pagina_ingresada_tlb(u_int32_t pid, u_int32_t numero_pagina);
+void log_cache_hit(u_int32_t pid, u_int32_t numero_pagina);
+void log_cache_miss(u_int32_t pid, u_int32_t numero_pagina);
 void log_pagina_ingresada_cache(u_int32_t pid, u_int32_t numero_pagina);
 void log_pagina_actualizada_cache_memoria(u_int32_t pid, u_int32_t numero_pagina, u_int32_t frame_memoria_principal);
 
