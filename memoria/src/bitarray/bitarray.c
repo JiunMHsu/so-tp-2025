@@ -1,8 +1,8 @@
 #include "bitarray.h"
 
-int32_t frames_totales;
-t_bitarray *bitmap;
-pthread_mutex_t bitmap_mutex;
+static u_int32_t frames_totales;
+static t_bitarray *bitmap;
+static pthread_mutex_t bitmap_mutex;
 
 void incializar_bitmap()
 {
@@ -32,14 +32,12 @@ int32_t asignar_marco()
 
     for (u_int32_t i = 0; i < frames_totales; i++)
     {
+        if (bitarray_test_bit(bitmap, i) != 0)
+            continue;
 
-        if (bitarray_test_bit(bitmap, i) == 0)
-        {
-            bitarray_set_bit(bitmap, i);
-            pthread_mutex_unlock(&bitmap_mutex);
-
-            return i;
-        }
+        bitarray_set_bit(bitmap, i);
+        pthread_mutex_unlock(&bitmap_mutex);
+        return i;
     }
 
     // Caso en el que todos los marcos esten ocupados
@@ -56,18 +54,16 @@ void liberar_marco(u_int32_t frame_a_liberar)
         log_mensaje_error("El frame solicitado se encuentra fuera de rango");
         exit(EXIT_FAILURE);
     }
-    
+
     pthread_mutex_lock(&bitmap_mutex);
 
     if (bitarray_test_bit(bitmap, frame_a_liberar) == 0)
     {
         pthread_mutex_unlock(&bitmap_mutex);
         log_mensaje_advertencia("El frame solicitado ya se encontraba liberado");
-        
     }
 
     bitarray_clean_bit(bitmap, frame_a_liberar);
-
     pthread_mutex_unlock(&bitmap_mutex);
 }
 

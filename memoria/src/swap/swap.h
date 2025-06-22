@@ -2,7 +2,9 @@
 
 #include <stdlib.h>
 #include <stdio.h>
+
 #include "config/config.h"
+#include "logger/logger.h"
 
 void inicializar_swap();
 void cerrar_swap();
