@@ -3,6 +3,7 @@
 
 #include <stdlib.h>
 #include <string.h>
+
 #include "config/config.h"
 
 typedef struct
@@ -14,10 +15,11 @@ typedef struct
 } entrada_cache;
 
 u_int32_t inicializar_cache();
-// void agregar_entrada_cache();
-u_int32_t pagina_en_cache();
+void agregar_entrada_cache(u_int32_t numero_pagina, int32_t marco);
+u_int32_t pagina_en_cache(u_int32_t pagina);
 u_int32_t cache_habilitada();
 void escribir_pagina();
 void leer_pagina();
+void destruir_cache();
 
-#endif
+#endif // CPU_CACHE_H

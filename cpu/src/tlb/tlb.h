@@ -12,7 +12,7 @@ typedef struct
 } entrada_tlb;
 
 u_int32_t inicializar_tlb();
-u_int32_t get_marco_tlb(u_int32_t pid, u_int32_t pagina);
+u_int32_t get_marco_tlb(u_int32_t pagina);
 void agregar_entrada_tlb(u_int32_t pagina, u_int32_t marco);
 void destruir_tlb();
 

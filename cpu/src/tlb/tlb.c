@@ -1,8 +1,14 @@
 #include "tlb.h"
 
-entrada_tlb *tlb;
-algoritmo_sustitucion algoritmo;
-u_int32_t entrada_libre;
+static entrada_tlb *tlb;
+static algoritmo_sustitucion algoritmo;
+static u_int32_t entrada_libre;
+
+static int32_t obtener_indice(u_int32_t pagina);
+static entrada_tlb get_entrada(u_int32_t indice_entrada);
+static entrada_tlb crear_entrada(u_int32_t pagina, u_int32_t marco);
+static void insertar_entrada(entrada_tlb entrada);
+static entrada_tlb remover_entrada(u_int32_t indice_pagina);
 
 u_int32_t inicializar_tlb()
 {
@@ -19,7 +25,7 @@ u_int32_t inicializar_tlb()
     return 1;
 }
 
-int32_t get_marco_tlb(u_int32_t pagina)
+u_int32_t get_marco_tlb(u_int32_t pagina)
 {
     int32_t indice = obtener_indice(pagina);
     entrada_tlb entrada_obtenida;
@@ -30,12 +36,12 @@ int32_t get_marco_tlb(u_int32_t pagina)
     switch (algoritmo)
     {
     case FIFO:
-        entrada = get_entrada(indice);
+        entrada_obtenida = get_entrada(indice);
         break;
     case LRU:
         // da la prioridad por acceso => si se accede se pone ultimo => no se sacara al principio
-        entrada = remover_entrada(indice);
-        insertar_entrada(entrada);
+        entrada_obtenida = remover_entrada(indice);
+        insertar_entrada(entrada_obtenida);
         break;
     default:
         break;
@@ -44,12 +50,12 @@ int32_t get_marco_tlb(u_int32_t pagina)
     return entrada_obtenida.marco; // tlb hit
 }
 
-entrada_tlb get_entrada(u_int32_t indice_entrada)
+static entrada_tlb get_entrada(u_int32_t indice_entrada)
 {
-    return tlb[indice];
+    return tlb[indice_entrada];
 }
 
-void insertar_entrada(entrada_tlb entrada)
+static void insertar_entrada(entrada_tlb entrada)
 {
     tlb[entrada_libre] = entrada;
     entrada_libre++;
@@ -67,7 +73,7 @@ void agregar_entrada_tlb(u_int32_t pagina, u_int32_t marco)
     entrada_libre++;
 }
 
-entrada_tlb remover_entrada(u_int32_t indice_pagina)
+static entrada_tlb remover_entrada(u_int32_t indice_pagina)
 {
     entrada_tlb entrada_removida = tlb[indice_pagina];
 
@@ -82,7 +88,7 @@ entrada_tlb remover_entrada(u_int32_t indice_pagina)
     return entrada_removida;
 }
 
-int32_t obtener_indice(u_int32_t pagina)
+static int32_t obtener_indice(u_int32_t pagina)
 {
     entrada_tlb entrada;
 
@@ -97,7 +103,7 @@ int32_t obtener_indice(u_int32_t pagina)
     return -1;
 }
 
-entrada_tlb crear_entrada(u_int32_t pagina, u_int32_t marco)
+static entrada_tlb crear_entrada(u_int32_t pagina, u_int32_t marco)
 {
     entrada_tlb nueva_entrada;
 
