@@ -3,7 +3,7 @@
 
 #include <stdio.h>
 #include <stdlib.h>
-#include <string.h>
+// #include <string.h>
 #include <commons/string.h>
 #include <commons/collections/dictionary.h>
 #include <commons/collections/list.h>
@@ -11,6 +11,7 @@
 #include <utils/string/string.h>
 
 #include "logger/logger.h"
+#include "tabla_paginas/tabla_paginas.h"
 
 void inicializar_espacio_sistema(void);
 
