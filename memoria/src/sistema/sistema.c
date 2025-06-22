@@ -36,9 +36,7 @@ t_list *leer_instrucciones(char *path)
     t_list *instrucciones = list_create();
 
     while (getline(&linea, &len, archivo) != -1)
-    {
         list_add(instrucciones, remove_new_line(linea));
-    }
 
     free(linea);
     fclose(archivo);
@@ -68,9 +66,16 @@ void finalizar_proceso(int32_t pid)
 
     t_proceso_memoria *tabla_de_proceso = dictionary_remove(procesos_tablas, key_pid);
     destruir_tabla_de_paginas_para_proceso(tabla_de_proceso->tabla_global);
-    free(tabla_de_proceso);
 
-    log_destruccion_proceso(pid, tabla_de_proceso->accesos_tablas, tabla_de_proceso->instrucciones_solicitadas, tabla_de_proceso->paginas_en_swap, tabla_de_proceso->paginas_en_memoria, tabla_de_proceso->lecturas_mem, tabla_de_proceso->escrituras_mem);
+    log_destruccion_proceso(pid,
+                            tabla_de_proceso->accesos_tablas,
+                            tabla_de_proceso->instrucciones_solicitadas,
+                            tabla_de_proceso->paginas_en_swap,
+                            tabla_de_proceso->paginas_en_memoria,
+                            tabla_de_proceso->lecturas_mem,
+                            tabla_de_proceso->escrituras_mem);
+
+    free(tabla_de_proceso);
     free(key_pid);
 }
 
