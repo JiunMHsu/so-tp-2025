@@ -51,27 +51,28 @@ typedef struct
 
     t_temporal *temporal;
 
-    u_int64_t ultima_estimacion_rafaga; // en milisegundos
-    u_int64_t estimacion_rafaga;        // en milisegundos
+    double estimacion_rafaga;   // en milisegundos
+    u_int64_t rafaga_ejecutada; // en milisegundos
 
     pthread_mutex_t mutex;
 } t_pcb;
 
 char *get_estado_string(t_state estado);
 
-t_pcb *crear_pcb(u_int32_t pid, u_int32_t tamanio, char *ejecutable, u_int64_t est_rafaga_inicial);
+t_pcb *crear_pcb(u_int32_t pid, u_int32_t tamanio, char *ejecutable, double est_rafaga_inicial);
 void destruir_pcb(t_pcb *pcb);
 
 t_state get_estado_pcb(t_pcb *pcb);
-u_int64_t get_ultima_estimacion_rafaga_pcb(t_pcb *pcb);
-u_int64_t get_estimacion_rafaga_pcb(t_pcb *pcb);
+u_int64_t get_tiempo_estado_actual_pcb(t_pcb *pcb);
+double get_estimacion_rafaga_pcb(t_pcb *pcb);
+u_int64_t get_rafaga_ejecutada_pcb(t_pcb *pcb);
 
 // TODO: get de las métricas de estado y tiempo (ojo el caso EXIT que no transita a otro)
 
 void set_program_counter_pcb(t_pcb *pcb, u_int32_t program_counter);
 void set_estado_pcb(t_pcb *pcb, t_state estado);
-void set_ultima_estimacion_rafaga_pcb(t_pcb *pcb, u_int64_t ultima_estimacion);
-void set_estimacion_rafaga_pcb(t_pcb *pcb, u_int64_t estimacion);
+void set_estimacion_rafaga_pcb(t_pcb *pcb, double estimacion);
+void set_rafaga_ejecutada_pcb(t_pcb *pcb, u_int64_t rafaga);
 
 void debug_pcb(t_pcb *pcb);
 
