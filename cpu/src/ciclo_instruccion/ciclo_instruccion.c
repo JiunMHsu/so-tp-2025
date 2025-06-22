@@ -62,8 +62,6 @@ static instruccion_ejecutable decode(char *instruccion_recibida)
     instruccion.funcion_instruccion = get_instruccion(vec_instruccion[0]);
     instruccion.parametros = remove_first_element(vec_instruccion);
 
-    // TODO: traduccion de direcciones de memoria para WRITE y READ -> puede ser que instruccion a ejecutar tenga otro campo "direccion fisica"
-
     string_array_destroy(vec_instruccion);
     return instruccion;
 }
