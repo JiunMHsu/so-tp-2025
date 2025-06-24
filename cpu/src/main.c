@@ -5,6 +5,8 @@
 #include "interrupcion/interrupcion.h"
 #include "instrucciones/instrucciones.h"
 #include "ciclo_instruccion/ciclo_instruccion.h"
+#include "mmu/mmu.h"
+#include "cache/cache.h"
 
 int main(int argc, char *argv[])
 {
@@ -35,6 +37,8 @@ int main(int argc, char *argv[])
 
     inicializar_interrupcion();
     inicializar_instrucciones();
+    inicializar_mmu();
+    inicializar_cache();
 
     while (1)
     {
