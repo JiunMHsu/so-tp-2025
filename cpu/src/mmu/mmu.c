@@ -9,6 +9,7 @@ static u_int32_t obtener_marco_de_memoria(u_int32_t pid,
                                           u_int32_t cantidad_niveles,
                                           u_int32_t numero_pagina,
                                           u_int32_t cantidad_entradas_tp);
+
 static u_int32_t potencia(u_int32_t base, u_int32_t exponente);
 
 void inicializar_mmu()
@@ -20,10 +21,12 @@ void inicializar_mmu()
     tamanio_pagina = get_tamanio_pagina();
 }
 
-u_int32_t get_direccion_fisica(u_int32_t pid, u_int32_t direccion_logica)
+//TODO cambiar todas las firmas con pid => agregar get_pid de ciclo_instruccion
+u_int32_t get_marco(u_int32_t direccion_logica)
 {
-    u_int32_t numero_pagina = floor(direccion_logica / tamanio_pagina);
-    u_int32_t offset = direccion_logica % tamanio_pagina;
+    u_int32_t numero_pagina = get_nro_pagina(direccion_logica);
+    u_int32_t offset = get_offset(direccion_logica);
+    u_int32_t pid = get_pid();
     int32_t marco;
 
     // revisar cache => si hay cache miss loggear => si hay cache hit escribir/leer ahi mismo (dejar como modificado si esta escrito)
@@ -59,7 +62,12 @@ u_int32_t get_direccion_fisica(u_int32_t pid, u_int32_t direccion_logica)
     }
 
     log_obtener_marco(pid, numero_pagina, marco);
-    return marco * tamanio_pagina + offset;
+    return marco;
+}
+
+u_int32_t get_direccion_fisica(u_int32_t direccion_logica)
+{
+    return get_marco(direccion_logica) * tamanio_pagina + get_offset(direccion_logica);
 }
 
 static u_int32_t obtener_marco_de_memoria(u_int32_t pid, u_int32_t cantidad_niveles, u_int32_t numero_pagina, u_int32_t cantidad_entradas_tp)
@@ -95,6 +103,16 @@ static u_int32_t potencia(u_int32_t base, u_int32_t exponente)
         resultado *= base;
 
     return resultado;
+}
+
+u_int32_t get_nro_pagina(u_int32_t direccion_logica)
+{
+    return (u_int32_t)floor(direccion_logica / tamanio_pagina);
+}
+
+u_int32_t get_offset(u_int32_t direccion_logica)
+{
+    return direccion_logica % tamanio_pagina;
 }
 
 void destruir_mmu()
