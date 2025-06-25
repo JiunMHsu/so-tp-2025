@@ -21,5 +21,6 @@ u_int32_t cache_habilitada();
 void escribir_pagina();
 void leer_pagina();
 void destruir_cache();
+void escribir_cache(u_int32_t numero_pagina, u_int32_t offset, void *datos);
 
 #endif // CPU_CACHE_H
