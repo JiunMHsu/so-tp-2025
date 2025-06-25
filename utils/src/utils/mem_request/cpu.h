@@ -13,9 +13,10 @@ typedef enum
     ESCRIBIR,      // Acceso a espacio de usuario
 } operacion_cpu_memoria;
 
-// Operaciones en duda:
-// Leer Página completa
-// Actualizar página completa
+// TODO
+//  Operaciones faltantes:
+//  Leer Página completa
+//  Actualizar página completa
 
 typedef struct
 {

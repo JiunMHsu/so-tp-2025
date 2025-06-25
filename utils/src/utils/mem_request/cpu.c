@@ -17,6 +17,8 @@ static t_peticion_cpu *crear_peticion_cpu(operacion_cpu_memoria operacion,
     peticion->direcciones_fisicas = NULL;
     peticion->buffer = NULL;
 
+    //TODO agregar caso escribir pagina completa y leer pagina completa (leer pag completa para traerme contenido void *)
+
     switch (operacion)
     {
     case FETCH_INSTRUCCION:
