@@ -20,5 +20,7 @@ u_int32_t get_cantidad_entradas_tp(void);
 u_int32_t get_tamanio_pagina(void);
 void enviar_peticion_instruccion(u_int32_t pid, u_int32_t program_counter);
 void enviar_peticion_marco(u_int32_t pid, char *entradas_por_nivel);
+void enviar_peticion_escritura(u_int32_t pid, u_int32_t direccion_fisica, void *contenido);
+void *enviar_peticion_contenido_pagina(u_int32_t pid, u_int32_t marco);
 
 #endif // CONEXION_MEMORIA_H

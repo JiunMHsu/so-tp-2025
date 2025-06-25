@@ -64,3 +64,13 @@ void enviar_peticion_marco(u_int32_t pid, char *entradas_por_nivel)
     enviar_peticion_cpu(fd_memoria, peticion_marco);
     destruir_peticion_cpu(peticion_marco);
 }
+
+void enviar_peticion_escritura(u_int32_t pid, u_int32_t direccion_fisica, void *contenido)
+{
+    //TODO
+}
+
+void *enviar_peticion_contenido_pagina(u_int32_t pid, u_int32_t marco)
+{
+    //TODO
+}
