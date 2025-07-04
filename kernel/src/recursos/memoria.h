@@ -44,7 +44,7 @@ int32_t solicitar_finalizacion_proceso(u_int32_t pid);
 int32_t solicitar_dump_proceso(u_int32_t pid);
 
 /**
- * @brief Solicita un intercambio de memoria (swap out) de un proceso.
+ * @brief Solicita la suspención (swap out) de un proceso.
  *
  * @param pid Identificador del proceso a intercambiar.
  * @return int32_t 1 si la solicitud fue exitosa, 0 en caso contrario.
@@ -54,7 +54,7 @@ int32_t solicitar_dump_proceso(u_int32_t pid);
 int32_t solicitar_swap_out(u_int32_t pid);
 
 /**
- * @brief Solicita un intercambio de memoria (swap in) de un proceso.
+ * @brief Solicita la desuspención (swap in) de un proceso.
  *
  * @param pid Identificador del proceso a intercambiar.
  * @return int32_t 1 si la solicitud fue exitosa, 0 en caso contrario.

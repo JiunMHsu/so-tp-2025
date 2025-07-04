@@ -202,9 +202,9 @@ static void *manejar_finalizados(void *_)
         t_fin_de_io *fin_de_io = get_finalizado();
 
         if (fin_de_io->motivo == EXECUTED)
-            desbloquear_proceso(fin_de_io->proceso->pid, 0);
+            desbloquear_proceso(fin_de_io->proceso, 0);
         else
-            desbloquear_proceso(fin_de_io->proceso->pid, -1);
+            desbloquear_proceso(fin_de_io->proceso, -1);
 
         destruir_fin_de_io(fin_de_io);
     }

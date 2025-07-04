@@ -7,9 +7,8 @@
 
 int main(int argc, char *argv[])
 {
-    // TODO: Leer por argumentos el archivo de pseudocodigo y el tamaño del proceso
-    char *pseudocodigo = "";
-    u_int32_t tamanio_proceso = 0;
+    char *pseudocodigo = argv[1];
+    u_int32_t tamanio_proceso = argv[2] ? atoi(argv[2]) : 0;
 
     signal(SIGINT, &finalizar_servidor_por_sigint);
 
