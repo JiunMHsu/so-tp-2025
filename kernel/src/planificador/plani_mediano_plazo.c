@@ -122,8 +122,19 @@ static void insertar_en_suspended_ready(t_pcb *proceso)
     }
 }
 
-// TODO: Implementar la logica de desuspender un proceso de susp_ready
-t_pcb *desuspender_proceso_ready() {}
+t_pcb *desuspender_proceso_ready()
+{
+    t_pcb *proceso = peek_proceso(q_susp_ready);
+    int32_t respuesta = solicitar_swap_in(proceso->pid);
+
+    if (!respuesta)
+    {
+        log_mensaje_error("Error al solicitar swap in del proceso suspendido.");
+        return NULL; // No se pudo desuspender
+    }
+
+    return remove_proceso(q_susp_ready, proceso->pid);
+}
 
 int8_t hay_proceso_susp_ready()
 {
@@ -133,7 +144,9 @@ int8_t hay_proceso_susp_ready()
 static void suspender_proceso(t_pcb *proceso)
 {
     push_proceso(q_susp_blocked, proceso);
-    solicitar_swap_out(proceso->pid); // en teoria esto devuelve algo, pero no se si hace falta evaluarlo
+
+    // TODO: Capaz pasar a exit si no se pudo suspender
+    solicitar_swap_out(proceso->pid);
     puede_admitir_proceso_nuevo();
 }
 
