@@ -185,7 +185,7 @@ void set_rafaga_ejecutada_pcb(t_pcb *pcb, u_int64_t rafaga)
     pthread_mutex_unlock(&(pcb->mutex));
 }
 
-int8_t es_de_menor_tamanio_que(t_pcb *proceso_a, t_pcb *proceso_b)
+int32_t es_de_menor_tamanio_que(t_pcb *proceso_a, t_pcb *proceso_b)
 {
     return proceso_a->tamanio <= proceso_b->tamanio;
 }
