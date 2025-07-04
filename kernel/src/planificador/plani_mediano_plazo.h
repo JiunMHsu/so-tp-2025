@@ -32,10 +32,10 @@ void insertar_en_blocked(t_pcb *proceso);
 /**
  * @brief Desbloquea un proceso y lo reinsertar en la cola correspondiente.
  *
- * @param pid PID del proceso a desbloquear.
- * @param resultado Resultado de la operación que causó el desbloqueo, `0` si fue exitoso, `-1` si falló.
+ * @param proceso pcb del proceso a desbloquear.
+ * @param fallo Resultado de la operación que causó el desbloqueo, `0` si fue exitoso, `-1` si falló.
  */
-void desbloquear_proceso(u_int32_t pid, int8_t resultado);
+void desbloquear_proceso(t_pcb *proceso, int8_t fallo);
 
 /**
  * @brief Intenta desuspender un proceso de la cola de suspended_ready.

@@ -43,24 +43,20 @@ static void init_proc(char *pseudocodigo, u_int32_t tamanio_proceso)
 
 static void dump_memory(t_pcb *proceso)
 {
-    u_int32_t *pid = malloc(sizeof(u_int32_t));
-    *pid = proceso->pid;
-
     insertar_en_blocked(proceso);
 
     pthread_t thread_dump;
-    pthread_create(&thread_dump, NULL, &_dump_memory, pid);
+    pthread_create(&thread_dump, NULL, &_dump_memory, proceso);
     pthread_detach(thread_dump);
 }
 
-static void *_dump_memory(void *_pid)
+static void *_dump_memory(void *_proceso)
 {
-    u_int32_t pid = *(u_int32_t *)_pid;
-    free(_pid);
+    t_pcb *proceso = (t_pcb *)_proceso;
 
-    int8_t respuesta = solicitar_dump_proceso(pid);
+    int8_t respuesta = solicitar_dump_proceso(proceso->pid);
     int32_t resultado = (respuesta == 0) ? respuesta : -1;
-    desbloquear_proceso(pid, resultado);
+    desbloquear_proceso(proceso, resultado);
 
     return NULL;
 }

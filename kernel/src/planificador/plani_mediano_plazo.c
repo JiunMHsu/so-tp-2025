@@ -13,6 +13,9 @@ static t_list *timer_pool;
 
 static void suspender_proceso(t_pcb *proceso);
 
+static void manejar_fallo(t_pcb *proceso);
+static void insertar_en_suspended_ready(t_pcb *proceso);
+
 static t_cronometro *crear_cronometro(u_int64_t tiempo_espera);
 static bool _cronometro_libre(void *_cronometro);
 static void *cronometrar(void *_cronometro);
@@ -62,9 +65,61 @@ void insertar_en_blocked(t_pcb *proceso)
     pthread_mutex_unlock(&timer_pool_mutex);
 }
 
-void desbloquear_proceso(u_int32_t pid, int8_t resultado)
+void desbloquear_proceso(t_pcb *proceso, int8_t fallo)
 {
-    // TODO: Si se interta en suspender_ready, considerar el algoritmo
+    if (fallo)
+        return manejar_fallo(proceso);
+
+    t_pcb *pcb = NULL;
+    switch (get_estado_pcb(proceso))
+    {
+    case BLOCKED:
+        pcb = remove_proceso(q_blocked, proceso->pid);
+        insertar_en_ready(pcb);
+        return;
+    case SUSPENDED_BLOCKED:
+        pcb = remove_proceso(q_susp_blocked, proceso->pid);
+        insertar_en_suspended_ready(pcb);
+        return;
+    default:
+        log_mensaje_error("proceso no bloqueado, ni bloqueado suspendido.");
+        return;
+    }
+}
+
+static void manejar_fallo(t_pcb *proceso)
+{
+    t_pcb *pcb = NULL;
+    switch (get_estado_pcb(proceso))
+    {
+    case BLOCKED:
+        pcb = remove_proceso(q_blocked, proceso->pid);
+        break;
+    case SUSPENDED_BLOCKED:
+        pcb = remove_proceso(q_susp_blocked, proceso->pid);
+        break;
+    default:
+        log_mensaje_error("proceso no bloqueado, ni bloqueado suspendido.");
+        return;
+    }
+
+    insertar_en_exit(pcb);
+}
+
+static void insertar_en_suspended_ready(t_pcb *proceso)
+{
+    switch (algoritmo)
+    {
+    case FIFO:
+        push_proceso(q_susp_ready, pcb);
+        return;
+    case PMCP:
+        ordered_insert_proceso(q_susp_ready, pcb, &es_de_menor_tamanio_que);
+        return;
+    default: // caso SJF, SRT, no debería ocurrir nunca
+        log_mensaje_error("Algoritmo de desuspención no soportado.");
+        return;
+    }
 }
 
 // TODO: Implementar la logica de desuspender un proceso de susp_ready
