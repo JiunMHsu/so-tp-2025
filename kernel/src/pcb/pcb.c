@@ -1,7 +1,6 @@
 #include "pcb.h"
 
 static void actualizar_metricas_estado(t_pcb *pcb);
-static void actualizar_metricas_tiempo(t_pcb *pcb);
 
 static void _destruir_lista_tiempos(void *elemento);
 
@@ -134,12 +133,11 @@ void set_program_counter_pcb(t_pcb *pcb, u_int32_t program_counter)
 
 void set_estado_pcb(t_pcb *pcb, t_state estado)
 {
-    pthread_mutex_lock(&(pcb->mutex));
+    actualizar_metricas_tiempo(pcb); // los tiempos se actualizan usando el estado viejo
 
+    pthread_mutex_lock(&(pcb->mutex));
     pcb->estado = estado;
     actualizar_metricas_estado(pcb);
-    actualizar_metricas_tiempo(pcb);
-
     pthread_mutex_unlock(&(pcb->mutex));
 }
 
@@ -150,11 +148,13 @@ static void actualizar_metricas_estado(t_pcb *pcb)
     (*cantidad)++;
 }
 
-static void actualizar_metricas_tiempo(t_pcb *pcb)
+void actualizar_metricas_tiempo(t_pcb *pcb)
 {
+    pthread_mutex_lock(&(pcb->mutex));
     if (pcb->temporal == NULL)
     {
         pcb->temporal = temporal_create();
+        pthread_mutex_unlock(&(pcb->mutex));
         return;
     }
 
@@ -169,6 +169,7 @@ static void actualizar_metricas_tiempo(t_pcb *pcb)
 
     temporal_destroy(pcb->temporal);
     pcb->temporal = temporal_create();
+    pthread_mutex_unlock(&(pcb->mutex));
 }
 
 void set_estimacion_rafaga_pcb(t_pcb *pcb, double estimacion)

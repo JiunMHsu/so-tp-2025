@@ -114,6 +114,7 @@ static void *finalizar_proceso(void *_)
             puede_admitir_proceso_nuevo();
             proceso = remove_proceso(q_exit, proceso->pid);
 
+            actualizar_metricas_tiempo(proceso);
             log_metricas_proceso(proceso->pid,
                                  proceso->metricas_estado,
                                  proceso->metricas_tiempo);

@@ -67,7 +67,7 @@ u_int64_t get_tiempo_estado_actual_pcb(t_pcb *pcb);
 double get_estimacion_rafaga_pcb(t_pcb *pcb);
 u_int64_t get_rafaga_ejecutada_pcb(t_pcb *pcb);
 
-// TODO: get de las métricas de estado y tiempo (ojo el caso EXIT que no transita a otro)
+void actualizar_metricas_tiempo(t_pcb *pcb);
 
 void set_program_counter_pcb(t_pcb *pcb, u_int32_t program_counter);
 void set_estado_pcb(t_pcb *pcb, t_state estado);
