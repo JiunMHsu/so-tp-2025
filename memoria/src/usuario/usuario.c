@@ -1,18 +1,17 @@
 #include "usuario.h"
 
 void *memoria_usuario;
+pthread_mutex_t memoria_usuario_mutex;
 
 void inicializar_memoria_usuario()
 {
     memoria_usuario = malloc(get_tam_memoria());
-    if (memoria_usuario == NULL)
-        log_mensaje_error("No se pudo iniciar la memoria");
-
-    incializar_bitmap();
+    inicializar_bitmap_estados();
+    pthread_mutex_init(&memoria_usuario_mutex, NULL);
 }
 
 void destruir_memoria_usuario()
 {
     free(memoria_usuario);
-    destruir_bitmap();
+    destruir_bitmap_estados();
 }

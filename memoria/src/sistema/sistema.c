@@ -58,7 +58,8 @@ void finalizar_proceso(int32_t pid)
     list_destroy_and_destroy_elements(instrucciones, free);
 
     if (dictionary_has_key(procesos_tablas, key_pid) == false)
-    { // Ver si esta bien hacer esto otra vez
+    {
+        // Ver si esta bien hacer esto otra vez
         log_mensaje_error("Se inteto finalizar un proceso inexistente.");
         free(key_pid);
         return;

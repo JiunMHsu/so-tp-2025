@@ -2,6 +2,7 @@
 #define TABLA_PAGINAS_H
 
 #include <stdlib.h>
+
 #include "config/config.h"
 
 typedef struct
