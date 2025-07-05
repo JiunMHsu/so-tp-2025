@@ -22,16 +22,23 @@ void set_estado_frame(u_int32_t frame, t_estado_frame estado)
 {
     pthread_mutex_lock(&bitmap_mutex);
 
-    if (bitarray_test_bit(bitmap, frame) == estado)
+    if ((t_estado_frame)bitarray_test_bit(bitmap, frame) == estado)
     {
+        pthread_mutex_unlock(&bitmap_mutex);
+        return;
     }
 
     if (estado == LIBRE)
+    {
         bitarray_clean_bit(bitmap, frame);
+        frames_libres++;
+    }
     else
+    {
         bitarray_set_bit(bitmap, frame);
+        frames_libres--;
+    }
 
-    frames_libres += (estado == 0) ? 1 : -1;
     pthread_mutex_unlock(&bitmap_mutex);
 }
 
@@ -55,7 +62,13 @@ int32_t get_frame_libre()
     return -1;
 }
 
-u_int32_t get_cantidad_frames_disponibles() {}
+u_int32_t get_cantidad_frames_disponibles()
+{
+    pthread_mutex_lock(&bitmap_mutex);
+    u_int32_t cantidad_frames_disponibles = frames_libres;
+    pthread_mutex_unlock(&bitmap_mutex);
+    return cantidad_frames_disponibles;
+}
 
 void destruir_bitmap_estados()
 {
