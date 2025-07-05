@@ -7,6 +7,12 @@
 
 int main(int argc, char *argv[])
 {
+    if (argc < 3)
+    {
+        printf("Uso: %s <archivo_pseudocodigo> <tamanio_proceso> \n", argv[0]);
+        return EXIT_FAILURE;
+    }
+
     char *pseudocodigo = argv[1];
     u_int32_t tamanio_proceso = argv[2] ? atoi(argv[2]) : 0;
 

@@ -23,6 +23,8 @@ void inicializar_planificador(char *archivo_pseudocodigo, u_int32_t tamanio_proc
     inicializar_planificador_mediano_plazo(q_blocked, q_susp_blocked, q_susp_ready);
     inicializar_planificador_corto_plazo(q_ready, q_executing);
 
+    insertar_proceso_nuevo(archivo_pseudocodigo, tamanio_proceso);
+
     sem_wait(fin_planificador);
 }
 
@@ -32,7 +34,7 @@ static void esperar_enter()
     while (input[0] != '\0')
     {
         free(input);
-        input = readline("[+] Presione Enter para continuar...\n");
+        input = readline("[+] Presione Enter para comenzar...\n");
     }
 
     free(input);
