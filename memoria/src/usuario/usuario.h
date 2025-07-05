@@ -3,8 +3,9 @@
 
 #include <stdio.h>
 #include <stdlib.h>
+#include <pthread.h>
 
-#include "bitarray/bitarray.h"
+#include "estado_frame/estado_frame.h"
 
 void inicializar_memoria_usuario();
 

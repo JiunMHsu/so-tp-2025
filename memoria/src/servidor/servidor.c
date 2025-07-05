@@ -76,7 +76,16 @@ static void *atender_kernel(void *fd_ptr)
             enviar_senial(1, fd_kernel);
             break;
 
-        default:
+        case DUMP_PROCESO:
+            break;
+
+        case SWAP_OUT:
+            break;
+
+        case SWAP_IN:
+            break;
+
+        default: // no debería ocurrir nunca
             break;
         }
 
