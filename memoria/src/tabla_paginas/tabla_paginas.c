@@ -70,6 +70,17 @@ static t_entrada *crear_entrada()
     return entrada;
 }
 
+// TODO: implementar cargar_marcos_asignados
+void cargar_marcos_asignados(u_int32_t pid, t_list *frames_asignados)
+{
+}
+
+// TODO: implementar obtener_marco
+int32_t obtener_marco(u_int32_t pid, u_int32_t *entradas)
+{
+    return 0;
+}
+
 void destruir_tablas_para(u_int32_t pid)
 {
     char *_pid = string_itoa(pid);

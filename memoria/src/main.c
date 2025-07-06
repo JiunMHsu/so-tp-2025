@@ -14,8 +14,8 @@ int main()
     iniciar_config();
     iniciar_logger(get_log_level());
 
-    inicializar_espacio_usuario();
     inicializar_espacio_sistema();
+    inicializar_espacio_usuario();
     inicializar_swap();
 
     iniciar_servidor();

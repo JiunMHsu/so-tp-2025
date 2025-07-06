@@ -3,10 +3,10 @@
 
 #include <stdlib.h>
 #include <string.h>
+#include <math.h>
 #include <pthread.h>
 #include <commons/bitarray.h>
-#include <pthread.h>
-#include <math.h>
+#include <commons/collections/list.h>
 
 #include "config/config.h"
 #include "logger/logger.h"
@@ -23,20 +23,20 @@ typedef enum
 void inicializar_bitmap_estados(void);
 
 /**
- * @brief Modifica el estado de un frame en el bitmap (LIBRE / OCUPADO).
+ * @brief Busca y ocupa una cantidad de frames libres.
+ * Si no hay suficientes frames libres, retorna NULL.
  *
- * @param frame
- * @param estado `t_estado_frame` - Estado del frame (0: LIBRE, 1: OCUPADO).
+ * @param cantidad_frames
+ * @return t_list*
  */
-void set_estado_frame(u_int32_t frame, t_estado_frame estado);
+t_list *ocupar_frames(u_int32_t cantidad_frames);
 
 /**
- * @brief Retorna el primer frame libre según el bitmap.
- *
- * @return `u_int32_t`
- * @note Si no hay frames libres, retorna -1.
+ * @brief Libera los frames ocupados.
+ * 
+ * @param frames 
  */
-int32_t get_frame_libre(void);
+void liberar_frames(t_list *frames);
 
 /**
  * @brief Retorna la cantidad de frames disponibles (Libres).
