@@ -10,6 +10,8 @@
 #include <utils/string/string.h>
 
 #include "logger/logger.h"
+#include "estado_frame/estado_frame.h"
+#include "metricas/metricas.h"
 #include "tabla_paginas/tabla_paginas.h"
 
 void inicializar_espacio_sistema(void);

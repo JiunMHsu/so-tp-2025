@@ -3,7 +3,7 @@
 void *memoria_usuario;
 pthread_mutex_t memoria_usuario_mutex;
 
-void inicializar_memoria_usuario()
+void inicializar_espacio_usuario()
 {
     memoria_usuario = malloc(get_tam_memoria());
     inicializar_bitmap_estados();
