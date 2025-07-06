@@ -2,7 +2,6 @@
 
 static t_dictionary *procesos_instrucciones;
 
-static u_int8_t hay_espacio_para(u_int32_t tamanio);
 static t_list *leer_instrucciones(char *path);
 
 void inicializar_espacio_sistema()
@@ -16,28 +15,20 @@ void inicializar_espacio_sistema()
 
 u_int8_t crear_proceso(u_int32_t pid, u_int32_t tamanio, char *path)
 {
-    if (!hay_espacio_para(tamanio))
-        return 0;
+    u_int32_t frames_necesarios = (u_int32_t)ceil((double)tamanio / get_tam_pagina());
 
-    t_list *instrucciones = leer_instrucciones(path);
-    if (instrucciones == NULL)
-        return 0;
+    t_list *frames_asignados = ocupar_frames(frames_necesarios);
+    if (frames_asignados == NULL)
+        return 0; // no hay suficientes frames libres
 
-    dictionary_put(procesos_instrucciones, string_itoa(pid), instrucciones);
-    crear_tablas_para(pid);
+    dictionary_put(procesos_instrucciones, string_itoa(pid), leer_instrucciones(path));
     crear_metricas_para(pid);
+    crear_tablas_para(pid);
+    cargar_marcos_asignados(pid, frames_asignados);
+
+    list_destroy_and_destroy_elements(frames_asignados, &free);
 
     log_creacion_proceso(pid, tamanio);
-    return 1;
-}
-
-static u_int8_t hay_espacio_para(u_int32_t tamanio)
-{
-    u_int32_t frames_libres = get_cantidad_frames_disponibles();
-    u_int32_t frames_necesarios = (u_int32_t)ceil((double)tamanio / get_tam_pagina());
-    if (frames_libres < frames_necesarios)
-        return 0;
-
     return 1;
 }
 
@@ -48,6 +39,7 @@ static t_list *leer_instrucciones(char *path)
     if (archivo == NULL)
     {
         log_mensaje_error("No se pudo abrir archivo de instrucciones.");
+        exit(EXIT_FAILURE); // no debería ocurrir, paniqueo directo
         return NULL;
     }
 

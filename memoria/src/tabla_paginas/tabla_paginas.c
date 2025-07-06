@@ -70,29 +70,15 @@ static t_entrada *crear_entrada()
     return entrada;
 }
 
-u_int32_t obtener_marco(u_int32_t pid, u_int32_t *entradas)
+// TODO: implementar cargar_marcos_asignados
+void cargar_marcos_asignados(u_int32_t pid, t_list *frames_asignados)
 {
-    // t_tabla *tabla = buscar_por_pid(pid);
-    // if (tabla == NULL)
-    // {
-    //     log_mensaje_error("No se encontró la tabla de páginas para el PID %u", pid);
-    //     return -1;
-    // }
+}
 
-    // if (entradas == NULL || list_size(tabla->entradas) < *entradas)
-    // {
-    //     log_mensaje_error("No hay suficientes entradas en la tabla de páginas para el PID %u", pid);
-    //     return -1;
-    // }
-
-    // t_entrada *entrada = list_get(tabla->entradas, *entradas);
-    // if (entrada == NULL || !entrada->presente)
-    // {
-    //     log_mensaje_error("La entrada no está presente o no es válida para el PID %u", pid);
-    //     return -1;
-    // }
-
-    // return entrada->marco;
+// TODO: implementar obtener_marco
+int32_t obtener_marco(u_int32_t pid, u_int32_t *entradas)
+{
+    return 0;
 }
 
 void destruir_tablas_para(u_int32_t pid)
