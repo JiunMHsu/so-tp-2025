@@ -37,14 +37,15 @@ void log_creacion_proceso(u_int32_t pid, u_int32_t tamanio)
     log_info(memoria_logger, "## PID: %d - Proceso Creado - Tamaño: %d", pid, tamanio);
 }
 
-void log_destruccion_proceso(u_int32_t pid,
-                             u_int32_t accesos_tablas,
-                             u_int32_t instrucciones_solicitadas,
-                             u_int32_t swap_outs,
-                             u_int32_t swap_ins,
-                             u_int32_t lecturas,
-                             u_int32_t escrituras)
+void log_destruccion_proceso(u_int32_t pid, t_metricas *metricas)
 {
+    u_int32_t accesos_tablas = metricas->accesos_tablas;
+    u_int32_t instrucciones_solicitadas = metricas->instrucciones_solicitadas;
+    u_int32_t swap_outs = metricas->swap_outs;
+    u_int32_t swap_ins = metricas->swap_ins;
+    u_int32_t lecturas = metricas->lecturas;
+    u_int32_t escrituras = metricas->escrituras;
+
     log_info(memoria_logger, "## PID: %d - Proceso Destruido - Métricas - Acc.T.Pag: %d; Inst.Sol.: %d; SWAP: %d; Mem.Prin.: %d; Lec.Mem.: %d; Esc.Mem.: %d",
              pid, accesos_tablas, instrucciones_solicitadas, swap_outs, swap_ins, lecturas, escrituras);
 }

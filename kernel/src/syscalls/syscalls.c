@@ -55,8 +55,8 @@ static void *_dump_memory(void *_proceso)
     t_pcb *proceso = (t_pcb *)_proceso;
 
     int8_t respuesta = solicitar_dump_proceso(proceso->pid);
-    int32_t resultado = (respuesta == 0) ? respuesta : -1;
-    desbloquear_proceso(proceso, resultado);
+    u_int8_t fallo = respuesta ? 0 : 1;
+    desbloquear_proceso(proceso, fallo);
 
     return NULL;
 }

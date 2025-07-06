@@ -65,7 +65,7 @@ void insertar_en_blocked(t_pcb *proceso)
     pthread_mutex_unlock(&timer_pool_mutex);
 }
 
-void desbloquear_proceso(t_pcb *proceso, int8_t fallo)
+void desbloquear_proceso(t_pcb *proceso, u_int8_t fallo)
 {
     if (fallo)
         return manejar_fallo(proceso);

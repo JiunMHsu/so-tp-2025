@@ -1,7 +1,9 @@
 #include "sistema.h"
 
 static t_dictionary *procesos_instrucciones;
-// static t_dictionary *procesos_tablas;
+
+static u_int8_t hay_espacio_para(u_int32_t tamanio);
+static t_list *leer_instrucciones(char *path);
 
 void inicializar_espacio_sistema()
 {
@@ -12,20 +14,30 @@ void inicializar_espacio_sistema()
     inicializar_tabla_de_paginas();
 }
 
-void crear_proceso(int32_t pid, char *path)
+u_int8_t crear_proceso(u_int32_t pid, u_int32_t tamanio, char *path)
 {
-    t_list *lista_instrucciones = leer_instrucciones(path);
-    dictionary_put(procesos_instrucciones, string_itoa(pid), lista_instrucciones);
+    if (!hay_espacio_para(tamanio))
+        return 0;
 
-    crear_proceso_memoria();
-    // t_proceso_memoria *estructura_memoria = 
-    // dictionary_put(procesos_tablas, string_itoa(pid), estructura_memoria);
+    t_list *instrucciones = leer_instrucciones(path);
+    if (instrucciones == NULL)
+        return 0;
 
-    int tamanio = list_size(lista_instrucciones);
-    log_creacion_proceso(pid, tamanio); // TODO: el tamaño es el de espacio de memoria
+    dictionary_put(procesos_instrucciones, string_itoa(pid), instrucciones);
+    crear_tablas_para(pid);
+    crear_metricas_para(pid);
+
+    log_creacion_proceso(pid, tamanio);
+    return 1;
 }
 
-t_list *leer_instrucciones(char *path)
+// TODO: hay_espacio_para
+static u_int8_t hay_espacio_para(u_int32_t tamanio)
+{
+    return 1;
+}
+
+static t_list *leer_instrucciones(char *path)
 {
     FILE *archivo = fopen(path, "r");
 
@@ -47,41 +59,28 @@ t_list *leer_instrucciones(char *path)
     return instrucciones;
 }
 
-void finalizar_proceso(int32_t pid)
+u_int8_t finalizar_proceso(u_int32_t pid)
 {
     char *key_pid = string_itoa(pid);
 
-    if (dictionary_has_key(procesos_instrucciones, key_pid) == false)
+    if (!dictionary_has_key(procesos_instrucciones, key_pid))
     {
         log_mensaje_error("Se inteto finalizar un proceso inexistente.");
         free(key_pid);
-        return;
+        return 0;
     }
 
     t_list *instrucciones = dictionary_remove(procesos_instrucciones, key_pid);
     list_destroy_and_destroy_elements(instrucciones, free);
 
-    // if (dictionary_has_key(procesos_tablas, key_pid) == false)
-    // {
+    t_metricas *metricas = remover_metricas_para(pid);
 
-    //     log_mensaje_error("Se inteto finalizar un proceso inexistente.");
-    //     free(key_pid);
-    //     return;
-    // }
+    log_destruccion_proceso(pid, metricas);
 
-    // t_proceso_memoria *tabla_de_proceso = dictionary_remove(procesos_tablas, key_pid);
-    // destruir_tabla_de_paginas_para_proceso(tabla_de_proceso->tabla_global);
-
-    // log_destruccion_proceso(pid,
-    //                         tabla_de_proceso->accesos_tablas,
-    //                         tabla_de_proceso->instrucciones_solicitadas,
-    //                         tabla_de_proceso->paginas_en_swap,
-    //                         tabla_de_proceso->paginas_en_memoria,
-    //                         tabla_de_proceso->lecturas_mem,
-    //                         tabla_de_proceso->escrituras_mem);
-
-    // free(tabla_de_proceso);
+    destruir_tablas_para(pid);
+    destruir_metricas(metricas);
     free(key_pid);
+    return 1;
 }
 
 char *obtener_instruccion(u_int32_t pid, u_int32_t program_counter)
