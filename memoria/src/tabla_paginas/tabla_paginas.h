@@ -2,33 +2,44 @@
 #define TABLA_PAGINAS_H
 
 #include <stdlib.h>
+#include <pthread.h>
+#include <commons/collections/list.h>
+#include <commons/collections/dictionary.h>
 
 #include "config/config.h"
+#include "logger/logger.h"
 
 typedef struct
 {
-    int32_t nivel_de_tabla;
+    /**
+     * @brief Nivel de la tabla de páginas. 1 a n.
+     */
+    u_int32_t nivel;
     t_list *entradas;
-    // t_entrada_tabla **entradas; // TODO Remplazar por listas de entradas
-
-} t_proceso_tabla;
+} t_tabla;
 
 typedef struct
 {
-    int32_t presente; // 1 si está cargada, 0 si no
+    /**
+     * @brief `1` si la entrada está cargada, `0` si no.
+     */
+    u_int8_t presente;
 
-    // Si no es el último nivel
-    t_proceso_tabla *siguiente_nivel;
+    /**
+     * @brief Puntero a la siguiente tabla de nivel inferior.
+     * @note `NULL` si es el último nivel de la tabla.
+     */
+    t_tabla *siguiente;
 
-    // Si es el último nivel
-    int32_t marco; // -1 si no tiene asignado
-} t_entrada_tabla;
+    /**
+     * @brief Número de marco asignado a la entrada.
+     * @note `-1`si no tiene asignado un marco.
+     */
+    int32_t marco;
+} t_entrada;
 
 void inicializar_tabla_de_paginas(void);
-
-void crear_proceso_memoria();
-t_proceso_tabla *crear_tabla_de_paginas(int32_t nivel_tabla_actual, int32_t nivel_total_tablas, int32_t entradas_por_tabla);
-void destruir_tabla_de_paginas_para_proceso(t_proceso_tabla *tabla);
-void destruir_entrada(void *entrada_liberar);
+void crear_tablas_para(u_int32_t pid);
+void destruir_tablas_para(u_int32_t pid);
 
 #endif // TABLA_PAGINAS_H
