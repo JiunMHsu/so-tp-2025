@@ -51,17 +51,71 @@ void destruir_metricas(t_metricas *metricas)
     metricas = NULL;
 }
 
-void incrementar_acceso_tabla(u_int32_t pid) {}
+void incrementar_acceso_tabla(u_int32_t pid)
+{
+    pthread_mutex_lock(&mutex_metricas);
+    t_metricas *metricas = buscar_por_pid(pid);
 
-void incrementar_instruccion_solicitada(u_int32_t pid) {}
+    if (metricas != NULL)
+        metricas->accesos_tablas++;
 
-void incrementar_swap_out(u_int32_t pid) {}
+    pthread_mutex_unlock(&mutex_metricas);
+}
 
-void incrementar_swap_in(u_int32_t pid) {}
+void incrementar_instruccion_solicitada(u_int32_t pid)
+{
+    pthread_mutex_lock(&mutex_metricas);
+    t_metricas *metricas = buscar_por_pid(pid);
 
-void incrementar_lectura(u_int32_t pid) {}
+    if (metricas != NULL)
+        metricas->instrucciones_solicitadas++;
 
-void incrementar_escritura(u_int32_t pid) {}
+    pthread_mutex_unlock(&mutex_metricas);
+}
+
+void incrementar_swap_out(u_int32_t pid)
+{
+    pthread_mutex_lock(&mutex_metricas);
+    t_metricas *metricas = buscar_por_pid(pid);
+
+    if (metricas != NULL)
+        metricas->swap_outs++;
+
+    pthread_mutex_unlock(&mutex_metricas);
+}
+
+void incrementar_swap_in(u_int32_t pid)
+{
+    pthread_mutex_lock(&mutex_metricas);
+    t_metricas *metricas = buscar_por_pid(pid);
+
+    if (metricas != NULL)
+        metricas->swap_ins++;
+
+    pthread_mutex_unlock(&mutex_metricas);
+}
+
+void incrementar_lectura(u_int32_t pid)
+{
+    pthread_mutex_lock(&mutex_metricas);
+    t_metricas *metricas = buscar_por_pid(pid);
+
+    if (metricas != NULL)
+        metricas->lecturas++;
+
+    pthread_mutex_unlock(&mutex_metricas);
+}
+
+void incrementar_escritura(u_int32_t pid)
+{
+    pthread_mutex_lock(&mutex_metricas);
+    t_metricas *metricas = buscar_por_pid(pid);
+
+    if (metricas != NULL)
+        metricas->escrituras++;
+
+    pthread_mutex_unlock(&mutex_metricas);
+}
 
 static t_metricas *crear_metricas()
 {
