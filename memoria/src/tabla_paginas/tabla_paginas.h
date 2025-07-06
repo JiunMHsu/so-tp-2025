@@ -42,4 +42,6 @@ void inicializar_tabla_de_paginas(void);
 void crear_tablas_para(u_int32_t pid);
 void destruir_tablas_para(u_int32_t pid);
 
+// TODO: Extender funciones para tablas de páginas
+
 #endif // TABLA_PAGINAS_H

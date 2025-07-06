@@ -109,3 +109,14 @@ static void destruir_entrada(void *entrada)
     free(entrada);
     entrada = NULL;
 }
+
+static t_tabla *buscar_por_pid(u_int32_t pid)
+{
+    char *_pid = string_itoa(pid);
+    pthread_mutex_lock(&mutex_tablas_procesos);
+    t_tabla *tabla = dictionary_get(tablas_procesos, _pid);
+    pthread_mutex_unlock(&mutex_tablas_procesos);
+    free(_pid);
+
+    return tabla;
+}
