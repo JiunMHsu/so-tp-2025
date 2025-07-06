@@ -6,6 +6,8 @@ static pthread_mutex_t bitmap_mutex;
 static u_int32_t frames_totales;
 static u_int32_t frames_libres;
 
+static void liberar_frame(void *frame);
+
 void inicializar_bitmap_estados()
 {
     frames_totales = get_tam_memoria() / get_tam_pagina();
@@ -18,48 +20,41 @@ void inicializar_bitmap_estados()
     pthread_mutex_init(&bitmap_mutex, NULL);
 }
 
-void set_estado_frame(u_int32_t frame, t_estado_frame estado)
+t_list *ocupar_frames(u_int32_t cantidad_frames)
 {
     pthread_mutex_lock(&bitmap_mutex);
 
-    if ((t_estado_frame)bitarray_test_bit(bitmap, frame) == estado)
+    if (cantidad_frames > frames_libres)
     {
         pthread_mutex_unlock(&bitmap_mutex);
-        return;
+        log_mensaje_advertencia("No hay suficientes frames libres para ocupar");
+        return NULL;
     }
 
-    if (estado == LIBRE)
-    {
-        bitarray_clean_bit(bitmap, frame);
-        frames_libres++;
-    }
-    else
-    {
-        bitarray_set_bit(bitmap, frame);
-        frames_libres--;
-    }
-
-    pthread_mutex_unlock(&bitmap_mutex);
-}
-
-int32_t get_frame_libre()
-{
-    pthread_mutex_lock(&bitmap_mutex);
-
-    for (int i = 0; i < frames_totales; i++)
+    t_list *frames_ocupados = list_create();
+    for (u_int32_t i = 0; i < frames_totales && cantidad_frames > 0; i++)
     {
         if (bitarray_test_bit(bitmap, i)) // si está ocupado (es 1, true)
             continue;
 
-        pthread_mutex_unlock(&bitmap_mutex);
-        return i;
+        bitarray_set_bit(bitmap, i);
+        frames_libres--;
+
+        u_int32_t *frame_ocupado = malloc(sizeof(u_int32_t));
+        *frame_ocupado = i;
+        list_add(frames_ocupados, frame_ocupado);
+        cantidad_frames--;
     }
 
-    // Caso en el que todos los marcos esten ocupados
     pthread_mutex_unlock(&bitmap_mutex);
-    log_mensaje_advertencia("No se encontraron frames libres");
+    return frames_ocupados;
+}
 
-    return -1;
+void liberar_frames(t_list *frames)
+{
+    pthread_mutex_lock(&bitmap_mutex);
+    list_iterate(frames, &liberar_frame);
+    pthread_mutex_unlock(&bitmap_mutex);
 }
 
 u_int32_t get_cantidad_frames_disponibles()
@@ -74,4 +69,11 @@ void destruir_bitmap_estados()
 {
     bitarray_destroy(bitmap);
     pthread_mutex_destroy(&bitmap_mutex);
+}
+
+static void liberar_frame(void *frame)
+{
+    u_int32_t _frame = *(u_int32_t *)frame;
+    bitarray_clean_bit(bitmap, _frame);
+    frames_libres++;
 }

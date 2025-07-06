@@ -41,6 +41,7 @@ typedef struct
 void inicializar_tabla_de_paginas(void);
 void crear_tablas_para(u_int32_t pid);
 void destruir_tablas_para(u_int32_t pid);
+u_int32_t obtener_marco(u_int32_t pid, u_int32_t *entradas);
 
 // TODO: Extender funciones para tablas de páginas
 
