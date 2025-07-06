@@ -24,19 +24,7 @@ typedef struct
     int32_t marco; // -1 si no tiene asignado
 } t_entrada_tabla;
 
-typedef struct
-{
-    t_proceso_tabla *tabla_global; // índice = ID tabla
 
-    // Metricas de cada proceso
-    int32_t accesos_tablas;
-    int32_t instrucciones_solicitadas;
-    int32_t paginas_en_swap;
-    int32_t paginas_en_memoria;
-    int32_t lecturas_mem;
-    int32_t escrituras_mem;
-
-} t_proceso_memoria;
 
 t_proceso_memoria *crear_proceso_memoria();
 t_proceso_tabla *crear_tabla_de_paginas(int32_t nivel_tabla_actual, int32_t nivel_total_tablas, int32_t entradas_por_tabla);
