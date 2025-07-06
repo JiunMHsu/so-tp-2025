@@ -19,8 +19,29 @@ typedef struct
 } t_metricas;
 
 void inicializar_metricas(void);
+
+/**
+ * @brief Inicializa `t_metricas` con valores por defecto (0) para un proceso dado.
+ *
+ * @param pid PID del proceso al que se le crearán las métricas.
+ */
 void crear_metricas_para(u_int32_t pid);
+
+/**
+ * @brief Remueve una métrica del diccionario y la retorna.
+ *
+ * @param pid PID del proceso al que pertenecen las métricas.
+ * @return `t_metricas*`
+ */
 t_metricas *remover_metricas_para(u_int32_t pid);
+
+/**
+ * @brief Destructor de métricas.
+ *
+ * @param metricas
+ * @note Si las métricas son NULL, no hace nada.
+ * @note No opera sobre el diccionario global.
+ */
 void destruir_metricas(t_metricas *metricas);
 
 void incrementar_acceso_tabla(u_int32_t pid);
