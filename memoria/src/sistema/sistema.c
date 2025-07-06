@@ -31,9 +31,13 @@ u_int8_t crear_proceso(u_int32_t pid, u_int32_t tamanio, char *path)
     return 1;
 }
 
-// TODO: hay_espacio_para
 static u_int8_t hay_espacio_para(u_int32_t tamanio)
 {
+    u_int32_t frames_libres = get_cantidad_frames_disponibles();
+    u_int32_t frames_necesarios = (u_int32_t)ceil((double)tamanio / get_tam_pagina());
+    if (frames_libres < frames_necesarios)
+        return 0;
+
     return 1;
 }
 
