@@ -12,6 +12,9 @@ static pthread_mutex_t mutex_tablas_procesos;
 static t_tabla *crear_tabla_paginas(u_int32_t nivel, u_int32_t cant_niveles);
 static t_entrada *crear_entrada(void);
 
+static void destruir_tabla(t_tabla *tabla);
+static void destruir_entrada(void *entrada);
+
 static t_tabla *buscar_por_pid(u_int32_t pid);
 
 void inicializar_tabla_de_paginas()
@@ -67,23 +70,42 @@ static t_entrada *crear_entrada()
     return entrada;
 }
 
-void destruir_tablas_para(u_int32_t pid) {}
+void destruir_tablas_para(u_int32_t pid)
+{
+    char *_pid = string_itoa(pid);
+    pthread_mutex_lock(&mutex_tablas_procesos);
 
-// void destruir_tabla_de_paginas_para_proceso(t_proceso_tabla *tabla)
-// {
-//     list_destroy_and_destroy_elements(tabla->entradas, destruir_entrada);
+    if (!dictionary_has_key(tablas_procesos, _pid))
+    {
+        pthread_mutex_unlock(&mutex_tablas_procesos);
+        free(_pid);
+        return;
+    }
 
-//     free(tabla);
-// }
+    t_tabla *tabla = dictionary_remove(tablas_procesos, _pid);
+    pthread_mutex_unlock(&mutex_tablas_procesos);
 
-// void destruir_entrada(void *entrada_liberar)
-// {
-//     t_entrada_tabla *entrada = (t_entrada_tabla *)entrada_liberar;
+    destruir_tabla(tabla);
+    free(_pid);
+}
 
-//     if (entrada->siguiente_nivel != NULL)
-//     {
-//         destruir_tabla_de_paginas_para_proceso(entrada->siguiente_nivel);
-//     }
+static void destruir_tabla(t_tabla *tabla)
+{
+    if (tabla == NULL)
+        return;
 
-//     free(entrada);
-// }
+    list_destroy_and_destroy_elements(tabla->entradas, &destruir_entrada);
+    free(tabla);
+    tabla = NULL;
+}
+
+static void destruir_entrada(void *entrada)
+{
+    if (entrada == NULL)
+        return;
+
+    t_entrada *_entrada = (t_entrada *)entrada;
+    destruir_tabla(_entrada->siguiente); // NULL safe function
+    free(entrada);
+    entrada = NULL;
+}
