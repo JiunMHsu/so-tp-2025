@@ -1,18 +1,11 @@
 #include "tabla_paginas.h"
 
-t_proceso_memoria *crear_proceso_memoria()
+void inicializar_tabla_de_paginas()
 {
-    t_proceso_memoria *proceso = malloc(sizeof(t_proceso_memoria));
+}
 
-    proceso->tabla_global = crear_tabla_de_paginas(0, get_cantidad_niveles(), get_entradas_por_tabla());
-    proceso->accesos_tablas = 0;
-    proceso->instrucciones_solicitadas = 0;
-    proceso->paginas_en_swap = 0;
-    proceso->paginas_en_memoria = 0;
-    proceso->lecturas_mem = 0;
-    proceso->escrituras_mem = 0;
-
-    return proceso;
+void crear_proceso_memoria()
+{
 }
 
 t_proceso_tabla *crear_tabla_de_paginas(int32_t nivel_tabla_actual, int32_t nivel_total_tablas, int32_t entradas_por_tabla)

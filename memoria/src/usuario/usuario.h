@@ -7,6 +7,6 @@
 
 #include "estado_frame/estado_frame.h"
 
-void inicializar_memoria_usuario();
+void inicializar_espacio_usuario(void);
 
 #endif // MEMORIA_USUARIO_H
