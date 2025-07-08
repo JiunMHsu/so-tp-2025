@@ -43,6 +43,14 @@ fin_ejecucion ejecutar_ciclo_instruccion(u_int32_t pid, u_int32_t program_counte
         free(instruccion_str);
     }
 
+    // TODO
+
+    if (tlb_habilitada())
+        eliminar_entradas_tlb();
+
+    if (cache_habilitada())
+        eliminar_entradas_cache();
+
     destruir_instruccion_ejecutable(instruccion);
     free(instruccion_str);
     return fin_de_ejecucion;
