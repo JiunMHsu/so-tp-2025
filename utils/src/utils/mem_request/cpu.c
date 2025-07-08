@@ -18,8 +18,6 @@ static t_peticion_cpu *crear_peticion_cpu(operacion_cpu_memoria operacion,
     peticion->direccion_fisica = NULL;
     peticion->buffer = NULL;
 
-    // TODO agregar caso escribir pagina completa y leer pagina completa (leer pag completa para traerme contenido void *)
-
     switch (operacion)
     {
     case FETCH_INSTRUCCION:
@@ -62,14 +60,14 @@ t_peticion_cpu *crear_peticion_nro_marco(u_int32_t pid, char *entradas_por_nivel
     return crear_peticion_cpu(OBTENER_MARCO, pid, 0, entradas_por_nivel, NULL, 0, 0, NULL);
 }
 
-t_peticion_cpu *crear_peticion_lectura(u_int32_t pid, char *direcciones_fisicas, u_int32_t tamanio_buffer)
+t_peticion_cpu *crear_peticion_lectura(u_int32_t pid, char *direccion_fisica, u_int32_t tamanio_buffer)
 {
-    return crear_peticion_cpu(LEER, pid, 0, NULL, direcciones_fisicas, 0, tamanio_buffer, NULL);
+    return crear_peticion_cpu(LEER, pid, 0, NULL, direccion_fisica, 0, tamanio_buffer, NULL);
 }
 
-t_peticion_cpu *crear_peticion_escritura(u_int32_t pid, char *direcciones_fisicas, u_int32_t tamanio_buffer, void *buffer)
+t_peticion_cpu *crear_peticion_escritura(u_int32_t pid, char *direccion_fisica, u_int32_t tamanio_buffer, void *buffer)
 {
-    return crear_peticion_cpu(ESCRIBIR, pid, 0, NULL, direcciones_fisicas, 0, tamanio_buffer, buffer);
+    return crear_peticion_cpu(ESCRIBIR, pid, 0, NULL, direccion_fisica, 0, tamanio_buffer, buffer);
 }
 
 t_peticion_cpu *crear_peticion_escritura_pagina(u_int32_t pid, u_int32_t frame, u_int32_t tamanio_pagina, void *contenido_pagina)
