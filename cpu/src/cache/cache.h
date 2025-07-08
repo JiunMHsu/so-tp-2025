@@ -14,13 +14,12 @@ typedef struct
     u_int32_t bit_modificado;
 } entrada_cache;
 
-u_int32_t inicializar_cache();
-void agregar_entrada_cache(u_int32_t numero_pagina, int32_t marco);
-u_int32_t pagina_en_cache(u_int32_t pagina);
+void inicializar_cache();
+void cachear_pagina(u_int32_t nro_pagina, void *contenido_pagina);
+void escribir_cache(u_int32_t numero_pagina, u_int32_t offset, void *datos, u_int32_t buffer_size);
+u_int32_t existe_pagina_cache(u_int32_t nro_pagina);
 u_int32_t cache_habilitada();
-void escribir_pagina();
-void leer_pagina();
+void eliminar_entradas_cache();
 void destruir_cache();
-void escribir_cache(u_int32_t numero_pagina, u_int32_t offset, void *datos);
 
 #endif // CPU_CACHE_H
