@@ -61,8 +61,7 @@ static void _write(char **parametros)
         if (!existe_pagina_cache(nro_pagina))
         {
             u_int32_t marco_pagina = get_marco(direccion_logica);
-            void *contenido_pagina = enviar_peticion_contenido_pagina(get_pid(), marco);
-            cachear_pagina(nro_pagina, contenido_pagina);
+            cachear_pagina(nro_pagina, marco_pagina);
         }
 
         escribir_cache(nro_pagina, offset, (void *)datos, string_length(datos));
@@ -71,6 +70,7 @@ static void _write(char **parametros)
     {
         u_int32_t direccion_fisica = get_direccion_fisica(get_pid(), direccion_logica);
         enviar_peticion_escritura(get_pid(), direccion_fisica, (void *)datos, string_length(datos)); // TODO revisar parametros
+        log_operacion_acceso_memoria(get_pid(), ESCRITURA, direccion_fisica, datos);
     }
 }
 
