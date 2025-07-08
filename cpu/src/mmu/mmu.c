@@ -33,10 +33,6 @@ u_int32_t get_marco(u_int32_t direccion_logica)
     // hubo cache miss => revisar tlb => si hay tlb miss loggear => si hay tlb hit agregar pagina a cache (si esta habilitada) => pedir pagina a memoria => agregar => si no, pedir marco a memoria calcular direccion => operacion
     // hubo tlb miss => pedir a memoria => agregar pagina a cache (si esta habilitada) => escribir ahi => si no, obtener marco => direccion => operacion
 
-    // TODO no se si es aca donde se consulta la cache => eso creo que deberia estar pasando por fuera de la mmu
-    // la mmu capaz tendria que exponer funciones q obtengan los datos de la dir logica por separado y esta funcion en particular
-    // capaz tendria que ser obtener marco nada mas
-
     marco = tlb_habilitada ? get_marco_tlb(numero_pagina) : -1;
 
     if (marco == -1)
