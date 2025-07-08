@@ -67,10 +67,15 @@ void enviar_peticion_marco(u_int32_t pid, char *entradas_por_nivel)
 
 void enviar_peticion_escritura(u_int32_t pid, u_int32_t direccion_fisica, void *contenido)
 {
-    //TODO
+    // TODO revisar implementacion funcion crear_peticion_escritura
+    t_peticion_cpu *peticion_escritura = crear_peticion_escritura(pid, direccion_fisica, contenido);
+    enviar_peticion_cpu(fd_memoria, peticion_contenido_pagina);
+    destruir_peticion_cpu(peticion_contenido_pagina);
 }
 
 void *enviar_peticion_contenido_pagina(u_int32_t pid, u_int32_t marco)
 {
-    //TODO
+    t_peticion_cpu *peticion_contenido_pagina = crear_peticion_contenido_pagina(pid, marco);
+    enviar_peticion_cpu(fd_memoria, peticion_contenido_pagina);
+    destruir_peticion_cpu(peticion_contenido_pagina);
 }
