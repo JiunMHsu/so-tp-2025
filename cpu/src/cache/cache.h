@@ -5,6 +5,8 @@
 #include <string.h>
 
 #include "config/config.h"
+#include "logger/logger.h"
+#include "ciclo_instruccion/ciclo_instruccion.h"
 
 typedef struct
 {
@@ -15,7 +17,7 @@ typedef struct
 } entrada_cache;
 
 void inicializar_cache();
-void cachear_pagina(u_int32_t nro_pagina, void *contenido_pagina);
+void cachear_pagina(u_int32_t nro_pagina, u_int32_t marco);
 void escribir_cache(u_int32_t numero_pagina, u_int32_t offset, void *datos, u_int32_t buffer_size);
 u_int32_t existe_pagina_cache(u_int32_t nro_pagina);
 u_int32_t cache_habilitada();
