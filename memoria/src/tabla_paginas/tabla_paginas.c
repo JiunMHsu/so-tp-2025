@@ -70,7 +70,6 @@ static t_entrada *crear_entrada()
     return entrada;
 }
 
-// TODO: implementar cargar_marcos_asignados
 void cargar_marcos_asignados(u_int32_t pid, t_list *frames_asignados)
 {
     t_tabla *tabla_raiz = buscar_por_pid(pid);
@@ -89,10 +88,22 @@ void cargar_marcos_asignados(u_int32_t pid, t_list *frames_asignados)
     list_destroy(entradas_ultimo_nivel);
 }
 
-// TODO: implementar obtener_marco
-int32_t obtener_marco(u_int32_t pid, u_int32_t *entradas)
+int32_t obtener_marco(u_int32_t pid, u_int32_t *paginas)
 {
-    return 0;
+    t_tabla *tabla = buscar_por_pid(pid);
+    int32_t marco = -1;
+
+    for (int nivel = 0; nivel < get_cantidad_niveles(); nivel++)
+    {
+        t_entrada *entrada = list_get(tabla->entradas, paginas[nivel]);
+
+        if (entrada->siguiente == NULL)
+            return entrada->marco;
+
+        tabla = entrada->siguiente;
+    }
+
+    return marco;
 }
 
 void destruir_tablas_para(u_int32_t pid)
