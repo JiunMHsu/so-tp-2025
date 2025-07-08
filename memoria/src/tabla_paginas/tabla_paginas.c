@@ -16,6 +16,8 @@ static void destruir_tabla(t_tabla *tabla);
 static void destruir_entrada(void *entrada);
 
 static t_tabla *buscar_por_pid(u_int32_t pid);
+static t_list *get_entradas_ultimo_nivel(t_tabla *tabla_raiz);
+static void recorrer_tablas(t_list *lista_entradas, t_tabla *tabla, u_int32_t nivel);
 
 void inicializar_tabla_de_paginas()
 {
@@ -73,16 +75,14 @@ static t_entrada *crear_entrada()
 void cargar_marcos_asignados(u_int32_t pid, t_list *frames_asignados)
 {
     t_tabla *tabla_raiz = buscar_por_pid(pid);
-
-    t_list *entradas_ultimo_nivel = listar_entradas_ultimo_nivel(tabla_raiz);
+    t_list *entradas_ultimo_nivel = get_entradas_ultimo_nivel(tabla_raiz);
 
     for (int i = 0; i < list_size(entradas_ultimo_nivel); i++)
     {
-        t_entrada *entrada = list_get(entradas_hoja, i);
-        u_int32_t *marco = list_get(frames_asignados, i);
+        t_entrada *entrada = list_get(entradas_ultimo_nivel, i);
 
         entrada->presente = 1;
-        entrada->marco = *marco;
+        entrada->marco = *(u_int32_t *)list_get(frames_asignados, i);
     }
 
     list_destroy(entradas_ultimo_nivel);
@@ -96,7 +96,6 @@ int32_t obtener_marco(u_int32_t pid, u_int32_t *paginas)
     for (int nivel = 0; nivel < get_cantidad_niveles(); nivel++)
     {
         t_entrada *entrada = list_get(tabla->entradas, paginas[nivel]);
-
         if (entrada->siguiente == NULL)
             return entrada->marco;
 
@@ -157,26 +156,23 @@ static t_tabla *buscar_por_pid(u_int32_t pid)
     return tabla;
 }
 
-t_list *listar_entradas_ultimo_nivel(t_tabla *tabla_raiz)
+static t_list *get_entradas_ultimo_nivel(t_tabla *tabla_raiz)
 {
-    t_list *lista_entradas;
+    t_list *lista_entradas = list_create();
     recorrer_tablas(lista_entradas, tabla_raiz, 1);
     return lista_entradas;
 }
 
-void recorrer_tablas(t_list *lista_entradas, t_tabla *tabla, u_int32_t nivel)
+static void recorrer_tablas(t_list *lista_entradas, t_tabla *tabla, u_int32_t nivel)
 {
-    u_int32_t cantidad_niveles = get_cantidad_niveles();
     u_int32_t entradas_por_tabla = get_entradas_por_tabla();
 
     for (int i = 0; i < entradas_por_tabla; i++)
     {
         t_entrada *entrada = list_get(tabla->entradas, i);
 
-        if (nivel < cantidad_niveles)
-        {
+        if (entrada->siguiente != NULL)
             recorrer_tablas(lista_entradas, entrada->siguiente, nivel + 1);
-        }
 
         list_add(lista_entradas, entrada);
     }
