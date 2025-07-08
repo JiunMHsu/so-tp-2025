@@ -63,20 +63,32 @@ static void *atender_kernel(void *fd_ptr)
         if (paquete == NULL)
             return NULL;
 
+        u_int8_t resultado;
+
         switch (paquete->operacion)
         {
         case INICIAR_PROCESO:
-            crear_proceso(paquete->pid, paquete->path);
-            int32_t valor_mock = 500;
-            enviar_senial(valor_mock, fd_kernel);
+            resultado = crear_proceso(paquete->pid,
+                                      paquete->tamanio,
+                                      paquete->path);
+            enviar_senial(resultado, fd_kernel);
             break;
 
         case FINALIZAR_PROCESO:
-            finalizar_proceso(paquete->pid);
-            enviar_senial(1, fd_kernel);
+            resultado = finalizar_proceso(paquete->pid);
+            enviar_senial(resultado, fd_kernel);
             break;
 
-        default:
+        case DUMP_PROCESO:
+            break;
+
+        case SWAP_OUT:
+            break;
+
+        case SWAP_IN:
+            break;
+
+        default: // no debería ocurrir nunca
             break;
         }
 

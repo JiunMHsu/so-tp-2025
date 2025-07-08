@@ -80,7 +80,7 @@ double get_estimacion_inicial()
     return config_get_double_value(kernel_config, "ESTIMACION_INICIAL");
 }
 
-u_int32_t get_tiempo_suspension()
+u_int64_t get_tiempo_suspension()
 {
     return config_get_int_value(kernel_config, "TIEMPO_SUSPENSION");
 }

@@ -17,6 +17,8 @@ void inicializar_planificador_largo_plazo(q_estado *q_new, q_estado *q_exit);
 
 void insertar_proceso_nuevo(char *pseudocodigo, u_int32_t tamanio_proceso);
 
+void puede_admitir_proceso_nuevo(void);
+
 void insertar_en_exit(t_pcb *proceso);
 
 #endif // PLANIFICADOR_LARGO_PLAZO_H

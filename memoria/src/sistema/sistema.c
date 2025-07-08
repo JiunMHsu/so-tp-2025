@@ -1,33 +1,45 @@
 #include "sistema.h"
 
-t_dictionary *procesos_instrucciones;
-t_dictionary *procesos_tablas;
+static t_dictionary *procesos_instrucciones;
+
+static t_list *leer_instrucciones(char *path);
 
 void inicializar_espacio_sistema()
 {
     procesos_instrucciones = dictionary_create();
-    procesos_tablas = dictionary_create();
+
+    inicializar_bitmap_estados();
+    inicializar_metricas();
+    inicializar_tabla_de_paginas();
 }
 
-void crear_proceso(int32_t pid, char *path)
+u_int8_t crear_proceso(u_int32_t pid, u_int32_t tamanio, char *path)
 {
-    t_list *lista_instrucciones = leer_instrucciones(path);
-    dictionary_put(procesos_instrucciones, string_itoa(pid), lista_instrucciones);
+    u_int32_t frames_necesarios = (u_int32_t)ceil((double)tamanio / get_tam_pagina());
 
-    t_proceso_memoria *estructura_memoria = crear_proceso_memoria();
-    dictionary_put(procesos_tablas, string_itoa(pid), estructura_memoria);
+    t_list *frames_asignados = ocupar_frames(frames_necesarios);
+    if (frames_asignados == NULL)
+        return 0; // no hay suficientes frames libres
 
-    int tamanio = list_size(lista_instrucciones);
-    log_creacion_proceso(pid, tamanio); // TODO: el tamaño es el de espacio de memoria
+    dictionary_put(procesos_instrucciones, string_itoa(pid), leer_instrucciones(path));
+    crear_metricas_para(pid);
+    crear_tablas_para(pid);
+    cargar_marcos_asignados(pid, frames_asignados);
+
+    list_destroy_and_destroy_elements(frames_asignados, &free);
+
+    log_creacion_proceso(pid, tamanio);
+    return 1;
 }
 
-t_list *leer_instrucciones(char *path)
+static t_list *leer_instrucciones(char *path)
 {
     FILE *archivo = fopen(path, "r");
 
     if (archivo == NULL)
     {
         log_mensaje_error("No se pudo abrir archivo de instrucciones.");
+        exit(EXIT_FAILURE); // no debería ocurrir, paniqueo directo
         return NULL;
     }
 
@@ -43,40 +55,28 @@ t_list *leer_instrucciones(char *path)
     return instrucciones;
 }
 
-void finalizar_proceso(int32_t pid)
+u_int8_t finalizar_proceso(u_int32_t pid)
 {
     char *key_pid = string_itoa(pid);
 
-    if (dictionary_has_key(procesos_instrucciones, key_pid) == false)
+    if (!dictionary_has_key(procesos_instrucciones, key_pid))
     {
         log_mensaje_error("Se inteto finalizar un proceso inexistente.");
         free(key_pid);
-        return;
+        return 0;
     }
 
     t_list *instrucciones = dictionary_remove(procesos_instrucciones, key_pid);
     list_destroy_and_destroy_elements(instrucciones, free);
 
-    if (dictionary_has_key(procesos_tablas, key_pid) == false)
-    { // Ver si esta bien hacer esto otra vez
-        log_mensaje_error("Se inteto finalizar un proceso inexistente.");
-        free(key_pid);
-        return;
-    }
+    t_metricas *metricas = remover_metricas_para(pid);
 
-    t_proceso_memoria *tabla_de_proceso = dictionary_remove(procesos_tablas, key_pid);
-    destruir_tabla_de_paginas_para_proceso(tabla_de_proceso->tabla_global);
+    log_destruccion_proceso(pid, metricas);
 
-    log_destruccion_proceso(pid,
-                            tabla_de_proceso->accesos_tablas,
-                            tabla_de_proceso->instrucciones_solicitadas,
-                            tabla_de_proceso->paginas_en_swap,
-                            tabla_de_proceso->paginas_en_memoria,
-                            tabla_de_proceso->lecturas_mem,
-                            tabla_de_proceso->escrituras_mem);
-
-    free(tabla_de_proceso);
+    destruir_tablas_para(pid);
+    destruir_metricas(metricas);
     free(key_pid);
+    return 1;
 }
 
 char *obtener_instruccion(u_int32_t pid, u_int32_t program_counter)

@@ -11,6 +11,8 @@ typedef enum
     OBTENER_MARCO, // Acceso a tabla de páginas
     LEER,          // Acceso a espacio de usuario
     ESCRIBIR,      // Acceso a espacio de usuario
+    LEER_PAG,      // Acceso a espacio de usuario
+    ESCRIBIR_PAG   // Acceso a espacio de usuario
 } operacion_cpu_memoria;
 
 // TODO
