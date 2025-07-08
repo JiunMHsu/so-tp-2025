@@ -69,3 +69,10 @@ algoritmo_sustitucion get_algoritmo_sustitucion_cache()
 
     return CLOCK_M;
 }
+
+u_int32_t get_retardo()
+{
+    u_int32_t retardo = config_get_int_value(cpu_config, "RETARDO_CACHE");
+
+    return retardo;
+}
