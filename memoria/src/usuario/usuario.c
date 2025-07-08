@@ -8,3 +8,13 @@ void inicializar_espacio_usuario()
     memoria_usuario = malloc(get_tam_memoria());
     pthread_mutex_init(&memoria_usuario_mutex, NULL);
 }
+
+u_int8_t escribir_memoria_usuario(u_int32_t pid, t_list *direcciones_fisicas, void *buffer, u_int32_t tamanio_buffer)
+{
+
+}
+
+void *leer_memoria_usuario(u_int32_t pid, t_list *direcciones_fisicas, u_int32_t tamanio_buffer)
+{
+    
+}

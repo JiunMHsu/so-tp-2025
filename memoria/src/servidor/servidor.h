@@ -13,6 +13,7 @@
 #include "logger/logger.h"
 #include "config/config.h"
 #include "sistema/sistema.h"
+#include "usuario/usuario.h"
 
 void iniciar_servidor(void);
 void finalizar_servidor(void);

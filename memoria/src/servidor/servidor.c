@@ -115,6 +115,8 @@ static void *atender_cpu(void *fd_ptr)
             return NULL;
         }
 
+        t_list *direcciones_fisicas;
+
         switch (peticion->operacion)
         {
         case FETCH_INSTRUCCION:
@@ -123,6 +125,33 @@ static void *atender_cpu(void *fd_ptr)
             log_obtencion_instruccion(peticion->pid, peticion->program_counter, instruccion);
             enviar_mensaje(instruccion, fd_cpu);
             free(instruccion); // si obtener instruccion no hiciera strdup, no haría falta
+            break;
+        
+        case OBTENER_MARCO:
+                u_int_32 *entradas_por_nivel = convertir_a_array_entradas_por_nivel(peticion->entradas_por_nivel);
+                int32_t marco = obtener_marco(peticion->pid, peticion->entradas_por_nivel);
+
+                free(entradas_por_nivel);
+            // enviar
+
+            break;
+
+        case LEER:
+            direcciones_fisicas = convertir_a_lista_de_direcciones_fisicas(peticion->direcciones_fisicas);
+            void* lectura = leer_memoria_usuario(peticion->pid, direcciones_fisicas, peticion->tamanio_buffer);
+            
+            log_acceso_espacio_usuario(peticion->pid, LECTURA, direcciones_fisicas, peticion->tamanio_buffer);
+            //enviar
+            list_destroy_and_destroy_elements(direcciones_fisicas, &free);
+            break;
+
+        case ESCRIBIR:
+            u_int8_t escritura = escribir_memoria_usuario(peticion->pid, direcciones_fisicas, peticion->buffer, peticion->tamanio_buffer);
+
+            log_acceso_espacio_usuario(peticion->pid, ESCRITURA, direcciones_fisicas, peticion->tamanio_buffer);
+            // enviar
+            free(peticion->buffer);
+            list_destroy_and_destroy_elements(direcciones_fisicas, &free);
             break;
 
         default:
