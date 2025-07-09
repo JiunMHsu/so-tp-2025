@@ -1,12 +1,12 @@
 #include "cpu.h"
 
-static t_peticion_cpu *crear_peticion_cpu(operacion_cpu_memoria, u_int32_t, u_int32_t, char *, char *, u_int32_t, void *);
+static t_peticion_cpu *crear_peticion_cpu(operacion_cpu_memoria, u_int32_t, u_int32_t, char *, u_int32_t, u_int32_t, void *);
 
 static t_peticion_cpu *crear_peticion_cpu(operacion_cpu_memoria operacion,
                                           u_int32_t pid,
                                           u_int32_t program_counter,
                                           char *entradas_por_nivel,
-                                          char *direccion_fisica,
+                                          u_int32_t direccion_fisica,
                                           u_int32_t tamanio_buffer,
                                           void *buffer)
 {
@@ -26,11 +26,11 @@ static t_peticion_cpu *crear_peticion_cpu(operacion_cpu_memoria operacion,
         peticion->entradas_por_nivel = strdup(entradas_por_nivel);
         break;
     case LEER:
-        peticion->direccion_fisica = strdup(direccion_fisica);
+        peticion->direccion_fisica = direccion_fisica;
         peticion->tamanio_buffer = tamanio_buffer;
         break;
     case ESCRIBIR:
-        peticion->direccion_fisica = strdup(direccion_fisica);
+        peticion->direccion_fisica = direccion_fisica;
         peticion->tamanio_buffer = tamanio_buffer;
         peticion->buffer = malloc(tamanio_buffer);
         memcpy(peticion->buffer, buffer, tamanio_buffer);
@@ -50,12 +50,12 @@ t_peticion_cpu *crear_peticion_nro_marco(u_int32_t pid, char *entradas_por_nivel
     return crear_peticion_cpu(OBTENER_MARCO, pid, 0, entradas_por_nivel, NULL, 0, NULL);
 }
 
-t_peticion_cpu *crear_peticion_lectura(u_int32_t pid, char *direccion_fisica, u_int32_t tamanio_buffer)
+t_peticion_cpu *crear_peticion_lectura(u_int32_t pid, u_int32_t direccion_fisica, u_int32_t tamanio_buffer)
 {
     return crear_peticion_cpu(LEER, pid, 0, 0, direccion_fisica, tamanio_buffer, NULL);
 }
 
-t_peticion_cpu *crear_peticion_escritura(u_int32_t pid, char *direccion_fisica, u_int32_t tamanio_buffer, void *buffer)
+t_peticion_cpu *crear_peticion_escritura(u_int32_t pid, u_int32_t direccion_fisica, u_int32_t tamanio_buffer, void *buffer)
 {
     return crear_peticion_cpu(ESCRIBIR, pid, 0, 0, direccion_fisica, tamanio_buffer, buffer);
 }
@@ -76,11 +76,11 @@ void enviar_peticion_cpu(int32_t fd_memoria, t_peticion_cpu *peticion)
         agregar_a_paquete(paquete, peticion->entradas_por_nivel, strlen(peticion->entradas_por_nivel) + 1);
         break;
     case LEER:
-        agregar_a_paquete(paquete, peticion->direccion_fisica, strlen(peticion->direccion_fisica) + 1);
+        agregar_a_paquete(paquete, &(peticion->direccion_fisica), sizeof(u_int32_t));
         agregar_a_paquete(paquete, &(peticion->tamanio_buffer), sizeof(u_int32_t));
         break;
     case ESCRIBIR:
-        agregar_a_paquete(paquete, peticion->direccion_fisica, strlen(peticion->direccion_fisica) + 1);
+        agregar_a_paquete(paquete, &(peticion->direccion_fisica), sizeof(u_int32_t));
         agregar_a_paquete(paquete, &(peticion->tamanio_buffer), sizeof(u_int32_t));
         agregar_a_paquete(paquete, peticion->buffer, peticion->tamanio_buffer);
         break;
@@ -110,11 +110,11 @@ t_peticion_cpu *recibir_peticion_cpu(int32_t fd_conexion)
         peticion->entradas_por_nivel = strdup(list_get(paquete, 2));
         break;
     case LEER:
-        peticion->direccion_fisica = strdup(list_get(paquete, 2));
+        peticion->direccion_fisica = *(u_int32_t *)list_get(paquete, 2);
         peticion->tamanio_buffer = *(u_int32_t *)list_get(paquete, 3);
         break;
     case ESCRIBIR:
-        peticion->direccion_fisica = strdup(list_get(paquete, 2));
+        peticion->direccion_fisica = *(u_int32_t *)list_get(paquete, 2);
         peticion->tamanio_buffer = *(u_int32_t *)list_get(paquete, 3);
         peticion->buffer = malloc(peticion->tamanio_buffer);
         memcpy(peticion->buffer, list_get(paquete, 4), peticion->tamanio_buffer);
@@ -135,11 +135,7 @@ void destruir_peticion_cpu(t_peticion_cpu *peticion)
     case OBTENER_MARCO:
         free(peticion->entradas_por_nivel);
         break;
-    case LEER:
-        free(peticion->direccion_fisica);
-        break;
     case ESCRIBIR:
-        free(peticion->direccion_fisica);
         free(peticion->buffer);
         break;
     default: // cualquier otro caso

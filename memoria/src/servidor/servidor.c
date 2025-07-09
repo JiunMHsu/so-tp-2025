@@ -117,6 +117,7 @@ static void *atender_cpu(void *fd_ptr)
         retardo_respuesta();
         u_int32_t direccion_fisica = 0;
         int32_t tamanio_pagina = get_tam_pagina();
+        void *lectura = NULL;
 
         switch (peticion->operacion)
         {
@@ -137,7 +138,7 @@ static void *atender_cpu(void *fd_ptr)
             break;
 
         case LEER:
-            void *lectura = leer_memoria_usuario(peticion->pid, peticion->direccion_fisica, peticion->tamanio_buffer);
+            lectura = leer_memoria_usuario(peticion->pid, peticion->direccion_fisica, peticion->tamanio_buffer);
             responder_lectura(lectura, peticion->tamanio_buffer, fd_cpu);
             free(lectura);
             break;
@@ -153,7 +154,7 @@ static void *atender_cpu(void *fd_ptr)
             break;
 
         case LEER_PAG:
-            void *lectura = leer_memoria_usuario(peticion->pid, peticion->direccion_fisica, tamanio_pagina);
+            lectura = leer_memoria_usuario(peticion->pid, peticion->direccion_fisica, tamanio_pagina);
             responder_lectura(lectura, tamanio_pagina, fd_cpu);
             free(lectura);
             break;
