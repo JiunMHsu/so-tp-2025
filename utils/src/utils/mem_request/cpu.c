@@ -160,17 +160,15 @@ t_list *convertir_a_lista_de_direcciones_fisicas(char *direcciones_fisicas)
     return lista_direcciones;
 }
 
-u_int32_t *convertir_a_array_entradas_por_nivel(char *entradas_por_nivel)
+int32_t *convertir_a_array_entradas_por_nivel(char *entradas_por_nivel)
 {
     int cantidad_entradas = 0;
     char **entradas = string_split(entradas_por_nivel, " ");
-    while (entradas[cantidad_entradas] != NULL)
-        cantidad_entradas++;
     
-    u_int32_t *array_entradas = malloc(cantidad_entradas * sizeof(u_int32_t));
+    int32_t *array_entradas = malloc(string_array_size(entradas) * sizeof(int32_t));
 
     for(int i = 0; entradas[i] != NULL; i++)
-        array_entradas[i] = (u_int32_t) entradas[i];
+        array_entradas[i] = (int32_t) atoi(entradas[i]);
     
     free(entradas);
     return array_entradas;

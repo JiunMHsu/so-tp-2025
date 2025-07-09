@@ -99,6 +99,27 @@ static void *atender_kernel(void *fd_ptr)
     return NULL;
 }
 
+static t_packet *serializar_respuesta(void *buffer, int32_t tamanio)
+{
+    if (buffer == NULL)
+        return NULL;
+
+    t_packet *paquete = crear_paquete();
+
+    agregar_a_paquete(paquete, &tamanio, sizeof(int32_t));
+    agregar_a_paquete(paquete, buffer, tamanio);
+
+    return paquete;
+}
+
+static void enviar_lectura(void *buffer, u_int32_t tamanio, int32_t fd_cpu)
+{
+    t_packet *paquete = serializar_respuesta(buffer, tamanio);
+
+    enviar_paquete(paquete, fd_cpu);
+    eliminar_paquete(paquete);
+}
+
 static void *atender_cpu(void *fd_ptr)
 {
     int32_t fd_cpu = *((int32_t *)fd_ptr);
@@ -116,6 +137,7 @@ static void *atender_cpu(void *fd_ptr)
         }
 
         t_list *direcciones_fisicas;
+        int32_t tamanio_pagina = get_tam_pagina();
 
         switch (peticion->operacion)
         {
@@ -128,11 +150,12 @@ static void *atender_cpu(void *fd_ptr)
             break;
         
         case OBTENER_MARCO:
-                u_int_32 *entradas_por_nivel = convertir_a_array_entradas_por_nivel(peticion->entradas_por_nivel);
-                int32_t marco = obtener_marco(peticion->pid, peticion->entradas_por_nivel);
+                int32_t *entradas_por_nivel = convertir_a_array_entradas_por_nivel(peticion->entradas_por_nivel);
+                int32_t marco = obtener_marco(peticion->pid, entradas_por_nivel);
 
+                enviar_senial(marco, fd_cpu);
                 free(entradas_por_nivel);
-            // enviar
+
 
             break;
 
@@ -141,17 +164,31 @@ static void *atender_cpu(void *fd_ptr)
             void* lectura = leer_memoria_usuario(peticion->pid, direcciones_fisicas, peticion->tamanio_buffer);
             
             log_acceso_espacio_usuario(peticion->pid, LECTURA, direcciones_fisicas, peticion->tamanio_buffer);
-            //enviar
+            enviar_lectura(lectura, peticion->tamanio_buffer, fd_cpu);
+            free(lectura);
             list_destroy_and_destroy_elements(direcciones_fisicas, &free);
             break;
 
         case ESCRIBIR:
+            direcciones_fisicas = convertir_a_lista_de_direcciones_fisicas(peticion->direcciones_fisicas);
             u_int8_t escritura = escribir_memoria_usuario(peticion->pid, direcciones_fisicas, peticion->buffer, peticion->tamanio_buffer);
 
             log_acceso_espacio_usuario(peticion->pid, ESCRITURA, direcciones_fisicas, peticion->tamanio_buffer);
-            // enviar
+            enviar_senial(escritura, fd_cpu);
             free(peticion->buffer);
             list_destroy_and_destroy_elements(direcciones_fisicas, &free);
+            break;
+
+        case LEER_PAG:
+            // void *lectura = leer_pagina_completa(peticion->pid, peticion->frame); 
+            enviar_lectura(lectura, tamanio_pagina, fd_cpu);
+            free(lectura);
+            break;
+
+        case ESCRIBIR_PAG:
+            // u_int8_t escritura = actulizar_pagina_completa(peticion->pid, peticion->frame, peticion->buffer);
+            enviar_senial(escritura, fd_cpu);
+            free(peticion->buffer);
             break;
 
         default:
@@ -160,6 +197,7 @@ static void *atender_cpu(void *fd_ptr)
         }
 
         destruir_peticion_cpu(peticion);
+        list_destroy_and_destroy_elements(direcciones_fisicas, &free);
     }
 
     return NULL;

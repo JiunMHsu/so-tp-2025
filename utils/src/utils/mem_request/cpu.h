@@ -40,5 +40,6 @@ t_peticion_cpu *recibir_peticion_cpu(int32_t fd_conexion);
 void destruir_peticion_cpu(t_peticion_cpu *peticion);
 
 t_list *convertir_a_lista_de_direcciones_fisicas(char *direcciones_fisicas);
+int32_t *convertir_a_array_entradas_por_nivel(char *entradas_por_nivel);
 
 #endif // CPU_MEM_REQUEST_H
