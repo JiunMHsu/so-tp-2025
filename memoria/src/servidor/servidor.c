@@ -99,6 +99,86 @@ static void *atender_kernel(void *fd_ptr)
     return NULL;
 }
 
+static void *atender_cpu(void *fd_ptr)
+{
+    int32_t fd_cpu = *((int32_t *)fd_ptr);
+    free(fd_ptr);
+
+    while (1)
+    {
+        t_peticion_cpu *peticion = recibir_peticion_cpu(fd_cpu);
+
+        if (peticion == NULL)
+        {
+            log_mensaje_error("Error al recibir la peticion de ejecucion. Cerrando conexion con CPU...");
+            cerrar_conexion(fd_cpu);
+            return NULL;
+        }
+
+        u_int32_t direccion_fisica = 0;
+        int32_t tamanio_pagina = get_tam_pagina();
+
+        switch (peticion->operacion)
+        {
+        case FETCH_INSTRUCCION:
+            char *instruccion = obtener_instruccion(peticion->pid, peticion->program_counter);
+
+            log_obtencion_instruccion(peticion->pid, peticion->program_counter, instruccion);
+            enviar_mensaje(instruccion, fd_cpu);
+            free(instruccion); // si obtener instruccion no hiciera strdup, no haría falta
+            break;
+
+        case OBTENER_MARCO:
+            t_list *entradas_por_nivel = convertir_a_lista_entradas_por_nivel(peticion->entradas_por_nivel);
+            int32_t marco = obtener_marco(peticion->pid, entradas_por_nivel);
+
+            enviar_senial(marco, fd_cpu);
+            list_destroy_and_destroy_elements(entradas_por_nivel, &free);
+            break;
+
+        case LEER:
+            // direcciones_fisicas = convertir_a_lista_de_direcciones_fisicas(peticion->direcciones_fisicas);
+            // void* lectura = leer_memoria_usuario(peticion->pid, direcciones_fisicas, peticion->tamanio_buffer);
+
+            // log_acceso_espacio_usuario(peticion->pid, LECTURA, direcciones_fisicas, peticion->tamanio_buffer);
+            // enviar_lectura(lectura, peticion->tamanio_buffer, fd_cpu);
+            // free(lectura);
+            // list_destroy_and_destroy_elements(direcciones_fisicas, &free);
+            break;
+
+        case ESCRIBIR:
+            // direcciones_fisicas = convertir_a_lista_de_direcciones_fisicas(peticion->direcciones_fisicas);
+            // u_int8_t escritura = escribir_memoria_usuario(peticion->pid, direcciones_fisicas, peticion->buffer, peticion->tamanio_buffer);
+
+            // log_acceso_espacio_usuario(peticion->pid, ESCRITURA, direcciones_fisicas, peticion->tamanio_buffer);
+            // enviar_senial(escritura, fd_cpu);
+            // free(peticion->buffer);
+            // list_destroy_and_destroy_elements(direcciones_fisicas, &free);
+            break;
+
+        case LEER_PAG:
+            // void *lectura = leer_pagina_completa(peticion->pid, peticion->frame);
+            // enviar_lectura(lectura, tamanio_pagina, fd_cpu);
+            // free(lectura);
+            break;
+
+        case ESCRIBIR_PAG:
+            // u_int8_t escritura = actulizar_pagina_completa(peticion->pid, peticion->frame, peticion->buffer);
+            // enviar_senial(escritura, fd_cpu);
+            // free(peticion->buffer);
+            break;
+
+        default:
+            log_mensaje_error("Operacion no soportada.");
+            break;
+        }
+
+        destruir_peticion_cpu(peticion);
+    }
+
+    return NULL;
+}
+
 static t_packet *serializar_respuesta(void *buffer, int32_t tamanio)
 {
     if (buffer == NULL)
@@ -118,87 +198,4 @@ static void enviar_lectura(void *buffer, u_int32_t tamanio, int32_t fd_cpu)
 
     enviar_paquete(paquete, fd_cpu);
     eliminar_paquete(paquete);
-}
-
-static void *atender_cpu(void *fd_ptr)
-{
-    int32_t fd_cpu = *((int32_t *)fd_ptr);
-    free(fd_ptr);
-
-    while (1)
-    {
-        t_peticion_cpu *peticion = recibir_peticion_cpu(fd_cpu);
-
-        if (peticion == NULL)
-        {
-            log_mensaje_error("Error al recibir la peticion de ejecucion. Cerrando conexion con CPU...");
-            cerrar_conexion(fd_cpu);
-            return NULL;
-        }
-
-        t_list *direcciones_fisicas;
-        int32_t tamanio_pagina = get_tam_pagina();
-
-        switch (peticion->operacion)
-        {
-        case FETCH_INSTRUCCION:
-            char *instruccion = obtener_instruccion(peticion->pid, peticion->program_counter);
-
-            log_obtencion_instruccion(peticion->pid, peticion->program_counter, instruccion);
-            enviar_mensaje(instruccion, fd_cpu);
-            free(instruccion); // si obtener instruccion no hiciera strdup, no haría falta
-            break;
-        
-        case OBTENER_MARCO:
-                int32_t *entradas_por_nivel = convertir_a_array_entradas_por_nivel(peticion->entradas_por_nivel);
-                int32_t marco = obtener_marco(peticion->pid, entradas_por_nivel);
-
-                enviar_senial(marco, fd_cpu);
-                free(entradas_por_nivel);
-
-
-            break;
-
-        case LEER:
-            direcciones_fisicas = convertir_a_lista_de_direcciones_fisicas(peticion->direcciones_fisicas);
-            void* lectura = leer_memoria_usuario(peticion->pid, direcciones_fisicas, peticion->tamanio_buffer);
-            
-            log_acceso_espacio_usuario(peticion->pid, LECTURA, direcciones_fisicas, peticion->tamanio_buffer);
-            enviar_lectura(lectura, peticion->tamanio_buffer, fd_cpu);
-            free(lectura);
-            list_destroy_and_destroy_elements(direcciones_fisicas, &free);
-            break;
-
-        case ESCRIBIR:
-            direcciones_fisicas = convertir_a_lista_de_direcciones_fisicas(peticion->direcciones_fisicas);
-            u_int8_t escritura = escribir_memoria_usuario(peticion->pid, direcciones_fisicas, peticion->buffer, peticion->tamanio_buffer);
-
-            log_acceso_espacio_usuario(peticion->pid, ESCRITURA, direcciones_fisicas, peticion->tamanio_buffer);
-            enviar_senial(escritura, fd_cpu);
-            free(peticion->buffer);
-            list_destroy_and_destroy_elements(direcciones_fisicas, &free);
-            break;
-
-        case LEER_PAG:
-            // void *lectura = leer_pagina_completa(peticion->pid, peticion->frame); 
-            enviar_lectura(lectura, tamanio_pagina, fd_cpu);
-            free(lectura);
-            break;
-
-        case ESCRIBIR_PAG:
-            // u_int8_t escritura = actulizar_pagina_completa(peticion->pid, peticion->frame, peticion->buffer);
-            enviar_senial(escritura, fd_cpu);
-            free(peticion->buffer);
-            break;
-
-        default:
-            log_mensaje_error("Operacion no soportada.");
-            break;
-        }
-
-        destruir_peticion_cpu(peticion);
-        list_destroy_and_destroy_elements(direcciones_fisicas, &free);
-    }
-
-    return NULL;
 }

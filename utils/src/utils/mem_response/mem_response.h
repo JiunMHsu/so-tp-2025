@@ -1,0 +1,4 @@
+#ifndef UTILS_MEM_RESPONSE_H
+#define UTILS_MEM_RESPONSE_H
+
+#endif // UTILS_MEM_RESPONSE_H
