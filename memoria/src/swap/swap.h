@@ -1,7 +1,10 @@
 #ifndef SWAP_H
+#define SWAP_H
 
 #include <stdlib.h>
 #include <stdio.h>
+#include <pthread.h>
+#include <commons/collections/list.h>
 #include <commons/collections/dictionary.h>
 
 #include "config/config.h"
@@ -9,14 +12,34 @@
 
 typedef struct
 {
-    u_int32_t offset;
-    u_int32_t paginas_en_swap;
-} t_swap_info;
+    u_int32_t paginas;
+    u_int32_t posicion;
+} t_swapped;
 
+/**
+ * @brief Inicializa las estructuras necesarias para el manejo de swap.
+ * Crea el archivo de swap vacío.
+ *
+ */
 void inicializar_swap();
-void cerrar_swap();
-void guardar_en_swap(u_int32_t pid, u_int32_t cantidad_paginas, void *origen);
-void recuperar_proceso_de_swap(u_int32_t pid, void *destino);
-void liberar_swap(u_int32_t pid);
+
+/**
+ * @brief Recibe el PID de un proceso y una lista de páginas (contenido).
+ * Guarda las páginas en el archivo de swap y actualiza la información
+ * del proceso en un diccionario.
+ *
+ * @param pid
+ * @param paginas
+ * @note Asume que la cantidad de páginas son estáticas, no icrementan ni decrementan.
+ */
+void guardar_en_swap(u_int32_t pid, t_list *paginas);
+
+/**
+ * @brief Recupera un proceso de swap y lo retorna las páginas en una lista, ordenada.
+ *
+ * @param pid
+ * @return t_list*
+ */
+t_list *recuperar_de_swap(u_int32_t pid);
 
 #endif // SWAP_H

@@ -1,49 +1,74 @@
 #include "swap.h"
 
-FILE *archivo_swap;
-static t_dictionary *procesos_en_swap;
-pthread_mutex_t mutex_swap = PTHREAD_MUTEX_INITIALIZER;
+static t_dictionary *swapped;
+static pthread_mutex_t mutex_swap;
+
+static char *path_swapfile;
+
+static t_swapped *crear_swapped(u_int32_t paginas, u_int32_t posicion);
 
 void inicializar_swap()
 {
-    archivo_swap = fopen(get_path_swapfile(), "wb+");
+    path_swapfile = get_path_swapfile();
+    FILE *swap = fopen(path_swapfile, "w+b");
 
     if (archivo_swap == NULL)
-        log_mensaje_error("No se pudo iniciar la swap.");
+    {
+        log_mensaje_error("No se pudo iniciar el swap.");
+        exit(EXIT_FAILURE);
+    }
 
+    fclose(swap);
+    swapped = dictionary_create();
     pthread_mutex_init(&mutex_swap, NULL);
-    procesos_en_swap = dictionary_create();
 }
 
-void cerrar_swap()
+void guardar_en_swap(u_int32_t pid, t_list *paginas)
 {
-    fclose(archivo_swap);
-    dictionary_destroy_and_destroy_elements(procesos_en_swap, free);
-    pthread_mutex_destroy(&mutex_swap);
-}
+    u_int32_t tam_pagina = get_tam_pagina();
+    u_int32_t posicion_escritura = 0;
+    u_int32_t cantidad_paginas = list_size(paginas);
 
-void guardar_en_swap(u_int32_t pid, u_int32_t cantidad_paginas, void *origen)
-{
+    char *_pid = string_itoa(pid);
+
     pthread_mutex_lock(&mutex_swap);
 
-    u_int32_t bytes_a_escribir = get_tam_pagina() * cantidad_paginas;
+    FILE *archivo_swap = fopen(path_swapfile, "r+b");
 
-    fseek(archivo_swap, 0, SEEK_END);
-    u_int32_t offset = ftell(archivo_swap);
+    if (!dictionary_has_key(_pid)) // primera vez que se guarda un proceso en swap
+    {
+        fseek(archivo_swap, 0, SEEK_END);
+        u_int32_t posicion = ftell(archivo_swap) / tam_pagina;
+        t_swapped *nuevo_swapped = crear_swapped(cantidad_paginas, posicion);
+        dictionary_put(swapped, strdup(_pid), nuevo_swapped);
+    }
 
-    fseek(archivo_swap, offset, SEEK_SET);
-    fwrite(origen, bytes_a_escribir, 1, archivo_swap);
-    fflush(archivo_swap);
+    t_swapped *proceso = dictionary_get(swapped, _pid);
+    if (cantidad_paginas != proceso->paginas)
+    {
+        log_mensaje_error("La cantidad de páginas cambió.");
+        exit(EXIT_FAILURE); // paniquea porque no debería ocurrir
+    }
 
-    t_swap_info *info = malloc(sizeof(t_swap_info));
-    info->offset = offset;
-    info->paginas = cantidad_paginas;
-    dictionary_put(procesos_en_swap, string_itoa(pid), info);
+    fseek(archivo_swap, proceso->posicion * tam_pagina, SEEK_SET);
+    t_list_iterator *iterador_paginas = list_iterator_create(paginas);
 
-    usleep(get_retardo_swap() * 1000);
-    incrementar_swap_out(pid);
+    while (list_iterator_has_next(iterador_paginas))
+    {
+        void *pagina = list_iterator_next(iterador_paginas);
+        fwrite(pagina, tam_pagina, 1, archivo_swap);
+    }
+
+    list_iterator_destroy(iterador_paginas);
+
+    fflush(archivo_swap); // necesario?
+    fclose(archivo_swap);
 
     pthread_mutex_unlock(&mutex_swap);
+
+    free(_pid);
+    usleep(get_retardo_swap() * 1000);
+    incrementar_swap_out(pid);
 }
 
 void recuperar_proceso_de_swap(u_int32_t pid, void *destino)
@@ -71,16 +96,11 @@ void recuperar_proceso_de_swap(u_int32_t pid, void *destino)
     pthread_mutex_unlock(&mutex_swap);
 }
 
-// No eliminamos bytes físicos del archivo (queda fragmentado),
-// pero sí liberamos el registro y podría reutilizarse en futuras mejoras.
-void liberar_swap(u_int32_t pid)
+static t_swapped *crear_swapped(u_int32_t paginas, u_int32_t posicion)
 {
-    pthread_mutex_lock(&mutex_swap);
+    t_swapped *swapped = malloc(sizeof(t_swapped));
+    swapped->paginas = paginas;
+    swapped->posicion = posicion;
 
-    t_swap_info *info = dictionary_remove(procesos_en_swap, string_itoa(pid));
-
-    if (info != NULL)
-        free(info);
-
-    pthread_mutex_unlock(&mutex_swap);
+    return swapped;
 }
