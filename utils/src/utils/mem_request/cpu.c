@@ -1,12 +1,12 @@
 #include "cpu.h"
 
-static t_peticion_cpu *crear_peticion_cpu(operacion_cpu_memoria, u_int32_t, u_int32_t, char *, char *, u_int32_t, u_int32_t, void *);
+static t_peticion_cpu *crear_peticion_cpu(operacion_cpu_memoria, u_int32_t, u_int32_t, char *, u_int32_t, u_int32_t, u_int32_t, void *);
 
 static t_peticion_cpu *crear_peticion_cpu(operacion_cpu_memoria operacion,
                                           u_int32_t pid,
                                           u_int32_t program_counter,
                                           char *entradas_por_nivel,
-                                          char *direccion_fisica,
+                                          u_int32_t direccion_fisica,
                                           u_int32_t frame,
                                           u_int32_t tamanio_buffer,
                                           void *buffer)
@@ -27,11 +27,11 @@ static t_peticion_cpu *crear_peticion_cpu(operacion_cpu_memoria operacion,
         peticion->entradas_por_nivel = strdup(entradas_por_nivel);
         break;
     case LEER:
-        peticion->direccion_fisica = strdup(direccion_fisica);
+        peticion->direccion_fisica = direccion_fisica;
         peticion->tamanio_buffer = tamanio_buffer;
         break;
     case ESCRIBIR:
-        peticion->direccion_fisica = strdup(direccion_fisica);
+        peticion->direccion_fisica = direccion_fisica;
         peticion->tamanio_buffer = tamanio_buffer;
         peticion->buffer = malloc(tamanio_buffer);
         memcpy(peticion->buffer, buffer, tamanio_buffer);
@@ -60,24 +60,14 @@ t_peticion_cpu *crear_peticion_nro_marco(u_int32_t pid, char *entradas_por_nivel
     return crear_peticion_cpu(OBTENER_MARCO, pid, 0, entradas_por_nivel, NULL, 0, 0, NULL);
 }
 
-t_peticion_cpu *crear_peticion_lectura(u_int32_t pid, char *direccion_fisica, u_int32_t tamanio_buffer)
+t_peticion_cpu *crear_peticion_lectura(u_int32_t pid, u_int32_t direccion_fisica, u_int32_t tamanio_buffer)
 {
-    return crear_peticion_cpu(LEER, pid, 0, NULL, direccion_fisica, 0, tamanio_buffer, NULL);
+    return crear_peticion_cpu(LEER, pid, 0, 0, direccion_fisica, tamanio_buffer, NULL);
 }
 
-t_peticion_cpu *crear_peticion_escritura(u_int32_t pid, char *direccion_fisica, u_int32_t tamanio_buffer, void *buffer)
+t_peticion_cpu *crear_peticion_escritura(u_int32_t pid, u_int32_t direccion_fisica, u_int32_t tamanio_buffer, void *buffer)
 {
-    return crear_peticion_cpu(ESCRIBIR, pid, 0, NULL, direccion_fisica, 0, tamanio_buffer, buffer);
-}
-
-t_peticion_cpu *crear_peticion_escritura_pagina(u_int32_t pid, u_int32_t frame, u_int32_t tamanio_pagina, void *contenido_pagina)
-{
-    return crear_peticion_cpu(ESCRIBIR_PAG, pid, 0, NULL, NULL, frame, tamanio_pagina, contenido_pagina);
-}
-
-t_peticion_cpu *crear_peticion_lectura_pagina(u_int32_t pid, u_int32_t frame, u_int32_t tamanio_pagina)
-{
-    return crear_peticion_cpu(ESCRIBIR_PAG, pid, 0, NULL, NULL, frame, tamanio_pagina, NULL);
+    return crear_peticion_cpu(ESCRIBIR, pid, 0, 0, direccion_fisica, tamanio_buffer, buffer);
 }
 
 void enviar_peticion_cpu(int32_t fd_memoria, t_peticion_cpu *peticion)
@@ -96,20 +86,11 @@ void enviar_peticion_cpu(int32_t fd_memoria, t_peticion_cpu *peticion)
         agregar_a_paquete(paquete, peticion->entradas_por_nivel, strlen(peticion->entradas_por_nivel) + 1);
         break;
     case LEER:
-        agregar_a_paquete(paquete, peticion->direccion_fisica, strlen(peticion->direccion_fisica) + 1);
+        agregar_a_paquete(paquete, &(peticion->direccion_fisica), sizeof(u_int32_t));
         agregar_a_paquete(paquete, &(peticion->tamanio_buffer), sizeof(u_int32_t));
         break;
     case ESCRIBIR:
-        agregar_a_paquete(paquete, peticion->direccion_fisica, strlen(peticion->direccion_fisica) + 1);
-        agregar_a_paquete(paquete, &(peticion->tamanio_buffer), sizeof(u_int32_t));
-        agregar_a_paquete(paquete, peticion->buffer, peticion->tamanio_buffer);
-        break;
-    case LEER_PAG:
-        agregar_a_paquete(paquete, &(peticion->frame), sizeof(u_int32_t));
-        agregar_a_paquete(paquete, &(peticion->tamanio_buffer), sizeof(u_int32_t));
-        break;
-    case ESCRIBIR_PAG:
-        agregar_a_paquete(paquete, &(peticion->frame), sizeof(u_int32_t));
+        agregar_a_paquete(paquete, &(peticion->direccion_fisica), sizeof(u_int32_t));
         agregar_a_paquete(paquete, &(peticion->tamanio_buffer), sizeof(u_int32_t));
         agregar_a_paquete(paquete, peticion->buffer, peticion->tamanio_buffer);
         break;
@@ -119,6 +100,7 @@ void enviar_peticion_cpu(int32_t fd_memoria, t_peticion_cpu *peticion)
     eliminar_paquete(paquete);
 }
 
+// TODO: contemplar los casos de leer pag y escribir pag
 t_peticion_cpu *recibir_peticion_cpu(int32_t fd_conexion)
 {
     t_list *paquete = recibir_paquete(fd_conexion);
@@ -173,14 +155,7 @@ void destruir_peticion_cpu(t_peticion_cpu *peticion)
     case OBTENER_MARCO:
         free(peticion->entradas_por_nivel);
         break;
-    case LEER:
-        free(peticion->direccion_fisica);
-        break;
     case ESCRIBIR:
-        free(peticion->direccion_fisica);
-        free(peticion->buffer);
-        break;
-    case ESCRIBIR_PAG:
         free(peticion->buffer);
         break;
     default: // cualquier otro caso
@@ -191,13 +166,18 @@ void destruir_peticion_cpu(t_peticion_cpu *peticion)
     peticion = NULL;
 }
 
-t_list *convertir_a_lista_de_direcciones_fisicas(char *direcciones_fisicas)
+t_list *convertir_a_lista_entradas_por_nivel(char *entradas_por_nivel)
 {
-    t_list *lista_direcciones = list_create();
-    char **direcciones = string_split(direcciones_fisicas, " ");
-    for (int i = 0; direcciones[i] != NULL; i++)
-        list_add(lista_direcciones, direcciones[i]);
+    t_list *lista_entradas = list_create();
+    char **entradas = string_split(entradas_por_nivel, " ");
 
-    free(direcciones);
-    return lista_direcciones;
+    for (int i = 0; entradas[i] != NULL; i++)
+    {
+        int32_t *entrada = malloc(sizeof(int32_t));
+        *entrada = (int32_t)atoi(entradas[i]);
+        list_add(lista_entradas, entrada);
+    }
+
+    string_array_destroy(entradas);
+    return lista_entradas;
 }
