@@ -118,6 +118,7 @@ static void *atender_cpu(void *fd_ptr)
         u_int32_t direccion_fisica = 0;
         int32_t tamanio_pagina = get_tam_pagina();
         void *lectura = NULL;
+        u_int8_t escritura = 0;
 
         switch (peticion->operacion)
         {
@@ -144,13 +145,8 @@ static void *atender_cpu(void *fd_ptr)
             break;
 
         case ESCRIBIR:
-            // direcciones_fisicas = convertir_a_lista_de_direcciones_fisicas(peticion->direcciones_fisicas);
-            // u_int8_t escritura = escribir_memoria_usuario(peticion->pid, direcciones_fisicas, peticion->buffer, peticion->tamanio_buffer);
-
-            // log_acceso_espacio_usuario(peticion->pid, ESCRITURA, direcciones_fisicas, peticion->tamanio_buffer);
-            // enviar_senial(escritura, fd_cpu);
-            // free(peticion->buffer);
-            // list_destroy_and_destroy_elements(direcciones_fisicas, &free);
+            escritura = escribir_memoria_usuario(peticion->pid, peticion->direccion_fisica, peticion->buffer, peticion->tamanio_buffer);
+            enviar_senial(escritura, fd_cpu);
             break;
 
         case LEER_PAG:
@@ -160,9 +156,8 @@ static void *atender_cpu(void *fd_ptr)
             break;
 
         case ESCRIBIR_PAG:
-            // u_int8_t escritura = actulizar_pagina_completa(peticion->pid, peticion->frame, peticion->buffer);
-            // enviar_senial(escritura, fd_cpu);
-            // free(peticion->buffer);
+            escritura = escribir_memoria_usuario(peticion->pid, peticion->direccion_fisica, peticion->buffer, tamanio_pagina);
+            enviar_senial(escritura, fd_cpu);
             break;
 
         default:
