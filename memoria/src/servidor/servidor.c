@@ -178,24 +178,3 @@ static void *atender_cpu(void *fd_ptr)
 
     return NULL;
 }
-
-static t_packet *serializar_respuesta(void *buffer, int32_t tamanio)
-{
-    if (buffer == NULL)
-        return NULL;
-
-    t_packet *paquete = crear_paquete();
-
-    agregar_a_paquete(paquete, &tamanio, sizeof(int32_t));
-    agregar_a_paquete(paquete, buffer, tamanio);
-
-    return paquete;
-}
-
-static void enviar_lectura(void *buffer, u_int32_t tamanio, int32_t fd_cpu)
-{
-    t_packet *paquete = serializar_respuesta(buffer, tamanio);
-
-    enviar_paquete(paquete, fd_cpu);
-    eliminar_paquete(paquete);
-}
