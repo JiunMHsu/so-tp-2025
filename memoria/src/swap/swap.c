@@ -10,7 +10,7 @@ static t_swapped *crear_swapped(u_int32_t paginas, u_int32_t posicion);
 void inicializar_swap()
 {
     path_swapfile = get_path_swapfile();
-    FILE *swap = fopen(path_swapfile, "w+b");
+    FILE *archivo_swap = fopen(path_swapfile, "w+b");
 
     if (archivo_swap == NULL)
     {
@@ -18,7 +18,7 @@ void inicializar_swap()
         exit(EXIT_FAILURE);
     }
 
-    fclose(swap);
+    fclose(archivo_swap);
     swapped = dictionary_create();
     pthread_mutex_init(&mutex_swap, NULL);
 }
@@ -26,16 +26,14 @@ void inicializar_swap()
 void guardar_en_swap(u_int32_t pid, t_list *paginas)
 {
     u_int32_t tam_pagina = get_tam_pagina();
-    u_int32_t posicion_escritura = 0;
     u_int32_t cantidad_paginas = list_size(paginas);
-
     char *_pid = string_itoa(pid);
 
     pthread_mutex_lock(&mutex_swap);
 
     FILE *archivo_swap = fopen(path_swapfile, "r+b");
 
-    if (!dictionary_has_key(_pid)) // primera vez que se guarda un proceso en swap
+    if (!dictionary_has_key(swapped, _pid)) // primera vez que se guarda un proceso en swap
     {
         fseek(archivo_swap, 0, SEEK_END);
         u_int32_t posicion = ftell(archivo_swap) / tam_pagina;
@@ -51,8 +49,8 @@ void guardar_en_swap(u_int32_t pid, t_list *paginas)
     }
 
     fseek(archivo_swap, proceso->posicion * tam_pagina, SEEK_SET);
-    t_list_iterator *iterador_paginas = list_iterator_create(paginas);
 
+    t_list_iterator *iterador_paginas = list_iterator_create(paginas);
     while (list_iterator_has_next(iterador_paginas))
     {
         void *pagina = list_iterator_next(iterador_paginas);
@@ -71,29 +69,41 @@ void guardar_en_swap(u_int32_t pid, t_list *paginas)
     incrementar_swap_out(pid);
 }
 
-void recuperar_proceso_de_swap(u_int32_t pid, void *destino)
+t_list *recuperar_de_swap(u_int32_t pid)
 {
+    char *_pid = string_itoa(pid);
     pthread_mutex_lock(&mutex_swap);
 
-    t_swap_info *info = dictionary_get(procesos_en_swap, string_itoa(pid));
-
-    if (info == NULL)
+    if (!dictionary_has_key(swapped, _pid) == false)
     {
-        log_mensaje_error("Se intento recuperar un proceso que no esta en swap.");
         pthread_mutex_unlock(&mutex_swap);
-        return;
+        log_mensaje_error("Se intento recuperar un proceso que no esta en swap.");
+        free(_pid);
+        return NULL;
     }
 
+    t_swapped *proceso = dictionary_get(swapped, _pid);
     u_int32_t tam_pagina = get_tam_pagina();
-    u_int32_t bytes_a_leer = tam_pagina * info->paginas;
+    t_list *paginas_recuperadas = list_create();
 
-    fseek(archivo_swap, info->offset, SEEK_SET);
-    fread(destino, bytes_a_leer, 1, archivo_swap);
+    FILE *archivo_swap = fopen(path_swapfile, "rb"); // TODO: Revisar modo de apertura
+    fseek(archivo_swap, proceso->posicion, SEEK_SET);
 
+    for (int i = 0; i < proceso->paginas; i++)
+    {
+        void *pagina = malloc(tam_pagina);
+        fread(pagina, tam_pagina, 1, archivo_swap);
+        list_add(paginas_recuperadas, pagina);
+    }
+
+    fclose(archivo_swap);
+    pthread_mutex_unlock(&mutex_swap);
+
+    free(_pid);
     usleep(get_retardo_swap() * 1000);
     incrementar_swap_in(pid);
 
-    pthread_mutex_unlock(&mutex_swap);
+    return paginas_recuperadas;
 }
 
 static t_swapped *crear_swapped(u_int32_t paginas, u_int32_t posicion)

@@ -2,6 +2,7 @@
 #define SWAP_H
 
 #include <stdlib.h>
+#include <unistd.h>
 #include <stdio.h>
 #include <pthread.h>
 #include <commons/collections/list.h>
@@ -39,6 +40,7 @@ void guardar_en_swap(u_int32_t pid, t_list *paginas);
  *
  * @param pid
  * @return t_list*
+ * @note Aloca memoria tanto para la lista como para las páginas dentro de ella. Debe ser liberada por el llamador.
  */
 t_list *recuperar_de_swap(u_int32_t pid);
 
