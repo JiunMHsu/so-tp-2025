@@ -5,8 +5,8 @@
 
 typedef enum
 {
-    OPERATION_SUCCEED,
     OPERATION_FAILED,
+    OPERATION_SUCCEED,
 } t_mem_response;
 
 typedef struct

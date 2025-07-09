@@ -32,10 +32,10 @@ u_int8_t escribir_memoria_usuario(u_int32_t pid, u_int32_t direccion_fisica, voi
     if (tamanio_guardado == tamanio_buffer)
     {
         log_acceso_espacio_usuario(pid, ESCRITURA, direccion_fisica, tamanio_buffer);
-        return OPERATION_SUCCEED;
+        return 1;
     }
 
-    return OPERATION_FAILED;
+    return 0;
 }
 
 void *leer_memoria_usuario(u_int32_t pid, u_int32_t direccion_fisica, u_int32_t tamanio_buffer)

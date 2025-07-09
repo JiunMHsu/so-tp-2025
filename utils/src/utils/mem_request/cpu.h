@@ -26,9 +26,9 @@ typedef struct
      *
      */
     char *entradas_por_nivel; // Presente solo para OBTENER_MARCO
-    char *direccion_fisica;   // Presente para LEER y ESCRIBIR
-    u_int32_t tamanio_buffer; // Presente para LEER y ESCRIBIR
-    void *buffer;             // Presente solo para ESCRIBIR
+    char *direccion_fisica;   // Presente para LEER, ESCRIBIR, LEER_PAG y ESCRIBIR_PAG
+    u_int32_t tamanio_buffer; // Presente para LEER, ESCRIBIR, LEER_PAG y ESCRIBIR_PAG
+    void *buffer;             // Presente solo para ESCRIBIR y ESCRIBIR_PAG
 } t_peticion_cpu;
 
 t_peticion_cpu *crear_peticion_instruccion(u_int32_t pid, u_int32_t program_counter);

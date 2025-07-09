@@ -5,6 +5,9 @@ int32_t fd_escucha;
 static void *atender_kernel(void *fd_ptr);
 static void *atender_cpu(void *fd_ptr);
 
+static void responder_lectura(void *buffer, u_int32_t tamanio_buffer, int32_t fd_conexion);
+static void retardo_respuesta(void);
+
 void iniciar_servidor()
 {
     char *puerto_escucha = get_puerto_escucha();
@@ -56,45 +59,41 @@ static void *atender_kernel(void *fd_ptr)
     int32_t fd_kernel = *((int32_t *)fd_ptr);
     free(fd_ptr);
 
-    while (1)
+    t_kernel_mem_req *paquete = recibir_kernel_mem_request(fd_kernel);
+    if (paquete == NULL)
+        return NULL;
+
+    retardo_respuesta();
+    u_int8_t resultado;
+
+    switch (paquete->operacion)
     {
-        t_kernel_mem_req *paquete = recibir_kernel_mem_request(fd_kernel);
+    case INICIAR_PROCESO:
+        resultado = crear_proceso(paquete->pid,
+                                  paquete->tamanio,
+                                  paquete->path);
+        enviar_senial(resultado, fd_kernel);
+        break;
 
-        if (paquete == NULL)
-            return NULL;
+    case FINALIZAR_PROCESO:
+        resultado = finalizar_proceso(paquete->pid);
+        enviar_senial(resultado, fd_kernel);
+        break;
 
-        u_int8_t resultado;
+    case DUMP_PROCESO:
+        break;
 
-        switch (paquete->operacion)
-        {
-        case INICIAR_PROCESO:
-            resultado = crear_proceso(paquete->pid,
-                                      paquete->tamanio,
-                                      paquete->path);
-            enviar_senial(resultado, fd_kernel);
-            break;
+    case SWAP_OUT:
+        break;
 
-        case FINALIZAR_PROCESO:
-            resultado = finalizar_proceso(paquete->pid);
-            enviar_senial(resultado, fd_kernel);
-            break;
+    case SWAP_IN:
+        break;
 
-        case DUMP_PROCESO:
-            break;
-
-        case SWAP_OUT:
-            break;
-
-        case SWAP_IN:
-            break;
-
-        default: // no debería ocurrir nunca
-            break;
-        }
-
-        destruir_kernel_mem_request(paquete);
+    default: // no debería ocurrir nunca
+        break;
     }
 
+    destruir_kernel_mem_request(paquete);
     close(fd_kernel);
     return NULL;
 }
@@ -115,6 +114,7 @@ static void *atender_cpu(void *fd_ptr)
             return NULL;
         }
 
+        retardo_respuesta();
         u_int32_t direccion_fisica = 0;
         int32_t tamanio_pagina = get_tam_pagina();
 
@@ -137,13 +137,9 @@ static void *atender_cpu(void *fd_ptr)
             break;
 
         case LEER:
-            // direcciones_fisicas = convertir_a_lista_de_direcciones_fisicas(peticion->direcciones_fisicas);
-            // void* lectura = leer_memoria_usuario(peticion->pid, direcciones_fisicas, peticion->tamanio_buffer);
-
-            // log_acceso_espacio_usuario(peticion->pid, LECTURA, direcciones_fisicas, peticion->tamanio_buffer);
-            // enviar_lectura(lectura, peticion->tamanio_buffer, fd_cpu);
-            // free(lectura);
-            // list_destroy_and_destroy_elements(direcciones_fisicas, &free);
+            void *lectura = leer_memoria_usuario(peticion->pid, peticion->direccion_fisica, peticion->tamanio_buffer);
+            responder_lectura(lectura, peticion->tamanio_buffer, fd_cpu);
+            free(lectura);
             break;
 
         case ESCRIBIR:
@@ -157,9 +153,9 @@ static void *atender_cpu(void *fd_ptr)
             break;
 
         case LEER_PAG:
-            // void *lectura = leer_pagina_completa(peticion->pid, peticion->frame);
-            // enviar_lectura(lectura, tamanio_pagina, fd_cpu);
-            // free(lectura);
+            void *lectura = leer_memoria_usuario(peticion->pid, peticion->direccion_fisica, tamanio_pagina);
+            responder_lectura(lectura, tamanio_pagina, fd_cpu);
+            free(lectura);
             break;
 
         case ESCRIBIR_PAG:
@@ -177,4 +173,17 @@ static void *atender_cpu(void *fd_ptr)
     }
 
     return NULL;
+}
+
+static void responder_lectura(void *buffer, u_int32_t tamanio_buffer, int32_t fd_conexion)
+{
+    t_mem_response response = buffer == NULL ? OPERATION_FAILED : OPERATION_SUCCEED;
+    t_mem_buffer_response *buffer_response = crear_buffer_response(response, buffer, tamanio_buffer);
+    enviar_buffer_response(fd_conexion, buffer_response);
+    destruir_buffer_response(buffer_response);
+}
+
+static void retardo_respuesta()
+{
+    usleep(get_retardo_memoria() * 1000);
 }
