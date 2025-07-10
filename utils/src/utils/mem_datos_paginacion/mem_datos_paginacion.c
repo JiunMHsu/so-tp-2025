@@ -13,9 +13,9 @@ t_mem_datos_paginacion *crear_mem_datos_paginacion(u_int32_t tamanio_pagina, u_i
 t_packet *serializar_mem_datos_paginacion(t_mem_datos_paginacion *mem_datos_paginacion)
 {
     t_packet *paquete = crear_paquete();
-    agregar_a_paquete(paquete, mem_datos_paginacion->cantidad_entradas_tp, sizeof(u_int32_t));
-    agregar_a_paquete(paquete, mem_datos_paginacion->cantidad_niveles, sizeof(u_int32_t));
-    agregar_a_paquete(paquete, mem_datos_paginacion->tamanio_pagina, sizeof(u_int32_t));
+    agregar_a_paquete(paquete, &(mem_datos_paginacion->cantidad_entradas_tp), sizeof(u_int32_t));
+    agregar_a_paquete(paquete, &(mem_datos_paginacion->cantidad_niveles), sizeof(u_int32_t));
+    agregar_a_paquete(paquete, &(mem_datos_paginacion->tamanio_pagina), sizeof(u_int32_t));
 
     return paquete;
 }
