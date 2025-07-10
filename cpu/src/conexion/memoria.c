@@ -110,16 +110,16 @@ void enviar_peticion_lectura(u_int32_t pid, u_int32_t direccion_fisica, u_int32_
     destruir_peticion_cpu(peticion_lectura);
 }
 
-void enviar_peticion_escritura_pagina(u_int32_t pid, u_int32_t frame, void *contenido, u_int32_t tamanio_pagina)
+void enviar_peticion_escritura_pagina(u_int32_t pid, u_int32_t direccion_fisica, void *contenido)
 {
-    t_peticion_cpu *peticion_contenido_pagina = crear_peticion_escritura_pagina(pid, frame, tamanio_pagina, contenido);
+    t_peticion_cpu *peticion_contenido_pagina = crear_peticion_escritura(pid, direccion_fisica, get_tamanio_pagina(), contenido);
     enviar_peticion_cpu(fd_memoria, peticion_contenido_pagina);
     destruir_peticion_cpu(peticion_contenido_pagina);
 }
 
-void enviar_peticion_lectura_pagina(u_int32_t pid, u_int32_t frame, u_int32_t tamanio_pagina)
+void enviar_peticion_lectura_pagina(u_int32_t pid, u_int32_t direccion_fisica)
 {
-    t_peticion_cpu *peticion_contenido_pagina = crear_peticion_lectura_pagina(pid, frame, tamanio_pagina);
+    t_peticion_cpu *peticion_contenido_pagina = crear_peticion_lectura(pid, direccion_fisica, get_tamanio_pagina());
     enviar_peticion_cpu(fd_memoria, peticion_contenido_pagina);
     destruir_peticion_cpu(peticion_contenido_pagina);
 }
