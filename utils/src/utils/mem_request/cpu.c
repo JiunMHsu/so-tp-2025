@@ -28,10 +28,6 @@ static t_peticion_cpu *crear_peticion_cpu(operacion_cpu_memoria operacion,
         peticion->buffer = malloc(tamanio_buffer);
         memcpy(peticion->buffer, buffer, tamanio_buffer);
         break;
-    case ESCRIBIR_PAG:
-        peticion->buffer = malloc(tamanio_buffer);
-        memcpy(peticion->buffer, buffer, tamanio_buffer);
-        break;
     default:
         // No se necesita inicializar nada más para las otras operaciones
         break;
@@ -90,7 +86,6 @@ void enviar_peticion_cpu(int32_t fd_memoria, t_peticion_cpu *peticion)
     eliminar_paquete(paquete);
 }
 
-// TODO: contemplar los casos de leer pag y escribir pag
 t_peticion_cpu *recibir_peticion_cpu(int32_t fd_conexion)
 {
     t_list *paquete = recibir_paquete(fd_conexion);
@@ -110,21 +105,11 @@ t_peticion_cpu *recibir_peticion_cpu(int32_t fd_conexion)
         peticion->entradas_por_nivel = strdup(list_get(paquete, 2));
         break;
     case LEER:
-        peticion->direccion_fisica = strdup(list_get(paquete, 2));
+        peticion->direccion_fisica = *(u_int32_t *)list_get(paquete, 2);
         peticion->tamanio_buffer = *(u_int32_t *)list_get(paquete, 3);
         break;
     case ESCRIBIR:
-        peticion->direccion_fisica = strdup(list_get(paquete, 2));
-        peticion->tamanio_buffer = *(u_int32_t *)list_get(paquete, 3);
-        peticion->buffer = malloc(peticion->tamanio_buffer);
-        memcpy(peticion->buffer, list_get(paquete, 4), peticion->tamanio_buffer);
-        break;
-    case LEER_PAG:
-        peticion->frame = *(u_int32_t *)list_get(paquete, 2);
-        peticion->tamanio_buffer = *(u_int32_t *)list_get(paquete, 3);
-        break;
-    case ESCRIBIR_PAG:
-        peticion->frame = *(u_int32_t *)list_get(paquete, 2);
+        peticion->direccion_fisica = *(u_int32_t *)list_get(paquete, 2);
         peticion->tamanio_buffer = *(u_int32_t *)list_get(paquete, 3);
         peticion->buffer = malloc(peticion->tamanio_buffer);
         memcpy(peticion->buffer, list_get(paquete, 4), peticion->tamanio_buffer);
