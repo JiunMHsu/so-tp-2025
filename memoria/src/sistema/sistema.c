@@ -87,7 +87,13 @@ char *obtener_instruccion(u_int32_t pid, u_int32_t program_counter)
     char *instruccion = (char *)list_get(lista_instrucciones, program_counter);
     free(pid_str);
 
-    return instruccion == NULL ? NULL : strdup(instruccion);
+    if (instruccion != NULL)
+    {
+        incrementar_instruccion_solicitada(pid);
+        return strdup(instruccion);
+    }
+
+    return NULL; // no hay instruccion
 }
 
 u_int8_t swap_out_proceso(u_int32_t pid)
@@ -103,6 +109,8 @@ u_int8_t swap_out_proceso(u_int32_t pid)
 
     guardar_en_swap(pid, paginas);
     liberar_frames(marcos_asignados);
+
+    incrementar_swap_out(pid);
 
     list_destroy_and_destroy_elements(marcos_asignados, &free);
     list_destroy_and_destroy_elements(paginas, &free);
@@ -134,6 +142,8 @@ u_int8_t swap_in_proceso(u_int32_t pid)
     // justo los marcos que se habían asignado antes del swap out
     cargar_marcos_asignados(pid, marcos_asignados);
 
+    incrementar_swap_in(pid);
+
     list_clean_and_destroy_elements(marcos_asignados, &free);
     list_destroy_and_destroy_elements(paginas_recuperadas, &free);
     return 1;
@@ -150,5 +160,6 @@ u_int8_t dump_proceso(u_int32_t pid)
 
     t_list *paginas = leer_paginas_por_marcos(marcos_asignados);
     generar_dump(pid, paginas);
+
     return 1;
 }

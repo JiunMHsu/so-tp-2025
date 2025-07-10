@@ -31,6 +31,7 @@ u_int8_t escribir_memoria_usuario(u_int32_t pid, u_int32_t direccion_fisica, voi
 
     if (tamanio_guardado == tamanio_buffer)
     {
+        incrementar_escritura(pid);
         log_acceso_espacio_usuario(pid, ESCRITURA, direccion_fisica, tamanio_buffer);
         return 1;
     }
@@ -66,6 +67,7 @@ void *leer_memoria_usuario(u_int32_t pid, u_int32_t direccion_fisica, u_int32_t 
     printf("[+] Loaded Buffer: %s\n", (char *)buffer);
     if (tamanio_leido == tamanio_buffer)
     {
+        incrementar_lectura(pid);
         log_acceso_espacio_usuario(pid, LECTURA, direccion_fisica, tamanio_buffer);
         return buffer;
     }
