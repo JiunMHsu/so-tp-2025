@@ -86,6 +86,33 @@ static void _read(char **parametros)
 
     // printear el dato leido
     // loggearlo
+    u_int32_t direccion_logica = atoi(parametros[0]);
+    u_int32_t tamanio_lectura = atoi(parametros[1]);
+    void *datos_leidos = NULL;
+
+    if (cache_habilitada())
+    {
+        u_int32_t nro_pagina = get_nro_pagina(direccion_logica);
+        u_int32_t offset = get_offset(direccion_logica);
+
+        if (!existe_pagina_cache(nro_pagina))
+        {
+            u_int32_t marco_pagina = get_marco(direccion_logica);
+            cachear_pagina(nro_pagina, marco_pagina);
+        }
+
+        datos_leidos = leer_cache(nro_pagina, offset, tamanio_lectura);
+    }
+    else
+    {
+        u_int32_t direccion_fisica = get_direccion_fisica(get_pid(), direccion_logica);
+        enviar_peticion_lectura(get_pid(), direccion_fisica, tamanio_lectura);
+        datos_leidos = recibir_datos_lectura();
+        log_operacion_acceso_memoria(get_pid(), LECTURA, direccion_fisica, (char *)datos_leidos);
+    }
+
+    printf("Datos leidos: %s", (char *)datos_leidos);
+    free(datos_leidos);
 }
 
 static void go_to(char **parametros)
