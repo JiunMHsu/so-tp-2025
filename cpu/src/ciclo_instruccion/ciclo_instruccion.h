@@ -22,5 +22,6 @@ fin_ejecucion ejecutar_ciclo_instruccion(u_int32_t pid, u_int32_t pc);
 
 void set_syscall(void);
 void set_program_counter(u_int32_t valor);
+u_int32_t get_pid();
 
 #endif // CPU_CICLO_INSTRUCCION_H

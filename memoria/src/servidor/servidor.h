@@ -9,10 +9,12 @@
 #include <utils/protocol/protocol.h>
 #include <utils/mem_request/kernel.h>
 #include <utils/mem_request/cpu.h>
+#include <utils/mem_response/mem_response.h>
 
 #include "logger/logger.h"
 #include "config/config.h"
 #include "sistema/sistema.h"
+#include "usuario/usuario.h"
 
 void iniciar_servidor(void);
 void finalizar_servidor(void);

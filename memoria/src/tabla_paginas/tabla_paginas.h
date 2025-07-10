@@ -42,8 +42,16 @@ void inicializar_tabla_de_paginas(void);
 void crear_tablas_para(u_int32_t pid);
 void cargar_marcos_asignados(u_int32_t pid, t_list *frames_asignados);
 void destruir_tablas_para(u_int32_t pid);
-int32_t obtener_marco(u_int32_t pid, u_int32_t *entradas);
+int32_t obtener_marco(u_int32_t pid, t_list *paginas);
 
-// TODO: Extender funciones para tablas de páginas
+/**
+ * @brief Obtiene los marcos asignados a un proceso.
+ *
+ * @param pid
+ * @return t_list*
+ * @note La lista contiene punteros a `u_int32_t` que representan los marcos asignados.
+ * @note La lista debe ser destruida con `list_destroy_and_destroy_elements` y `free` para liberar la memoria.
+ */
+t_list *obtener_marcos_asignados(u_int32_t pid);
 
 #endif // TABLA_PAGINAS_H

@@ -37,33 +37,58 @@ static void noop(char **_)
 
 static void _write(char **parametros)
 {
-    // descomponer parametros
-    // 1. direccion logica
-    // 2. dato a escribir en memoria principal (o memoria cache si es que la pagina se encuentra en ella)
+    u_int32_t direccion_logica = atoi(parametros[0]);
+    char *datos = parametros[1];
 
-    //fijarse si hay cache habilitada
-    //si esta habilitada => operar en cache
-    //si NO esta habilitada => operar en memoria => traduccion de direccion logica a fisica
+    if (cache_habilitada())
+    {
+        u_int32_t nro_pagina = get_nro_pagina(direccion_logica);
+        u_int32_t offset = get_offset(direccion_logica);
 
-    // operacion en cache_
-    // pagina en cache => operar directamente
-    // pagina NO esta en cache:
-    // CASO 1: tlb habilitada => buscar marco en tlb => pedir a memoria la pagina de ese marco => cargarla en cache => operar en cache
-    // CASO 2: tlb NO habilitada => buscar pagina directamente en memoria y cargarla => operar en cache
+        if (!existe_pagina_cache(nro_pagina))
+        {
+            u_int32_t marco_pagina = get_marco(direccion_logica);
+            cachear_pagina(nro_pagina, marco_pagina);
+        }
+
+        escribir_cache(nro_pagina, offset, (void *)datos, string_length(datos));
+    }
+    else
+    {
+        u_int32_t direccion_fisica = get_direccion_fisica(get_pid(), direccion_logica);
+        enviar_peticion_escritura(get_pid(), direccion_fisica, (void *)datos, string_length(datos)); // TODO revisar parametros
+        log_operacion_acceso_memoria(get_pid(), ESCRITURA, direccion_fisica, datos);
+    }
 }
 
 static void _read(char **parametros)
 {
-    //descomponer parametros
-    //1. direccion logica
-    //2. tamaño de dato a leer
+    u_int32_t direccion_logica = atoi(parametros[0]);
+    u_int32_t tamanio_lectura = atoi(parametros[1]);
+    void *datos_leidos = NULL;
 
-    // fijarse si hay cache habilitada
-    // si esta habilitada => operar en cache
-    // si NO esta habilitada => operar en memoria => traduccion de direccion logica a fisica
+    if (cache_habilitada())
+    {
+        u_int32_t nro_pagina = get_nro_pagina(direccion_logica);
 
-    //printear el dato leido
-    //loggearlo
+        if (!existe_pagina_cache(nro_pagina))
+        {
+            u_int32_t marco_pagina = get_marco(direccion_logica);
+            cachear_pagina(nro_pagina, marco_pagina);
+        }
+
+        datos_leidos = leer_cache(nro_pagina, get_offset(direccion_logica), tamanio_lectura);
+    }
+    else
+    {
+        u_int32_t direccion_fisica = get_direccion_fisica(get_pid(), direccion_logica);
+        enviar_peticion_lectura(get_pid(), direccion_fisica, tamanio_lectura);
+        datos_leidos = recibir_datos_lectura();
+        log_operacion_acceso_memoria(get_pid(), LECTURA, direccion_fisica, (char *)datos_leidos);
+    }
+
+    printf("Datos leidos: %s", (char *)datos_leidos);
+    free(datos_leidos);
 }
 
 static void go_to(char **parametros)

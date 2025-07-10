@@ -88,14 +88,17 @@ void cargar_marcos_asignados(u_int32_t pid, t_list *frames_asignados)
     list_destroy(entradas_ultimo_nivel);
 }
 
-int32_t obtener_marco(u_int32_t pid, u_int32_t *paginas)
+int32_t obtener_marco(u_int32_t pid, t_list *entradas)
 {
+    int32_t marco = -2; // por un tema de como se maneja la señal (-1 es error)
     t_tabla *tabla = buscar_por_pid(pid);
-    int32_t marco = -1;
+    if (!tabla)
+        return marco;
 
     for (int nivel = 0; nivel < get_cantidad_niveles(); nivel++)
     {
-        t_entrada *entrada = list_get(tabla->entradas, paginas[nivel]);
+        u_int32_t nro_entrada = *(u_int32_t *)list_get(entradas, nivel);
+        t_entrada *entrada = list_get(tabla->entradas, nro_entrada);
         if (entrada->siguiente == NULL)
             return entrada->marco;
 
@@ -122,6 +125,34 @@ void destruir_tablas_para(u_int32_t pid)
 
     destruir_tabla(tabla);
     free(_pid);
+}
+
+t_list *obtener_marcos_asignados(u_int32_t pid)
+{
+    t_tabla *tabla = buscar_por_pid(pid);
+    if (tabla == NULL)
+        return NULL;
+
+    t_list *marcos_asignados = list_create();
+
+    pthread_mutex_lock(&mutex_tablas_procesos);
+    t_list *entradas_ultimo_nivel = get_entradas_ultimo_nivel(tabla);
+
+    for (int i = 0; i < list_size(entradas_ultimo_nivel); i++)
+    {
+        t_entrada *entrada = list_get(entradas_ultimo_nivel, i);
+        if (!entrada->presente)
+            continue; // Solo agregar entradas presentes
+
+        u_int32_t *marco = malloc(sizeof(u_int32_t));
+        *marco = entrada->marco;
+        list_add(marcos_asignados, marco);
+    }
+
+    list_destroy(entradas_ultimo_nivel);
+    pthread_mutex_unlock(&mutex_tablas_procesos);
+
+    return marcos_asignados;
 }
 
 static void destruir_tabla(t_tabla *tabla)
@@ -170,7 +201,6 @@ static void recorrer_tablas(t_list *lista_entradas, t_tabla *tabla, u_int32_t ni
     for (int i = 0; i < entradas_por_tabla; i++)
     {
         t_entrada *entrada = list_get(tabla->entradas, i);
-
         if (entrada->siguiente != NULL)
             recorrer_tablas(lista_entradas, entrada->siguiente, nivel + 1);
 
