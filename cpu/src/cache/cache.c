@@ -8,6 +8,11 @@ static u_int32_t entrada_libre;
 static u_int32_t retardo_milisegundos;
 static u_int32_t puntero_clock;
 
+static entrada_cache crear_entrada(u_int32_t nro_pagina, u_int32_t marco);
+static entrada_cache *get_entrada(u_int32_t indice);
+static u_int32_t obtener_victima(void);
+static void destruir_entrada_cache(entrada_cache *entrada);
+
 void inicializar_cache()
 {
     cantidad_entradas = get_entradas_cache();
@@ -29,8 +34,6 @@ void inicializar_cache()
     }
 }
 
-// TODO: funciones de cache
-
 void cachear_pagina(u_int32_t nro_pagina, u_int32_t marco)
 {
     entrada_cache nueva_entrada = crear_entrada(nro_pagina, marco);
@@ -43,12 +46,12 @@ void cachear_pagina(u_int32_t nro_pagina, u_int32_t marco)
     else
     {
         u_int32_t indice_victima = obtener_victima();
-        entrada_cache victima = get_entrada(indice_victima);
+        entrada_cache *victima = get_entrada(indice_victima);
 
-        if (victima.bit_modificado)
+        if (victima->bit_modificado)
         {
-            enviar_peticion_escritura_pagina(get_pid(), get_direccion_fisica_por_marco(victima.marco), victima.contenido);
-            log_pagina_actualizada_cache_memoria(get_pid(), victima.pagina, victima.marco);
+            enviar_peticion_escritura_pagina(get_pid(), get_direccion_fisica_por_marco(victima->marco), victima->contenido);
+            log_pagina_actualizada_cache_memoria(get_pid(), victima->pagina, victima->marco);
         }
 
         memoria_cache[indice_victima] = nueva_entrada;
@@ -58,7 +61,7 @@ void cachear_pagina(u_int32_t nro_pagina, u_int32_t marco)
     log_pagina_ingresada_cache(get_pid(), nro_pagina);
 }
 
-u_int32_t obtener_victima()
+static u_int32_t obtener_victima()
 {
     u_int32_t indice_victima = 0;
 
@@ -136,7 +139,7 @@ void *leer_cache(u_int32_t nro_pagina, u_int32_t offset, u_int32_t bytes_tamanio
     return datos_leidos;
 }
 
-entrada_cache crear_entrada(u_int32_t nro_pagina, u_int32_t marco)
+static entrada_cache crear_entrada(u_int32_t nro_pagina, u_int32_t marco)
 {
     entrada_cache nueva_entrada;
     nueva_entrada.contenido = malloc(get_tamanio_pagina());
@@ -153,7 +156,7 @@ entrada_cache crear_entrada(u_int32_t nro_pagina, u_int32_t marco)
     return nueva_entrada;
 }
 
-entrada_cache *get_entrada(u_int32_t indice)
+static entrada_cache *get_entrada(u_int32_t indice)
 {
     return &memoria_cache[indice];
 }
@@ -185,21 +188,22 @@ void limpiar_cache()
 {
     for (u_int32_t i = 0; i < entrada_libre; i++)
     {
-        entrada_cache entrada = memoria_cache[i];
-
-        if (entrada.bit_modificado == 1)
+        entrada_cache *entrada = get_entrada(i);
+        if (entrada->bit_modificado == 0)
         {
-            enviar_peticion_escritura_pagina(get_pid(), get_direccion_fisica_por_marco(entrada.marco), entrada.contenido);
-            log_pagina_actualizada_cache_memoria(get_pid(), victima.pagina, victima.marco);
+            destruir_entrada_cache(entrada);
+            continue;
         }
 
+        enviar_peticion_escritura_pagina(get_pid(), get_direccion_fisica_por_marco(entrada->marco), entrada->contenido);
+        log_pagina_actualizada_cache_memoria(get_pid(), entrada->pagina, entrada->marco);
         destruir_entrada_cache(entrada);
     }
 
     entrada_libre = 0;
 }
 
-void destruir_entrada_cache(entrada_cache entrada)
+static void destruir_entrada_cache(entrada_cache *entrada)
 {
-    free(entrada.contenido);
+    free(entrada->contenido);
 }

@@ -21,21 +21,19 @@ void inicializar_mmu()
     tamanio_pagina = get_tamanio_pagina();
 }
 
-// TODO cambiar todas las firmas con pid => agregar get_pid de ciclo_instruccion
 u_int32_t get_marco(u_int32_t direccion_logica)
 {
     u_int32_t numero_pagina = get_nro_pagina(direccion_logica);
-    u_int32_t offset = get_offset(direccion_logica);
     u_int32_t pid = get_pid();
     int32_t marco;
 
-    marco = tlb_habilitada ? get_marco_tlb(numero_pagina) : -1;
+    marco = tlb_habilitada() ? get_marco_tlb(numero_pagina) : -1;
 
     if (marco == -1)
     {
         marco = obtener_marco_de_memoria(pid, cantidad_niveles, numero_pagina, cantidad_entradas_tp);
 
-        if (tlb_habilitada)
+        if (tlb_habilitada())
         {
             log_tlb_miss(pid, numero_pagina);
             agregar_entrada_tlb(numero_pagina, marco);
@@ -43,9 +41,7 @@ u_int32_t get_marco(u_int32_t direccion_logica)
         }
     }
     else
-    {
         log_tlb_hit(pid, numero_pagina);
-    }
 
     log_obtener_marco(pid, numero_pagina, marco);
     return marco;
@@ -77,11 +73,8 @@ static u_int32_t obtener_marco_de_memoria(u_int32_t pid, u_int32_t cantidad_nive
     }
 
     enviar_peticion_marco(pid, entradas_por_nivel);
-
     u_int32_t marco = recibir_marco();
 
-    // TODO revisar si esta bien esta liberacion => entiendo que si
-    // porque en el envio se hace una copia del string entonces el original (este) no se libera con la destruccion del pedido
     free(entradas_por_nivel);
     return marco;
 }

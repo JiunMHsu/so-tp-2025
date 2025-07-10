@@ -37,15 +37,12 @@ u_int32_t recibir_marco()
 void *recibir_datos_lectura()
 {
     t_mem_buffer_response *respuesta_memoria = recibir_buffer_response(fd_memoria);
-
     if (respuesta_memoria->resultado == OPERATION_FAILED)
         return NULL;
 
-    void *datos_leidos = malloc(get_tamanio_pagina());
+    void *datos_leidos = malloc(respuesta_memoria->tamanio_buffer);
     memcpy(datos_leidos, respuesta_memoria->buffer, respuesta_memoria->tamanio_buffer);
-
     destruir_buffer_response(respuesta_memoria);
-
     return datos_leidos;
 }
 
@@ -95,12 +92,11 @@ void enviar_peticion_marco(u_int32_t pid, char *entradas_por_nivel)
     destruir_peticion_cpu(peticion_marco);
 }
 
-void enviar_peticion_escritura(u_int32_t pid, u_int32_t direccion_fisica, void *contenido)
+void enviar_peticion_escritura(u_int32_t pid, u_int32_t direccion_fisica, void *contenido, u_int32_t tamanio_bytes)
 {
-    // TODO revisar implementacion funcion crear_peticion_escritura
-    t_peticion_cpu *peticion_escritura = crear_peticion_escritura(pid, direccion_fisica, contenido);
-    enviar_peticion_cpu(fd_memoria, peticion_contenido_pagina);
-    destruir_peticion_cpu(peticion_contenido_pagina);
+    t_peticion_cpu *peticion_escritura = crear_peticion_escritura(pid, direccion_fisica, tamanio_bytes, contenido);
+    enviar_peticion_cpu(fd_memoria, peticion_escritura);
+    destruir_peticion_cpu(peticion_escritura);
 }
 
 void enviar_peticion_lectura(u_int32_t pid, u_int32_t direccion_fisica, u_int32_t tamanio_bytes)
