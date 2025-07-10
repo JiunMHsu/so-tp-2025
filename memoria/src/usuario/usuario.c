@@ -95,6 +95,22 @@ void escribir_marco_entero(u_int32_t marco, void *contenido)
     pthread_mutex_unlock(&memoria_usuario_mutex);
 }
 
+t_list *leer_paginas_por_marcos(t_list *marcos)
+{
+    t_list *paginas = list_create();
+
+    t_list_iterator *iterador_marcos = list_iterator_create(marcos);
+    while (list_iterator_has_next(iterador_marcos))
+    {
+        u_int32_t marco = *(u_int32_t *)list_iterator_next(iterador_marcos);
+        void *pagina = leer_pagina_por_marco(marco);
+        list_add(paginas, pagina);
+    }
+    list_iterator_destroy(iterador_marcos);
+
+    return paginas;
+}
+
 static u_int32_t get_numero_de_frame(u_int32_t direccion_fisica)
 {
     return direccion_fisica / get_tam_pagina();

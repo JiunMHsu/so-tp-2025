@@ -64,7 +64,7 @@ static void *atender_kernel(void *fd_ptr)
         return NULL;
 
     retardo_respuesta();
-    u_int8_t resultado;
+    u_int8_t resultado = 0;
 
     switch (paquete->operacion)
     {
@@ -72,31 +72,29 @@ static void *atender_kernel(void *fd_ptr)
         resultado = crear_proceso(paquete->pid,
                                   paquete->tamanio,
                                   paquete->path);
-        enviar_senial(resultado, fd_kernel);
         break;
 
     case FINALIZAR_PROCESO:
         resultado = finalizar_proceso(paquete->pid);
-        enviar_senial(resultado, fd_kernel);
         break;
 
     case DUMP_PROCESO:
+        resultado = dump_proceso(paquete->pid);
         break;
 
     case SWAP_OUT:
         resultado = swap_out_proceso(paquete->pid);
-        enviar_senial(resultado, fd_kernel);
         break;
 
     case SWAP_IN:
         resultado = swap_in_proceso(paquete->pid);
-        enviar_senial(resultado, fd_kernel);
         break;
 
     default: // no debería ocurrir nunca
         break;
     }
 
+    enviar_senial(resultado, fd_kernel);
     destruir_kernel_mem_request(paquete);
     close(fd_kernel);
     return NULL;

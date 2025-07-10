@@ -6,6 +6,8 @@ void generar_dump(u_int32_t pid, t_list *paginas)
     // generar el nombre del archivo de dump
     // crear el archivo de dump
 
+    // retornar si la lista de páginas es NULL (generar archivo vacío)
+
     // iterar sobre la lista de páginas
     // ir escribiendo las páginas en el archivo de dump
 

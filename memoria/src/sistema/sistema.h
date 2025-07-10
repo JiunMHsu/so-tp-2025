@@ -16,6 +16,7 @@
 #include "tabla_paginas/tabla_paginas.h"
 #include "usuario/usuario.h"
 #include "swap/swap.h"
+#include "dump/dump.h"
 
 void inicializar_espacio_sistema(void);
 
@@ -51,6 +52,12 @@ u_int8_t swap_out_proceso(u_int32_t pid);
  */
 u_int8_t swap_in_proceso(u_int32_t pid);
 
+/**
+ * @brief Genera un archivo de dump del proceso.
+ *
+ * @param pid
+ * @return `1` si se generó el dump correctamente, `0` en caso contrario.
+ */
 u_int8_t dump_proceso(u_int32_t pid);
 
 #endif // MEMORIA_SISTEMA_H

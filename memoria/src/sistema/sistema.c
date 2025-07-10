@@ -99,15 +99,7 @@ u_int8_t swap_out_proceso(u_int32_t pid)
         return 1; // no hay marcos asignados, no hay nada que hacer
     }
 
-    t_list *paginas = list_create();
-    t_list_iterator *iterador_marcos = list_iterator_create(marcos_asignados);
-    while (list_iterator_has_next(iterador_marcos))
-    {
-        u_int32_t marco = *(u_int32_t *)list_iterator_next(iterador_marcos);
-        void *pagina = leer_pagina_por_marco(marco);
-        list_add(paginas, pagina);
-    }
-    list_iterator_destroy(iterador_marcos);
+    t_list *paginas = leer_paginas_por_marcos(marcos_asignados);
 
     guardar_en_swap(pid, paginas);
     liberar_frames(marcos_asignados);
@@ -147,8 +139,16 @@ u_int8_t swap_in_proceso(u_int32_t pid)
     return 1;
 }
 
-// TODO: dump_proceso
 u_int8_t dump_proceso(u_int32_t pid)
 {
-    return 0;
+    t_list *marcos_asignados = obtener_marcos_asignados(pid);
+    if (marcos_asignados == NULL)
+    {
+        generar_dump(pid, NULL);
+        return 1;
+    }
+
+    t_list *paginas = leer_paginas_por_marcos(marcos_asignados);
+    generar_dump(pid, paginas);
+    return 1;
 }
