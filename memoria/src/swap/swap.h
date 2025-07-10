@@ -15,6 +15,7 @@ typedef struct
 {
     u_int32_t paginas;
     u_int32_t posicion;
+    int8_t en_disco;
 } t_swapped;
 
 /**
@@ -23,6 +24,14 @@ typedef struct
  *
  */
 void inicializar_swap();
+
+/**
+ * @brief Devuelve la cantidad de páginas que tiene un proceso en swap.
+ * 
+ * @param pid 
+ * @return -1 si el proceso no está en swap, la cantidad de páginas si está.
+ */
+int32_t get_cantidad_paginas(u_int32_t pid);
 
 /**
  * @brief Recibe el PID de un proceso y una lista de páginas (contenido).

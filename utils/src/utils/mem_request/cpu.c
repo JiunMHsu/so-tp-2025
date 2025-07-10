@@ -13,27 +13,23 @@ static t_peticion_cpu *crear_peticion_cpu(operacion_cpu_memoria operacion,
     t_peticion_cpu *peticion = malloc(sizeof(t_peticion_cpu));
     peticion->operacion = operacion;
     peticion->pid = pid;
+    peticion->program_counter = program_counter;
     peticion->entradas_por_nivel = NULL;
-    peticion->direccion_fisica = NULL;
+    peticion->direccion_fisica = direccion_fisica;
+    peticion->tamanio_buffer = tamanio_buffer;
     peticion->buffer = NULL;
 
     switch (operacion)
     {
-    case FETCH_INSTRUCCION:
-        peticion->program_counter = program_counter;
-        break;
     case OBTENER_MARCO:
         peticion->entradas_por_nivel = strdup(entradas_por_nivel);
         break;
-    case LEER:
-        peticion->direccion_fisica = direccion_fisica;
-        peticion->tamanio_buffer = tamanio_buffer;
-        break;
     case ESCRIBIR:
-        peticion->direccion_fisica = direccion_fisica;
-        peticion->tamanio_buffer = tamanio_buffer;
         peticion->buffer = malloc(tamanio_buffer);
         memcpy(peticion->buffer, buffer, tamanio_buffer);
+        break;
+    default:
+        // No se necesita inicializar nada más para las otras operaciones
         break;
     }
 
@@ -42,22 +38,22 @@ static t_peticion_cpu *crear_peticion_cpu(operacion_cpu_memoria operacion,
 
 t_peticion_cpu *crear_peticion_instruccion(u_int32_t pid, u_int32_t program_counter)
 {
-    return crear_peticion_cpu(FETCH_INSTRUCCION, pid, program_counter, 0, NULL, 0, NULL);
+    return crear_peticion_cpu(FETCH_INSTRUCCION, pid, program_counter, NULL, 0, 0, NULL);
 }
 
 t_peticion_cpu *crear_peticion_nro_marco(u_int32_t pid, char *entradas_por_nivel)
 {
-    return crear_peticion_cpu(OBTENER_MARCO, pid, 0, entradas_por_nivel, NULL, 0, NULL);
+    return crear_peticion_cpu(OBTENER_MARCO, pid, 0, entradas_por_nivel, 0, 0, NULL);
 }
 
 t_peticion_cpu *crear_peticion_lectura(u_int32_t pid, u_int32_t direccion_fisica, u_int32_t tamanio_buffer)
 {
-    return crear_peticion_cpu(LEER, pid, 0, 0, direccion_fisica, tamanio_buffer, NULL);
+    return crear_peticion_cpu(LEER, pid, 0, NULL, direccion_fisica, tamanio_buffer, NULL);
 }
 
 t_peticion_cpu *crear_peticion_escritura(u_int32_t pid, u_int32_t direccion_fisica, u_int32_t tamanio_buffer, void *buffer)
 {
-    return crear_peticion_cpu(ESCRIBIR, pid, 0, 0, direccion_fisica, tamanio_buffer, buffer);
+    return crear_peticion_cpu(ESCRIBIR, pid, 0, NULL, direccion_fisica, tamanio_buffer, buffer);
 }
 
 void enviar_peticion_cpu(int32_t fd_memoria, t_peticion_cpu *peticion)
@@ -90,7 +86,6 @@ void enviar_peticion_cpu(int32_t fd_memoria, t_peticion_cpu *peticion)
     eliminar_paquete(paquete);
 }
 
-// TODO: contemplar los casos de leer pag y escribir pag
 t_peticion_cpu *recibir_peticion_cpu(int32_t fd_conexion)
 {
     t_list *paquete = recibir_paquete(fd_conexion);
