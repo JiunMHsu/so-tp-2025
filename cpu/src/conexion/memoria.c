@@ -34,6 +34,36 @@ u_int32_t recibir_marco()
     return recibir_senial(fd_memoria);
 }
 
+void *recibir_datos_lectura()
+{
+    t_mem_buffer_response *respuesta_memoria = recibir_buffer_response(fd_memoria);
+
+    if (respuesta_memoria->resultado == OPERATION_FAILED)
+        return NULL;
+
+    void *datos_leidos = malloc(get_tamanio_pagina());
+    memcpy(datos_leidos, respuesta_memoria->buffer, respuesta_memoria->tamanio_buffer);
+
+    destruir_buffer_response(respuesta_memoria);
+
+    return datos_leidos;
+}
+
+void *recibir_contenido_pagina()
+{
+    t_mem_buffer_response *respuesta_memoria = recibir_buffer_response(fd_memoria);
+
+    if (respuesta_memoria->resultado == OPERATION_FAILED)
+        return NULL;
+
+    void *contenido_pagina = malloc(get_tamanio_pagina());
+    memcpy(contenido_pagina, respuesta_memoria->buffer, get_tamanio_pagina());
+
+    destruir_buffer_response(respuesta_memoria);
+
+    return contenido_pagina;
+}
+
 // TODO: Implementar get_cantidad_niveles, get_cantidad_entradas_tp y get_tamanio_pagina
 
 u_int32_t get_cantidad_niveles()
@@ -73,9 +103,23 @@ void enviar_peticion_escritura(u_int32_t pid, u_int32_t direccion_fisica, void *
     destruir_peticion_cpu(peticion_contenido_pagina);
 }
 
-void *enviar_peticion_contenido_pagina(u_int32_t pid, u_int32_t marco)
+void enviar_peticion_lectura(u_int32_t pid, u_int32_t direccion_fisica, u_int32_t tamanio_bytes)
 {
-    t_peticion_cpu *peticion_contenido_pagina = crear_peticion_contenido_pagina(pid, marco);
+    t_peticion_cpu *peticion_lectura = crear_peticion_lectura(pid, direccion_fisica, tamanio_bytes);
+    enviar_peticion_cpu(fd_memoria, peticion_lectura);
+    destruir_peticion_cpu(peticion_lectura);
+}
+
+void enviar_peticion_escritura_pagina(u_int32_t pid, u_int32_t direccion_fisica, void *contenido)
+{
+    t_peticion_cpu *peticion_contenido_pagina = crear_peticion_escritura(pid, direccion_fisica, get_tamanio_pagina(), contenido);
+    enviar_peticion_cpu(fd_memoria, peticion_contenido_pagina);
+    destruir_peticion_cpu(peticion_contenido_pagina);
+}
+
+void enviar_peticion_lectura_pagina(u_int32_t pid, u_int32_t direccion_fisica)
+{
+    t_peticion_cpu *peticion_contenido_pagina = crear_peticion_lectura(pid, direccion_fisica, get_tamanio_pagina());
     enviar_peticion_cpu(fd_memoria, peticion_contenido_pagina);
     destruir_peticion_cpu(peticion_contenido_pagina);
 }

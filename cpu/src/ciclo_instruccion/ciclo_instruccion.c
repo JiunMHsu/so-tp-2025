@@ -46,10 +46,10 @@ fin_ejecucion ejecutar_ciclo_instruccion(u_int32_t pid, u_int32_t program_counte
     // TODO
 
     if (tlb_habilitada())
-        eliminar_entradas_tlb();
+        limpiar_tlb();
 
     if (cache_habilitada())
-        eliminar_entradas_cache();
+        limpiar_cache();
 
     destruir_instruccion_ejecutable(instruccion);
     free(instruccion_str);

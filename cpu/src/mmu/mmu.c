@@ -1,6 +1,6 @@
 #include "mmu.h"
 
-static u_int32_t tlb_habilitada;
+static u_int32_t tlb_esta_habilitada;
 static u_int32_t cantidad_niveles;
 static u_int32_t cantidad_entradas_tp;
 static u_int32_t tamanio_pagina;
@@ -14,14 +14,14 @@ static u_int32_t potencia(u_int32_t base, u_int32_t exponente);
 
 void inicializar_mmu()
 {
-    tlb_habilitada = inicializar_tlb();
+    tlb_esta_habilitada = inicializar_tlb();
 
     cantidad_niveles = get_cantidad_niveles();
     cantidad_entradas_tp = get_cantidad_entradas_tp();
     tamanio_pagina = get_tamanio_pagina();
 }
 
-//TODO cambiar todas las firmas con pid => agregar get_pid de ciclo_instruccion
+// TODO cambiar todas las firmas con pid => agregar get_pid de ciclo_instruccion
 u_int32_t get_marco(u_int32_t direccion_logica)
 {
     u_int32_t numero_pagina = get_nro_pagina(direccion_logica);
@@ -29,19 +29,15 @@ u_int32_t get_marco(u_int32_t direccion_logica)
     u_int32_t pid = get_pid();
     int32_t marco;
 
-    // revisar cache => si hay cache miss loggear => si hay cache hit escribir/leer ahi mismo (dejar como modificado si esta escrito)
-    // hubo cache miss => revisar tlb => si hay tlb miss loggear => si hay tlb hit agregar pagina a cache (si esta habilitada) => pedir pagina a memoria => agregar => si no, pedir marco a memoria calcular direccion => operacion
-    // hubo tlb miss => pedir a memoria => agregar pagina a cache (si esta habilitada) => escribir ahi => si no, obtener marco => direccion => operacion
-
     marco = tlb_habilitada ? get_marco_tlb(numero_pagina) : -1;
 
     if (marco == -1)
     {
-        log_tlb_miss(pid, numero_pagina);
         marco = obtener_marco_de_memoria(pid, cantidad_niveles, numero_pagina, cantidad_entradas_tp);
 
         if (tlb_habilitada)
         {
+            log_tlb_miss(pid, numero_pagina);
             agregar_entrada_tlb(numero_pagina, marco);
             log_pagina_ingresada_tlb(numero_pagina, marco);
         }
@@ -49,12 +45,6 @@ u_int32_t get_marco(u_int32_t direccion_logica)
     else
     {
         log_tlb_hit(pid, numero_pagina);
-
-        if (cache_habilitada())
-        {
-            agregar_entrada_cache(numero_pagina, marco);
-            log_pagina_ingresada_cache(pid, numero_pagina);
-        }
     }
 
     log_obtener_marco(pid, numero_pagina, marco);
@@ -64,6 +54,11 @@ u_int32_t get_marco(u_int32_t direccion_logica)
 u_int32_t get_direccion_fisica(u_int32_t direccion_logica)
 {
     return get_marco(direccion_logica) * tamanio_pagina + get_offset(direccion_logica);
+}
+
+u_int32_t get_direccion_fisica_por_marco(u_int32_t marco)
+{
+    return marco * tamanio_pagina;
 }
 
 static u_int32_t obtener_marco_de_memoria(u_int32_t pid, u_int32_t cantidad_niveles, u_int32_t numero_pagina, u_int32_t cantidad_entradas_tp)
@@ -111,8 +106,7 @@ u_int32_t get_offset(u_int32_t direccion_logica)
     return direccion_logica % tamanio_pagina;
 }
 
-void destruir_mmu()
+u_int32_t tlb_habilitada()
 {
-    destruir_cache();
-    destruir_tlb();
+    return tlb_esta_habilitada;
 }
