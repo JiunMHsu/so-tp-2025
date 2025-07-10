@@ -105,6 +105,13 @@ static void *atender_cpu(void *fd_ptr)
     int32_t fd_cpu = *((int32_t *)fd_ptr);
     free(fd_ptr);
 
+    t_mem_datos_paginacion *datos_paginacion = crear_mem_datos_paginacion(
+        get_tam_pagina(),
+        get_entradas_por_tabla(),
+        get_cantidad_niveles());
+    enviar_mem_datos_paginacion(fd_cpu, datos_paginacion);
+    destruir_mem_datos_paginacion(datos_paginacion);
+
     while (1)
     {
         t_peticion_cpu *peticion = recibir_peticion_cpu(fd_cpu);

@@ -2,9 +2,9 @@
 
 static int32_t fd_memoria;
 
-static u_int32_t cant_niveles;
-static u_int32_t cant_entradas_tp;
 static u_int32_t tamanio_pagina;
+static u_int32_t cant_entradas_tp;
+static u_int32_t cant_niveles;
 
 int8_t conectar_memoria()
 {
@@ -27,9 +27,9 @@ int8_t conectar_memoria()
         return -1;
     }
 
-    cant_niveles = datos_paginacion->cantidad_niveles;
-    cant_entradas_tp = datos_paginacion->cantidad_entradas_tp;
     tamanio_pagina = datos_paginacion->tamanio_pagina;
+    cant_entradas_tp = datos_paginacion->cantidad_entradas_tp;
+    cant_niveles = datos_paginacion->cantidad_niveles;
     destruir_mem_datos_paginacion(datos_paginacion);
 
     return 0;

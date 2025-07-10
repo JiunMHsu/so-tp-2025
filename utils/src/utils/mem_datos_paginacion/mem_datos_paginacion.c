@@ -3,9 +3,9 @@
 t_mem_datos_paginacion *crear_mem_datos_paginacion(u_int32_t tamanio_pagina, u_int32_t cantidad_entradas_tp, u_int32_t cantidad_niveles)
 {
     t_mem_datos_paginacion *mem_datos_paginacion = malloc(sizeof(t_mem_datos_paginacion));
+    mem_datos_paginacion->tamanio_pagina = tamanio_pagina;
     mem_datos_paginacion->cantidad_entradas_tp = cantidad_entradas_tp;
     mem_datos_paginacion->cantidad_niveles = cantidad_niveles;
-    mem_datos_paginacion->tamanio_pagina = tamanio_pagina;
 
     return mem_datos_paginacion;
 }
