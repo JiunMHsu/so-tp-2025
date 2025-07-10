@@ -84,6 +84,7 @@ static void *atender_kernel(void *fd_ptr)
         break;
 
     case SWAP_OUT:
+        t_list *marcos = obtener_marcos_asignados(u_int32_t pid);
         break;
 
     case SWAP_IN:
@@ -146,17 +147,6 @@ static void *atender_cpu(void *fd_ptr)
 
         case ESCRIBIR:
             escritura = escribir_memoria_usuario(peticion->pid, peticion->direccion_fisica, peticion->buffer, peticion->tamanio_buffer);
-            enviar_senial(escritura, fd_cpu);
-            break;
-
-        case LEER_PAG:
-            lectura = leer_memoria_usuario(peticion->pid, peticion->direccion_fisica, tamanio_pagina);
-            responder_lectura(lectura, tamanio_pagina, fd_cpu);
-            free(lectura);
-            break;
-
-        case ESCRIBIR_PAG:
-            escritura = escribir_memoria_usuario(peticion->pid, peticion->direccion_fisica, peticion->buffer, tamanio_pagina);
             enviar_senial(escritura, fd_cpu);
             break;
 

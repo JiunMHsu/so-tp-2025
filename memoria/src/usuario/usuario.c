@@ -74,6 +74,18 @@ void *leer_memoria_usuario(u_int32_t pid, u_int32_t direccion_fisica, u_int32_t 
     return NULL;
 }
 
+void *leer_pagina_por_marco(u_int32_t marco)
+{
+    u_int32_t _dir = marco * get_tam_pagina();
+    void *pagina = malloc(get_tam_pagina());
+
+    pthread_mutex_lock(&memoria_usuario_mutex);
+    memcpy(pagina, memoria_usuario + _dir, get_tam_pagina());
+    pthread_mutex_unlock(&memoria_usuario_mutex);
+
+    return pagina;
+}
+
 static u_int32_t get_numero_de_frame(u_int32_t direccion_fisica)
 {
     return direccion_fisica / get_tam_pagina();

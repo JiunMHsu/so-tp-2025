@@ -89,3 +89,34 @@ char *obtener_instruccion(u_int32_t pid, u_int32_t program_counter)
 
     return instruccion == NULL ? NULL : strdup(instruccion);
 }
+
+u_int8_t swap_out_proceso(u_int32_t pid)
+{
+    t_list *marcos_asignados = obtener_marcos_asignados(pid);
+    if (marcos_asignados == NULL)
+    {
+        // TODO: revisar que hacer aca (swapeo exitoso?)
+        return 1; // no hay marcos asignados, no hay nada que hacer
+    }
+
+    t_list *paginas = list_create();
+    t_list_iterator *iterador_marcos = list_iterator_create(marcos_asignados);
+    while (list_iterator_has_next(iterador_marcos))
+    {
+        u_int32_t marco = *(u_int32_t *)list_iterator_next(iterador_marcos);
+        void *pagina = leer_pagina_por_marco(marco);
+        list_add(paginas, pagina);
+    }
+    list_iterator_destroy(iterador_marcos);
+
+    guardar_en_swap(pid, paginas);
+    liberar_frames(marcos_asignados);
+
+    list_destroy_and_destroy_elements(marcos_asignados, &free);
+    list_destroy_and_destroy_elements(paginas, &free);
+    return 1;
+}
+
+u_int8_t swap_in_proceso(u_int32_t pid) {}
+
+u_int8_t dump_proceso(u_int32_t pid) {}

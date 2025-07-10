@@ -11,5 +11,6 @@ void inicializar_espacio_usuario(void);
 
 u_int8_t escribir_memoria_usuario(u_int32_t pid, u_int32_t direccion_fisica, void *buffer, u_int32_t tamanio_buffer);
 void *leer_memoria_usuario(u_int32_t pid, u_int32_t direccion_fisica, u_int32_t tamanio_buffer);
+void *leer_pagina_por_marco(u_int32_t marco);
 
 #endif // MEMORIA_USUARIO_H
