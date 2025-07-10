@@ -2,6 +2,10 @@
 
 static int32_t fd_memoria;
 
+static u_int32_t cant_niveles;
+static u_int32_t cant_entradas_tp;
+static u_int32_t tamanio_pagina;
+
 int8_t conectar_memoria()
 {
     mem_address datos_memoria = get_memoria_address();
@@ -14,6 +18,19 @@ int8_t conectar_memoria()
         cerrar_conexion(fd_memoria);
         return -1;
     }
+
+    t_mem_datos_paginacion *datos_paginacion = recibir_mem_datos_paginacion(fd_memoria);
+    if (datos_paginacion == NULL)
+    {
+        log_mensaje_error("No se pudo recibir los datos de paginación de memoria");
+        cerrar_conexion(fd_memoria);
+        return -1;
+    }
+
+    cant_niveles = datos_paginacion->cantidad_niveles;
+    cant_entradas_tp = datos_paginacion->cantidad_entradas_tp;
+    tamanio_pagina = datos_paginacion->tamanio_pagina;
+    destruir_mem_datos_paginacion(datos_paginacion);
 
     return 0;
 }
@@ -61,21 +78,19 @@ void *recibir_contenido_pagina()
     return contenido_pagina;
 }
 
-// TODO: Implementar get_cantidad_niveles, get_cantidad_entradas_tp y get_tamanio_pagina
-
 u_int32_t get_cantidad_niveles()
 {
-    return 0;
+    return cant_niveles;
 }
 
 u_int32_t get_cantidad_entradas_tp()
 {
-    return 0;
+    return cant_entradas_tp;
 }
 
 u_int32_t get_tamanio_pagina()
 {
-    return 0;
+    return tamanio_pagina;
 }
 
 void enviar_peticion_instruccion(u_int32_t pid, u_int32_t program_counter)

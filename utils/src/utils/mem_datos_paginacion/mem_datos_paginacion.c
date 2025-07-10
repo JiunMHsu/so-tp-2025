@@ -30,6 +30,9 @@ void enviar_mem_datos_paginacion(u_int32_t fd_conexion, t_mem_datos_paginacion *
 t_mem_datos_paginacion *recibir_mem_datos_paginacion(u_int32_t fd_conexion)
 {
     t_list *paquete = recibir_paquete(fd_conexion);
+    if (paquete == NULL)
+        return NULL;
+
     t_mem_datos_paginacion *mem_datos_paginacion = malloc(sizeof(t_mem_datos_paginacion));
     mem_datos_paginacion->cantidad_entradas_tp = *(u_int32_t *)list_get(paquete, 0);
     mem_datos_paginacion->cantidad_niveles = *(u_int32_t *)list_get(paquete, 1);

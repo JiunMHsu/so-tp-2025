@@ -7,6 +7,7 @@
 #include <utils/protocol/protocol.h>
 #include <utils/mem_request/cpu.h>
 #include <utils/mem_response/mem_response.h>
+#include <utils/mem_datos_paginacion/mem_datos_paginacion.h>
 
 #include "config/config.h"
 #include "logger/logger.h"
