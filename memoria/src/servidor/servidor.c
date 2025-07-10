@@ -23,18 +23,18 @@ void iniciar_servidor()
         {
         case KERNEL:
             log_evento("Kernel conectado.");
-
             pthread_t atencion_kernel;
             pthread_create(&atencion_kernel, NULL, &atender_kernel, fd_cliente);
             pthread_detach(atencion_kernel);
             break;
+
         case CPU:
             log_evento("CPU conectado.");
-
             pthread_t atencion_cpu;
             pthread_create(&atencion_cpu, NULL, &atender_cpu, fd_cliente);
             pthread_detach(atencion_cpu);
             break;
+
         default:
             log_mensaje_error("Modulo desconocido.");
         }
@@ -134,7 +134,6 @@ static void *atender_cpu(void *fd_ptr)
         case OBTENER_MARCO:
             t_list *entradas_por_nivel = convertir_a_lista_entradas_por_nivel(peticion->entradas_por_nivel);
             int32_t marco = obtener_marco(peticion->pid, entradas_por_nivel);
-
             enviar_senial(marco, fd_cpu);
             list_destroy_and_destroy_elements(entradas_por_nivel, &free);
             break;
