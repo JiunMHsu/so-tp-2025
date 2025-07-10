@@ -11,8 +11,8 @@ typedef enum
     OBTENER_MARCO, // Acceso a tabla de páginas
     LEER,          // Acceso a espacio de usuario
     ESCRIBIR,      // Acceso a espacio de usuario
-    LEER_PAG,      // Acceso a espacio de usuario
-    ESCRIBIR_PAG   // Acceso a espacio de usuario
+    LEER_PAG,      // Acceso a página en memoria
+    ESCRIBIR_PAG   // Acceso a página en memoria
 } operacion_cpu_memoria;
 
 typedef struct
@@ -21,18 +21,15 @@ typedef struct
     u_int32_t pid;
     u_int32_t program_counter;  // Presente solo para FETCH_INSTRUCCION
     char *entradas_por_nivel;   // Presente solo para OBTENER_MARCO
-    u_int32_t direccion_fisica; // Presente para LEER y ESCRIBIR
-    u_int32_t frame;            // Presente para LEER_PAG y ESCRIBIR_PAG
-    u_int32_t tamanio_buffer;   // Presente para LEER y ESCRIBIR
-    void *buffer;               // Presente solo para ESCRIBIR
+    u_int32_t direccion_fisica; // Presente para LEER, ESCRIBIR, LEER_PAG y ESCRIBIR_PAG
+    u_int32_t tamanio_buffer;   // Presente solo para LEER y ESCRIBIR
+    void *buffer;               // Presente para ESCRIBIR y ESCRIBIR_PAG
 } t_peticion_cpu;
 
 t_peticion_cpu *crear_peticion_instruccion(u_int32_t pid, u_int32_t program_counter);
 t_peticion_cpu *crear_peticion_nro_marco(u_int32_t pid, char *entradas_por_nivel);
 t_peticion_cpu *crear_peticion_lectura(u_int32_t pid, u_int32_t direccion_fisica, u_int32_t tamanio_buffer);
 t_peticion_cpu *crear_peticion_escritura(u_int32_t pid, u_int32_t direccion_fisica, u_int32_t tamanio_buffer, void *buffer);
-t_peticion_cpu *crear_peticion_lectura_pagina(u_int32_t pid, u_int32_t frame, u_int32_t tamanio_buffer);
-t_peticion_cpu *crear_peticion_escritura_pagina(u_int32_t pid, u_int32_t frame, void *buffer);
 
 void enviar_peticion_cpu(int32_t fd_memoria, t_peticion_cpu *peticion);
 t_peticion_cpu *recibir_peticion_cpu(int32_t fd_conexion);
