@@ -1,6 +1,6 @@
 #include "mmu.h"
 
-static u_int32_t tlb_habilitada;
+static u_int32_t tlb_esta_habilitada;
 static u_int32_t cantidad_niveles;
 static u_int32_t cantidad_entradas_tp;
 static u_int32_t tamanio_pagina;
@@ -14,14 +14,14 @@ static u_int32_t potencia(u_int32_t base, u_int32_t exponente);
 
 void inicializar_mmu()
 {
-    tlb_habilitada = inicializar_tlb();
+    tlb_esta_habilitada = inicializar_tlb();
 
     cantidad_niveles = get_cantidad_niveles();
     cantidad_entradas_tp = get_cantidad_entradas_tp();
     tamanio_pagina = get_tamanio_pagina();
 }
 
-//TODO cambiar todas las firmas con pid => agregar get_pid de ciclo_instruccion
+// TODO cambiar todas las firmas con pid => agregar get_pid de ciclo_instruccion
 u_int32_t get_marco(u_int32_t direccion_logica)
 {
     u_int32_t numero_pagina = get_nro_pagina(direccion_logica);
@@ -111,8 +111,7 @@ u_int32_t get_offset(u_int32_t direccion_logica)
     return direccion_logica % tamanio_pagina;
 }
 
-void destruir_mmu()
+u_int32_t tlb_habilitada()
 {
-    destruir_cache();
-    destruir_tlb();
+    return tlb_esta_habilitada;
 }
