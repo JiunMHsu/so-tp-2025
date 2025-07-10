@@ -3,7 +3,7 @@
 static entrada_cache *memoria_cache;
 static algoritmo_sustitucion algoritmo;
 static u_int32_t cantidad_entradas;
-static u_int32_t habilitada;
+static u_int32_t esta_habilitada;
 static u_int32_t entrada_libre;
 static u_int32_t retardo_milisegundos;
 static u_int32_t puntero_clock;
@@ -15,11 +15,11 @@ void inicializar_cache()
 
     if (cantidad_entradas == 0)
     {
-        habilitada = 0;
+        esta_habilitada = 0;
     }
     else
     {
-        habilitada = 1;
+        esta_habilitada = 1;
 
         memoria_cache = malloc(cantidad_entradas * sizeof(entrada_cache));
 
@@ -47,7 +47,8 @@ void cachear_pagina(u_int32_t nro_pagina, u_int32_t marco)
 
         if (victima.bit_modificado)
         {
-            enviar_peticion_escritura_pagina(get_pid(), victima.marco, victima.contenido, get_tamanio_pagina()); // TODO sacar tamanio de pagina
+            enviar_peticion_escritura_pagina(get_pid(), get_direccion_fisica_por_marco(victima.marco), victima.contenido);
+            log_pagina_actualizada_cache_memoria(get_pid(), victima.pagina, victima.marco);
         }
 
         memoria_cache[indice_victima] = nueva_entrada;
@@ -144,7 +145,6 @@ entrada_cache crear_entrada(u_int32_t nro_pagina, u_int32_t marco)
     nueva_entrada.marco = marco;
 
     enviar_peticion_lectura_pagina(get_pid(), get_direccion_fisica_por_marco(marco));
-
     nueva_entrada.contenido = recibir_contenido_pagina();
 
     nueva_entrada.bit_uso = 1;
@@ -178,7 +178,7 @@ u_int32_t existe_pagina_cache(u_int32_t nro_pagina)
 
 u_int32_t cache_habilitada()
 {
-    return habilitada;
+    return esta_habilitada;
 }
 
 void limpiar_cache()
@@ -188,7 +188,10 @@ void limpiar_cache()
         entrada_cache entrada = memoria_cache[i];
 
         if (entrada.bit_modificado == 1)
-            enviar_peticion_escritura_pagina(get_pid(), entrada.marco, entrada.contenido);
+        {
+            enviar_peticion_escritura_pagina(get_pid(), get_direccion_fisica_por_marco(entrada.marco), entrada.contenido);
+            log_pagina_actualizada_cache_memoria(get_pid(), victima.pagina, victima.marco);
+        }
 
         destruir_entrada_cache(entrada);
     }
