@@ -117,6 +117,38 @@ u_int8_t swap_out_proceso(u_int32_t pid)
     return 1;
 }
 
-u_int8_t swap_in_proceso(u_int32_t pid) {}
+u_int8_t swap_in_proceso(u_int32_t pid)
+{
+    int32_t cantidad_paginas = get_cantidad_paginas(pid);
+    if (cantidad_paginas < 0)
+        return 0; // error al obtener cantidad de paginas
 
-u_int8_t dump_proceso(u_int32_t pid) {}
+    if (cantidad_paginas == 0)
+        return 1; // no estoy seguro si debería validar este caso
+
+    t_list *marcos_asignados = ocupar_frames(cantidad_paginas);
+    if (marcos_asignados == NULL)
+        return 0; // no hay suficientes frames libres
+
+    t_list *paginas_recuperadas = recuperar_de_swap(pid);
+    for (int i = 0; i < cantidad_paginas; i++)
+    {
+        void *pagina = list_get(paginas_recuperadas, i);
+        u_int32_t marco = *(u_int32_t *)list_get(marcos_asignados, i);
+        escribir_marco_entero(marco, pagina);
+    }
+
+    // se asume que la cantidad de paginas no cambia, es decir, se reemplazan
+    // justo los marcos que se habían asignado antes del swap out
+    cargar_marcos_asignados(pid, marcos_asignados);
+
+    list_clean_and_destroy_elements(marcos_asignados, &free);
+    list_destroy_and_destroy_elements(paginas_recuperadas, &free);
+    return 1;
+}
+
+// TODO: dump_proceso
+u_int8_t dump_proceso(u_int32_t pid)
+{
+    return 0;
+}

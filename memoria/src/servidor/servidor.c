@@ -84,10 +84,13 @@ static void *atender_kernel(void *fd_ptr)
         break;
 
     case SWAP_OUT:
-        t_list *marcos = obtener_marcos_asignados(u_int32_t pid);
+        resultado = swap_out_proceso(paquete->pid);
+        enviar_senial(resultado, fd_kernel);
         break;
 
     case SWAP_IN:
+        resultado = swap_in_proceso(paquete->pid);
+        enviar_senial(resultado, fd_kernel);
         break;
 
     default: // no debería ocurrir nunca
@@ -116,8 +119,6 @@ static void *atender_cpu(void *fd_ptr)
         }
 
         retardo_respuesta();
-        u_int32_t direccion_fisica = 0;
-        int32_t tamanio_pagina = get_tam_pagina();
         void *lectura = NULL;
         u_int8_t escritura = 0;
 
@@ -125,7 +126,6 @@ static void *atender_cpu(void *fd_ptr)
         {
         case FETCH_INSTRUCCION:
             char *instruccion = obtener_instruccion(peticion->pid, peticion->program_counter);
-
             log_obtencion_instruccion(peticion->pid, peticion->program_counter, instruccion);
             enviar_mensaje(instruccion, fd_cpu);
             free(instruccion); // si obtener instruccion no hiciera strdup, no haría falta
