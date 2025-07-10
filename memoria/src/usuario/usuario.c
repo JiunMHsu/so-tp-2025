@@ -74,6 +74,16 @@ void *leer_memoria_usuario(u_int32_t pid, u_int32_t direccion_fisica, u_int32_t 
     return NULL;
 }
 
+static u_int32_t get_numero_de_frame(u_int32_t direccion_fisica)
+{
+    return direccion_fisica / get_tam_pagina();
+}
+
+// Las siguientes funciones son auxiliares para manejar la memoria de usuario.
+// No se si corresponden hacer log de "acceso_espacio_usuario" ya que no son accesos directos de un proceso,
+// sino que son funciones internas de la memoria.
+// Sirven para hacer memory dumps y swapping
+
 void *leer_pagina_por_marco(u_int32_t marco)
 {
     u_int32_t _dir = marco * get_tam_pagina();
@@ -109,9 +119,4 @@ t_list *leer_paginas_por_marcos(t_list *marcos)
     list_iterator_destroy(iterador_marcos);
 
     return paginas;
-}
-
-static u_int32_t get_numero_de_frame(u_int32_t direccion_fisica)
-{
-    return direccion_fisica / get_tam_pagina();
 }
