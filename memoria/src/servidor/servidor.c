@@ -23,18 +23,18 @@ void iniciar_servidor()
         {
         case KERNEL:
             log_evento("Kernel conectado.");
-
             pthread_t atencion_kernel;
             pthread_create(&atencion_kernel, NULL, &atender_kernel, fd_cliente);
             pthread_detach(atencion_kernel);
             break;
+
         case CPU:
             log_evento("CPU conectado.");
-
             pthread_t atencion_cpu;
             pthread_create(&atencion_cpu, NULL, &atender_cpu, fd_cliente);
             pthread_detach(atencion_cpu);
             break;
+
         default:
             log_mensaje_error("Modulo desconocido.");
         }
@@ -64,7 +64,7 @@ static void *atender_kernel(void *fd_ptr)
         return NULL;
 
     retardo_respuesta();
-    u_int8_t resultado;
+    u_int8_t resultado = 0;
 
     switch (paquete->operacion)
     {
@@ -72,27 +72,29 @@ static void *atender_kernel(void *fd_ptr)
         resultado = crear_proceso(paquete->pid,
                                   paquete->tamanio,
                                   paquete->path);
-        enviar_senial(resultado, fd_kernel);
         break;
 
     case FINALIZAR_PROCESO:
         resultado = finalizar_proceso(paquete->pid);
-        enviar_senial(resultado, fd_kernel);
         break;
 
     case DUMP_PROCESO:
+        resultado = dump_proceso(paquete->pid);
         break;
 
     case SWAP_OUT:
+        resultado = swap_out_proceso(paquete->pid);
         break;
 
     case SWAP_IN:
+        resultado = swap_in_proceso(paquete->pid);
         break;
 
     default: // no debería ocurrir nunca
         break;
     }
 
+    enviar_senial(resultado, fd_kernel);
     destruir_kernel_mem_request(paquete);
     close(fd_kernel);
     return NULL;
@@ -115,8 +117,6 @@ static void *atender_cpu(void *fd_ptr)
         }
 
         retardo_respuesta();
-        u_int32_t direccion_fisica = 0;
-        int32_t tamanio_pagina = get_tam_pagina();
         void *lectura = NULL;
         u_int8_t escritura = 0;
 
@@ -124,7 +124,6 @@ static void *atender_cpu(void *fd_ptr)
         {
         case FETCH_INSTRUCCION:
             char *instruccion = obtener_instruccion(peticion->pid, peticion->program_counter);
-
             log_obtencion_instruccion(peticion->pid, peticion->program_counter, instruccion);
             enviar_mensaje(instruccion, fd_cpu);
             free(instruccion); // si obtener instruccion no hiciera strdup, no haría falta
@@ -133,7 +132,6 @@ static void *atender_cpu(void *fd_ptr)
         case OBTENER_MARCO:
             t_list *entradas_por_nivel = convertir_a_lista_entradas_por_nivel(peticion->entradas_por_nivel);
             int32_t marco = obtener_marco(peticion->pid, entradas_por_nivel);
-
             enviar_senial(marco, fd_cpu);
             list_destroy_and_destroy_elements(entradas_por_nivel, &free);
             break;
@@ -146,17 +144,6 @@ static void *atender_cpu(void *fd_ptr)
 
         case ESCRIBIR:
             escritura = escribir_memoria_usuario(peticion->pid, peticion->direccion_fisica, peticion->buffer, peticion->tamanio_buffer);
-            enviar_senial(escritura, fd_cpu);
-            break;
-
-        case LEER_PAG:
-            lectura = leer_memoria_usuario(peticion->pid, peticion->direccion_fisica, tamanio_pagina);
-            responder_lectura(lectura, tamanio_pagina, fd_cpu);
-            free(lectura);
-            break;
-
-        case ESCRIBIR_PAG:
-            escritura = escribir_memoria_usuario(peticion->pid, peticion->direccion_fisica, peticion->buffer, tamanio_pagina);
             enviar_senial(escritura, fd_cpu);
             break;
 

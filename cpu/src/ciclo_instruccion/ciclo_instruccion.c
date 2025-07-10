@@ -2,6 +2,7 @@
 
 static int8_t hay_syscall;
 static u_int32_t global_program_counter;
+static u_int32_t pid_global;
 
 static char *fetch(u_int32_t pid, u_int32_t program_counter);
 static instruccion_ejecutable decode(char *instruccion_recibida);
@@ -13,6 +14,7 @@ fin_ejecucion ejecutar_ciclo_instruccion(u_int32_t pid, u_int32_t program_counte
 {
     hay_syscall = 0;
     global_program_counter = program_counter;
+    pid_global = pid;
     fin_ejecucion fin_de_ejecucion;
 
     char *instruccion_str = NULL;
@@ -40,6 +42,12 @@ fin_ejecucion ejecutar_ciclo_instruccion(u_int32_t pid, u_int32_t program_counte
         destruir_instruccion_ejecutable(instruccion);
         free(instruccion_str);
     }
+
+    if (tlb_habilitada())
+        limpiar_tlb();
+
+    if (cache_habilitada())
+        limpiar_cache();
 
     destruir_instruccion_ejecutable(instruccion);
     free(instruccion_str);
@@ -90,4 +98,9 @@ static fin_ejecucion crear_fin_ejecucion(motivo_desalojo motivo, u_int32_t progr
     resultado.syscall = syscall ? strdup(syscall) : NULL;
 
     return resultado;
+}
+
+u_int32_t get_pid()
+{
+    return pid_global;
 }

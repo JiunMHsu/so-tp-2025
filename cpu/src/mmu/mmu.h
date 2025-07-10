@@ -5,15 +5,21 @@
 #include <string.h>
 #include <math.h>
 #include <commons/string.h>
-#include <conexion/memoria.h>
-#include "utils/mem_request/cpu.h"
-#include "logger/logger.h"
+#include <utils/mem_request/cpu.h>
+
 #include "config/config.h"
+#include "logger/logger.h"
+#include "conexion/memoria.h"
 #include "tlb/tlb.h"
 #include "cache/cache.h"
+#include "ciclo_instruccion/ciclo_instruccion.h"
 
 void inicializar_mmu();
-u_int32_t get_direccion_fisica(u_int32_t pid, u_int32_t direccion_logica);
-void destruir_mmu();
+u_int32_t get_direccion_fisica(u_int32_t direccion_logica);
+u_int32_t get_direccion_fisica_por_marco(u_int32_t marco);
+u_int32_t get_offset(u_int32_t direccion_logica);
+u_int32_t get_nro_pagina(u_int32_t direccion_logica);
+u_int32_t get_marco(u_int32_t direccion_logica);
+u_int32_t tlb_habilitada();
 
 #endif

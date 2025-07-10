@@ -8,6 +8,9 @@
 
 #include "logger/logger.h"
 #include "ciclo_instruccion/ciclo_instruccion.h"
+#include "mmu/mmu.h"
+#include "cache/cache.h"
+#include "conexion/memoria.h"
 
 typedef struct
 {

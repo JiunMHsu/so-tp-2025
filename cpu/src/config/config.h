@@ -35,6 +35,7 @@ u_int32_t get_entradas_tlb(void);
 u_int32_t get_entradas_cache(void);
 algoritmo_sustitucion get_algoritmo_sustitucion_tlb();
 algoritmo_sustitucion get_algoritmo_sustitucion_cache();
+u_int32_t get_retardo();
 kernel_address get_kernel_address();
 mem_address get_memoria_address();
 t_log_level get_log_level();
