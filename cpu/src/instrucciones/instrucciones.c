@@ -55,8 +55,8 @@ static void _write(char **parametros)
     }
     else
     {
-        u_int32_t direccion_fisica = get_direccion_fisica(get_pid(), direccion_logica);
-        enviar_peticion_escritura(get_pid(), direccion_fisica, (void *)datos, string_length(datos)); // TODO revisar parametros
+        u_int32_t direccion_fisica = get_direccion_fisica(direccion_logica);
+        enviar_peticion_escritura(get_pid(), direccion_fisica, (void *)datos, string_length(datos));
         log_operacion_acceso_memoria(get_pid(), ESCRITURA, direccion_fisica, datos);
     }
 }
@@ -81,7 +81,7 @@ static void _read(char **parametros)
     }
     else
     {
-        u_int32_t direccion_fisica = get_direccion_fisica(get_pid(), direccion_logica);
+        u_int32_t direccion_fisica = get_direccion_fisica(direccion_logica);
         enviar_peticion_lectura(get_pid(), direccion_fisica, tamanio_lectura);
         datos_leidos = recibir_datos_lectura();
         log_operacion_acceso_memoria(get_pid(), LECTURA, direccion_fisica, (char *)datos_leidos);

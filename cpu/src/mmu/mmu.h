@@ -5,10 +5,11 @@
 #include <string.h>
 #include <math.h>
 #include <commons/string.h>
-#include <conexion/memoria.h>
-#include "utils/mem_request/cpu.h"
-#include "logger/logger.h"
+#include <utils/mem_request/cpu.h>
+
 #include "config/config.h"
+#include "logger/logger.h"
+#include "conexion/memoria.h"
 #include "tlb/tlb.h"
 #include "cache/cache.h"
 #include "ciclo_instruccion/ciclo_instruccion.h"

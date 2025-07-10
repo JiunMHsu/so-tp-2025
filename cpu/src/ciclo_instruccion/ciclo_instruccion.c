@@ -43,8 +43,6 @@ fin_ejecucion ejecutar_ciclo_instruccion(u_int32_t pid, u_int32_t program_counte
         free(instruccion_str);
     }
 
-    // TODO
-
     if (tlb_habilitada())
         limpiar_tlb();
 
