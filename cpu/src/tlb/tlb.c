@@ -114,7 +114,7 @@ static entrada_tlb crear_entrada(u_int32_t pagina, u_int32_t marco)
     return nueva_entrada;
 }
 
-void destruir_tlb()
+void limpiar_tlb()
 {
-    free(tlb); // TODO: por ahora no tiene info a liberar dentro
+    entrada_libre = 0;
 }
