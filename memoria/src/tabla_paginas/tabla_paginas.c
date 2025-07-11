@@ -95,10 +95,15 @@ int32_t obtener_marco(u_int32_t pid, t_list *entradas)
     if (!tabla)
         return marco;
 
-    for (int nivel = 0; nivel < get_cantidad_niveles(); nivel++)
+    u_int32_t cantidad_niveles = get_cantidad_niveles();
+
+    for (int nivel = 0; nivel < cantidad_niveles; nivel++)
     {
         u_int32_t nro_entrada = *(u_int32_t *)list_get(entradas, nivel);
         t_entrada *entrada = list_get(tabla->entradas, nro_entrada);
+
+        incrementar_acceso_tabla(pid);
+
         if (entrada->siguiente == NULL)
             return entrada->marco;
 

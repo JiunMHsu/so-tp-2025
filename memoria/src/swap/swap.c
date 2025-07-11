@@ -87,7 +87,6 @@ void guardar_en_swap(u_int32_t pid, t_list *paginas)
 
     free(_pid);
     usleep(get_retardo_swap() * 1000);
-    incrementar_swap_out(pid);
 }
 
 t_list *recuperar_de_swap(u_int32_t pid)
@@ -131,7 +130,6 @@ t_list *recuperar_de_swap(u_int32_t pid)
 
     free(_pid);
     usleep(get_retardo_swap() * 1000);
-    incrementar_swap_in(pid);
 
     return paginas_recuperadas;
 }
