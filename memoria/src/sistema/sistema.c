@@ -146,6 +146,7 @@ u_int8_t swap_in_proceso(u_int32_t pid)
 
     list_clean_and_destroy_elements(marcos_asignados, &free);
     list_destroy_and_destroy_elements(paginas_recuperadas, &free);
+
     return 1;
 }
 
