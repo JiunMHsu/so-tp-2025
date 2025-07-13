@@ -17,35 +17,33 @@ static int64_t get_rafaga_restante_estimado(t_pcb *pcb);
 static t_pcb *_es_de_menor_rafaga(t_pcb *proceso_a, t_pcb *proceso_b);
 static t_pcb *_mayor_rafaga_restante(t_pcb *a, t_pcb *b);
 
-static void *planificar_por_fifo(void *_);
-static void *planificar_por_sjf(void *_);
-static void *planificar_por_srt(void *_);
+static void *planificar_por_fifo();
+static void *planificar_por_sjf();
+static void *planificar_por_srt();
 
-static void *manejar_desalojado(void *_);
+static void *manejar_desalojado();
 
-void inicializar_planificador_corto_plazo(q_estado *q_ready, q_estado *q_executing)
+void inicializar_planificador_corto_plazo()
 {
-    q_ready = q_ready;
-    q_executing = q_executing;
+    q_ready = crear_estado(READY);
+    q_executing = crear_estado(EXEC);
 
     alpha = get_alfa_estimacion();
     estimacion_inicial = get_estimacion_inicial();
 
     void *(*planificador_corto_plazo)(void *) = NULL;
+    algoritmo_en_uso = get_alg_plani_corto_plazo();
 
-    switch (get_alg_plani_corto_plazo())
+    switch (algoritmo_en_uso)
     {
     case FIFO:
         planificador_corto_plazo = &planificar_por_fifo;
-        algoritmo_en_uso = FIFO;
         break;
     case SJF:
         planificador_corto_plazo = &planificar_por_sjf;
-        algoritmo_en_uso = SJF;
         break;
     case SRT:
         planificador_corto_plazo = &planificar_por_srt;
-        algoritmo_en_uso = SRT;
         break;
     default:
         log_mensaje_error("Algoritmo de planificación de corto plazo no soportado.");
@@ -54,10 +52,10 @@ void inicializar_planificador_corto_plazo(q_estado *q_ready, q_estado *q_executi
 
     pthread_t rutinas[2];
 
-    pthread_create(&rutinas[0], NULL, planificador_corto_plazo, NULL);
+    pthread_create(&(rutinas[0]), NULL, planificador_corto_plazo, NULL);
     pthread_detach(rutinas[0]);
 
-    pthread_create(&rutinas[1], NULL, &manejar_desalojado, NULL);
+    pthread_create(&(rutinas[1]), NULL, &manejar_desalojado, NULL);
     pthread_detach(rutinas[1]);
 }
 
@@ -86,7 +84,7 @@ static t_pcb *_es_de_menor_rafaga(t_pcb *proceso_a, t_pcb *proceso_b)
     return proceso_b;
 }
 
-static void *planificar_por_fifo(void *_)
+static void *planificar_por_fifo()
 {
     while (1)
     {
@@ -99,7 +97,7 @@ static void *planificar_por_fifo(void *_)
     return NULL;
 }
 
-static void *planificar_por_sjf(void *_)
+static void *planificar_por_sjf()
 {
     hay_cpu_libre = malloc(sizeof(sem_t));
     sem_init(hay_cpu_libre, 0, 1);
@@ -130,7 +128,7 @@ static t_pcb *_mayor_rafaga_restante(t_pcb *proceso_a, t_pcb *proceso_b)
     return proceso_b;
 }
 
-static void *planificar_por_srt(void *_)
+static void *planificar_por_srt()
 {
     puede_replanificar = malloc(sizeof(sem_t));
     sem_init(puede_replanificar, 0, 1);
@@ -164,7 +162,7 @@ static void *planificar_por_srt(void *_)
     return NULL;
 }
 
-static void *manejar_desalojado(void *_)
+static void *manejar_desalojado()
 {
     while (1)
     {

@@ -10,6 +10,7 @@
 
 #include "config/config.h"
 #include "logger/logger.h"
+#include "servidor/servidor.h"
 
 /**
  * @brief Solicita la creación de un proceso en memoria.

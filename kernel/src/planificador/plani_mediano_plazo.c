@@ -1,8 +1,8 @@
 #include "plani_mediano_plazo.h"
 
-static q_estado *q_susp_ready;
-static q_estado *q_susp_blocked;
 static q_estado *q_blocked;
+static q_estado *q_susp_blocked;
+static q_estado *q_susp_ready;
 
 static algoritmo_planificacion algoritmo;
 
@@ -20,13 +20,11 @@ static t_cronometro *crear_cronometro(u_int64_t tiempo_espera);
 static bool _cronometro_libre(void *_cronometro);
 static void *cronometrar(void *_cronometro);
 
-void inicializar_planificador_mediano_plazo(q_estado *q_susp_ready,
-                                            q_estado *q_susp_blocked,
-                                            q_estado *q_blocked)
+void inicializar_planificador_mediano_plazo()
 {
-    q_susp_ready = q_susp_ready;
-    q_susp_blocked = q_susp_blocked;
-    q_blocked = q_blocked;
+    q_blocked = crear_estado(BLOCKED);
+    q_susp_blocked = crear_estado(SUSPENDED_BLOCKED);
+    q_susp_ready = crear_estado(SUSPENDED_READY);
 
     algoritmo = get_alg_ingreso_a_ready();
 

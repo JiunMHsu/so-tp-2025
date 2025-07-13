@@ -12,16 +12,16 @@ static sem_t *puede_crearse_proceso;
 static void *admitir_proceso(void *_);
 static void *finalizar_proceso(void *_);
 
-void inicializar_planificador_largo_plazo(q_estado *q_new, q_estado *q_exit)
+void inicializar_planificador_largo_plazo()
 {
     puede_crearse_proceso = malloc(sizeof(sem_t));
-    sem_init(puede_crearse_proceso, 0, 1);
+    sem_init(puede_crearse_proceso, 0, 0);
 
     pid_count = 0;
 
     algoritmo = get_alg_ingreso_a_ready();
-    q_new = q_new;
-    q_exit = q_exit;
+    q_new = crear_estado(NEW);
+    q_exit = crear_estado(EXIT);
 
     pthread_t rutinas[2];
 

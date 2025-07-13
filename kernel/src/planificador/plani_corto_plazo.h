@@ -13,7 +13,7 @@
 #include "recursos/cpu.h"
 #include "syscalls/syscalls.h"
 
-void inicializar_planificador_corto_plazo(q_estado *q_ready, q_estado *q_executing);
+void inicializar_planificador_corto_plazo(void);
 
 void insertar_en_ready(t_pcb *proceso);
 

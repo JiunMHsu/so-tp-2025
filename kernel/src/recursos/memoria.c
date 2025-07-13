@@ -48,6 +48,7 @@ static int32_t enviar_solicitud(t_kernel_mem_req *mem_request)
     {
         log_mensaje_error("Error al recibir respuesta de memoria");
         desconectar_memoria(fd_memoria);
+        finalizar_servidor();
         exit(EXIT_FAILURE);
     }
 

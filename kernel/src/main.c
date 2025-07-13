@@ -14,7 +14,7 @@ int main(int argc, char *argv[])
     }
 
     char *pseudocodigo = argv[1];
-    u_int32_t tamanio_proceso = argv[2] ? atoi(argv[2]) : 0;
+    u_int32_t tamanio_proceso = atoi(argv[2]);
 
     signal(SIGINT, &finalizar_servidor_por_sigint);
 

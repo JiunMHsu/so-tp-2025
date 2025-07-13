@@ -23,9 +23,7 @@ typedef struct
     pthread_t rutina_consumo;
 } t_cronometro;
 
-void inicializar_planificador_mediano_plazo(q_estado *blocked,
-                                            q_estado *q_susp_blocked,
-                                            q_estado *q_susp_ready);
+void inicializar_planificador_mediano_plazo(void);
 
 void insertar_en_blocked(t_pcb *proceso);
 
