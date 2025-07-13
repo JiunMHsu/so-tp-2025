@@ -13,7 +13,7 @@ void inicializar_espacio_sistema()
     inicializar_tabla_de_paginas();
 }
 
-u_int8_t crear_proceso(u_int32_t pid, u_int32_t tamanio, char *path)
+u_int8_t crear_proceso(u_int32_t pid, u_int32_t tamanio, char *ejecutable)
 {
     u_int32_t frames_necesarios = (u_int32_t)ceil((double)tamanio / get_tam_pagina());
 
@@ -21,7 +21,7 @@ u_int8_t crear_proceso(u_int32_t pid, u_int32_t tamanio, char *path)
     if (frames_asignados == NULL)
         return 0; // no hay suficientes frames libres
 
-    dictionary_put(procesos_instrucciones, string_itoa(pid), leer_instrucciones(path));
+    dictionary_put(procesos_instrucciones, string_itoa(pid), leer_instrucciones(ejecutable));
     crear_metricas_para(pid);
     crear_tablas_para(pid);
     cargar_marcos_asignados(pid, frames_asignados);
@@ -32,9 +32,14 @@ u_int8_t crear_proceso(u_int32_t pid, u_int32_t tamanio, char *path)
     return 1;
 }
 
-static t_list *leer_instrucciones(char *path)
+static t_list *leer_instrucciones(char *ejecutable)
 {
-    FILE *archivo = fopen(path, "r");
+    char *path_completo = string_new();
+    char *path_base = get_path_instrucciones();
+    string_append(&path_completo, path_base);
+    string_append(&path_completo, ejecutable);
+
+    FILE *archivo = fopen(path_completo, "r");
 
     if (archivo == NULL)
     {

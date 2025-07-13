@@ -53,6 +53,11 @@ char *get_path_swapfile()
     return config_get_string_value(memoria_config, "PATH_SWAPFILE");
 }
 
+char *get_path_instrucciones()
+{
+    return config_get_string_value(memoria_config, "PATH_INSTRUCCIONES");
+}
+
 int32_t get_retardo_swap()
 {
     return config_get_int_value(memoria_config, "RETARDO_SWAP");

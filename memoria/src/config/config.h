@@ -18,6 +18,7 @@ int32_t get_entradas_por_tabla(void);
 int32_t get_cantidad_niveles(void);
 int32_t get_retardo_memoria(void);
 char *get_path_swapfile(void);
+char *get_path_instrucciones(void);
 int32_t get_retardo_swap(void);
 char *get_dump_path(void);
 
