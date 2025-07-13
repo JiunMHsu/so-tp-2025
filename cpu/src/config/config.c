@@ -2,9 +2,9 @@
 
 t_config *cpu_config;
 
-void iniciar_config()
+void iniciar_config(char* file_name)
 {
-    cpu_config = config_create(CONFIG_FILE);
+    cpu_config = config_create(file_name);
 }
 
 void destruir_config()

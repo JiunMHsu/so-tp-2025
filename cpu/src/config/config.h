@@ -6,8 +6,6 @@
 #include <commons/config.h>
 #include <commons/log.h>
 
-#define CONFIG_FILE "cpu.config"
-
 typedef struct
 {
     char *ip;
@@ -29,7 +27,7 @@ typedef enum
     CLOCK_M
 } algoritmo_sustitucion;
 
-void iniciar_config(void);
+void iniciar_config(char* file_name);
 void destruir_config(void);
 u_int32_t get_entradas_tlb(void);
 u_int32_t get_entradas_cache(void);
