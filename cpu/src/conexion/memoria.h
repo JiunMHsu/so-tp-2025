@@ -15,7 +15,7 @@
 int8_t conectar_memoria(void);
 void cerrar_conexion_memoria(void);
 
-char *recibir_mensaje_memoria(void);
+char *recibir_instruccion(void);
 u_int32_t recibir_marco(void);
 void *recibir_contenido_pagina(void);
 void *recibir_datos_lectura(void);

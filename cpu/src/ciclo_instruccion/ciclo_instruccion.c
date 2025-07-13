@@ -58,7 +58,7 @@ static char *fetch(u_int32_t pid, u_int32_t program_counter)
 {
     log_fetch_instruccion(pid, program_counter);
     enviar_peticion_instruccion(pid, program_counter);
-    return recibir_mensaje_memoria();
+    return recibir_instruccion();
 }
 
 static instruccion_ejecutable decode(char *instruccion_recibida)

@@ -41,7 +41,7 @@ void cerrar_conexion_memoria()
     cerrar_conexion(fd_memoria);
 }
 
-char *recibir_mensaje_memoria()
+char *recibir_instruccion()
 {
     return recibir_mensaje(fd_memoria);
 }
