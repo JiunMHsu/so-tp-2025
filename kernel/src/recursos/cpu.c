@@ -122,6 +122,7 @@ static t_cpu *crear_cpu(char *id, int32_t fd_dispatch, int32_t fd_interrupt)
     cpu->fd_interrupt = fd_interrupt;
     cpu->proceso = NULL;
     pthread_mutex_init(&(cpu->mutex_proceso), NULL);
+    cpu->hay_proceso = malloc(sizeof(sem_t));
     sem_init(cpu->hay_proceso, 0, 0);
 
     return cpu;
