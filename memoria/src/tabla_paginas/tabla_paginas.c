@@ -77,7 +77,10 @@ void cargar_marcos_asignados(u_int32_t pid, t_list *frames_asignados)
     t_tabla *tabla_raiz = buscar_por_pid(pid);
     t_list *entradas_ultimo_nivel = get_entradas_ultimo_nivel(tabla_raiz);
 
-    for (int i = 0; i < list_size(entradas_ultimo_nivel); i++)
+    // se evalúa por tamaño de frames asignados
+    // se supone que la cantidad de frames asignados serán siempre menor
+    // o igual a la cantidad de entradas del último nivel (cantidad de marcos direccionables)
+    for (int i = 0; i < list_size(frames_asignados); i++)
     {
         t_entrada *entrada = list_get(entradas_ultimo_nivel, i);
 
