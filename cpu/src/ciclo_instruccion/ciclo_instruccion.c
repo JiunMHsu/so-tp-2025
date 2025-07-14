@@ -22,6 +22,12 @@ fin_ejecucion ejecutar_ciclo_instruccion(u_int32_t pid, u_int32_t program_counte
     while (1)
     {
         instruccion_str = fetch(pid, global_program_counter);
+        if (instruccion_str == NULL)
+        {
+            log_mensaje_error("NULL instruction received");
+            exit(EXIT_FAILURE);
+        }
+
         instruccion = decode(instruccion_str);
 
         execute(instruccion);

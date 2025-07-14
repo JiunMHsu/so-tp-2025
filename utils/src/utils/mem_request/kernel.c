@@ -40,7 +40,7 @@ t_kernel_mem_req *recibir_kernel_mem_request(int32_t fd_kernel)
     mem_request->path = NULL;
 
     if (mem_request->operacion == INICIAR_PROCESO)
-        mem_request->path = strdup((char *)list_get(paquete, 2));
+        mem_request->path = strdup((char *)list_get(paquete, 3));
 
     list_destroy_and_destroy_elements(paquete, &free);
     return mem_request;
