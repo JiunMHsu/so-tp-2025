@@ -1,6 +1,7 @@
 #include "cpu.h"
 
 static t_mutex_list *cpus;
+static t_mutex_queue *cpus_libres;
 
 static sem_t *hay_cpu_libre;
 static sem_t *hay_desalojado;
@@ -16,6 +17,7 @@ static t_cpu *buscar_libre(void);
 void inicializar_cpu()
 {
     cpus = mlist_create();
+    cpus_libres = mqueue_create();
     desalojados = mqueue_create();
 
     hay_cpu_libre = malloc(sizeof(sem_t));
@@ -44,14 +46,15 @@ void conectar_cpu(char *id_cpu, int32_t fd_dispatch, int32_t fd_interrupt)
     pthread_detach(hilo_ejecucion);
 
     mlist_add(cpus, cpu);
+    mqueue_push(cpus_libres, cpu);
     sem_post(hay_cpu_libre);
 }
 
 void ejecutar(t_pcb *proceso)
 {
-    sem_wait(hay_cpu_libre);
+    sem_wait(hay_cpu_libre); //creo que no hace falta si pop es bloquiante
 
-    t_cpu *cpu_libre = buscar_libre();
+    t_cpu *cpu_libre = queue_pop(cpus_libres); 
 
     pthread_mutex_lock(&(cpu_libre->mutex_proceso));
     cpu_libre->proceso = proceso;
@@ -90,6 +93,7 @@ static void *_ejecutar(void *_cpu)
         cpu->proceso = NULL;
         pthread_mutex_unlock(&(cpu->mutex_proceso));
 
+        queue_push(cpus_libres, cpu);
         sem_post(hay_cpu_libre);
     }
 
@@ -161,7 +165,7 @@ static t_cpu *buscar_por_pid(u_int32_t pid)
     return (t_cpu *)mlist_find(cpus, &_tiene_pid);
 }
 
-static t_cpu *buscar_libre(void)
+static t_cpu *buscar_libre(void)     //ya no hace falta
 {
     int32_t _esta_libre(void *_cpu)
     {
