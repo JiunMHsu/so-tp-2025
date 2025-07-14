@@ -1,6 +1,7 @@
 #include "cpu.h"
 
 static t_mutex_list *cpus;
+static t_mutex_queue *cpus_libres;
 
 static sem_t *hay_cpu_libre;
 static sem_t *hay_desalojado;
@@ -11,11 +12,11 @@ static void *_ejecutar(void *_cpu);
 static t_cpu *crear_cpu(char *id, int32_t fd_dispatch, int32_t fd_interrupt);
 static t_cpu *buscar_por_id(char *id);
 static t_cpu *buscar_por_pid(u_int32_t pid);
-static t_cpu *buscar_libre(void);
 
 void inicializar_cpu()
 {
     cpus = mlist_create();
+    cpus_libres = mqueue_create();
     desalojados = mqueue_create();
 
     hay_cpu_libre = malloc(sizeof(sem_t));
@@ -44,14 +45,14 @@ void conectar_cpu(char *id_cpu, int32_t fd_dispatch, int32_t fd_interrupt)
     pthread_detach(hilo_ejecucion);
 
     mlist_add(cpus, cpu);
+    mqueue_push(cpus_libres, cpu);
     sem_post(hay_cpu_libre);
 }
 
 void ejecutar(t_pcb *proceso)
 {
     sem_wait(hay_cpu_libre);
-
-    t_cpu *cpu_libre = buscar_libre();
+    t_cpu *cpu_libre = mqueue_pop(cpus_libres);
 
     pthread_mutex_lock(&(cpu_libre->mutex_proceso));
     cpu_libre->proceso = proceso;
@@ -78,18 +79,26 @@ static void *_ejecutar(void *_cpu)
         pthread_mutex_lock(&(cpu->mutex_proceso));
         u_int32_t pid = cpu->proceso->pid;
         u_int32_t program_counter = cpu->proceso->program_counter;
+        pthread_mutex_unlock(&(cpu->mutex_proceso));
 
         t_peticion_ejecucion *peticion = crear_peticion_ejecucion(pid, program_counter);
         enviar_peticion_ejecucion(fd_dispatch, peticion);
         destruir_peticion_ejecucion(peticion);
 
         t_desalojo *desalojado = recibir_desalojo(fd_dispatch);
-        mqueue_push(desalojados, desalojado);
-        sem_post(hay_desalojado);
 
+        // si se recibe un desalojo, se marca inmediatamente el proceso como NULL
+        // es para evitar que se envíe una interrupción a la CPU.
+        // igualmente va a pasar que se envíe interrupciones cuando el proceso ya está desalojado,
+        // es responsabilidad de la CPU ignorar esas señales.
+        pthread_mutex_lock(&(cpu->mutex_proceso)); 
         cpu->proceso = NULL;
         pthread_mutex_unlock(&(cpu->mutex_proceso));
 
+        mqueue_push(desalojados, desalojado);
+        sem_post(hay_desalojado);
+
+        mqueue_push(cpus_libres, cpu);
         sem_post(hay_cpu_libre);
     }
 
@@ -159,20 +168,4 @@ static t_cpu *buscar_por_pid(u_int32_t pid)
     };
 
     return (t_cpu *)mlist_find(cpus, &_tiene_pid);
-}
-
-static t_cpu *buscar_libre(void)
-{
-    int32_t _esta_libre(void *_cpu)
-    {
-        t_cpu *cpu = (t_cpu *)_cpu;
-
-        pthread_mutex_lock(&(cpu->mutex_proceso));
-        int8_t ret = cpu->proceso == NULL;
-        pthread_mutex_unlock(&(cpu->mutex_proceso));
-
-        return ret;
-    };
-
-    return (t_cpu *)mlist_find(cpus, &_esta_libre);
 }
