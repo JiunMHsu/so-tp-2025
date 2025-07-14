@@ -85,7 +85,8 @@ void log_metricas_proceso(u_int32_t pid, t_dictionary *metricas_estado, t_dictio
         // Si no me equivoco, después del fold, el primer elemento de la lista queda modificado
         // y el puntero retornado es el primero de la lista, es decir, si libero la lista, también libero el retornado.
         // revisar si es así
-        u_int64_t *time = (u_int64_t *)list_fold1(time_list, &u_int64_t_sum);
+        u_int64_t seed_time = 0;
+        u_int64_t *time = (u_int64_t *)list_fold(time_list, &seed_time, &u_int64_t_sum);
 
         char *count_str = string_itoa(*count);
         char *time_str = string_itoa(*time);
