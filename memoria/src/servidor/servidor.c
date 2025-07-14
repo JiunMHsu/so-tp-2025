@@ -22,7 +22,7 @@ void iniciar_servidor()
         switch (modulo_cliente)
         {
         case KERNEL:
-            log_evento("Kernel conectado.");
+            log_conexion_kernel(*fd_cliente);
             pthread_t atencion_kernel;
             pthread_create(&atencion_kernel, NULL, &atender_kernel, fd_cliente);
             pthread_detach(atencion_kernel);
