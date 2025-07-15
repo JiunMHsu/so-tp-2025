@@ -51,6 +51,11 @@ u_int32_t recibir_marco()
     return recibir_senial(fd_memoria);
 }
 
+u_int8_t recibir_confirmacion_escritura()
+{
+    return recibir_senial(fd_memoria);
+}
+
 void *recibir_datos_lectura()
 {
     t_mem_buffer_response *respuesta_memoria = recibir_buffer_response(fd_memoria);

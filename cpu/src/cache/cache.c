@@ -51,6 +51,14 @@ void cachear_pagina(u_int32_t nro_pagina, u_int32_t marco)
         if (victima->bit_modificado)
         {
             enviar_peticion_escritura_pagina(get_pid(), get_direccion_fisica_por_marco(victima->marco), victima->contenido);
+
+            if (!recibir_confirmacion_escritura())
+            {
+                log_mensaje_error("No se pudo escribir en memoria.");
+                exit(EXIT_FAILURE);
+                return;
+            }
+            
             log_pagina_actualizada_cache_memoria(get_pid(), victima->pagina, victima->marco);
         }
 
@@ -196,6 +204,14 @@ void limpiar_cache()
         }
 
         enviar_peticion_escritura_pagina(get_pid(), get_direccion_fisica_por_marco(entrada->marco), entrada->contenido);
+
+        if (!recibir_confirmacion_escritura())
+        {
+            log_mensaje_error("No se pudo escribir en memoria.");
+            exit(EXIT_FAILURE);
+            return;
+        }
+
         log_pagina_actualizada_cache_memoria(get_pid(), entrada->pagina, entrada->marco);
         destruir_entrada_cache(entrada);
     }

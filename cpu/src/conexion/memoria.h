@@ -18,6 +18,7 @@ void cerrar_conexion_memoria(void);
 char *recibir_instruccion(void);
 u_int32_t recibir_marco(void);
 void *recibir_contenido_pagina(void);
+u_int8_t recibir_confirmacion_escritura(void);
 void *recibir_datos_lectura(void);
 u_int32_t get_cantidad_niveles(void);
 u_int32_t get_cantidad_entradas_tp(void);
