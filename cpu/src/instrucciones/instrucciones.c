@@ -57,6 +57,14 @@ static void _write(char **parametros)
     {
         u_int32_t direccion_fisica = get_direccion_fisica(direccion_logica);
         enviar_peticion_escritura(get_pid(), direccion_fisica, (void *)datos, string_length(datos));
+
+        if (!recibir_confirmacion_escritura())
+        {
+            log_mensaje_error("No se pudo escribir en memoria.");
+            exit(EXIT_FAILURE);
+            return;
+        }
+
         log_operacion_acceso_memoria(get_pid(), ESCRITURA, direccion_fisica, datos);
     }
 }
