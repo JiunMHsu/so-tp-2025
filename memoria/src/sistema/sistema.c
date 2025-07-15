@@ -71,6 +71,13 @@ u_int8_t finalizar_proceso(u_int32_t pid)
         return 0;
     }
 
+    t_list *marcos_asignados = obtener_marcos_asignados(pid);
+
+    if (marcos_asignados == NULL)
+        return 1; // no hay marcos asignados, no hay nada que hacer
+
+    liberar_frames(marcos_asignados);
+
     t_list *instrucciones = dictionary_remove(procesos_instrucciones, key_pid);
     list_destroy_and_destroy_elements(instrucciones, free);
 
