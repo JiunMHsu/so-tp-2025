@@ -101,6 +101,7 @@ static void *_ejecutar(void *_cpu)
             if (is_init_proc(desalojado->syscall))
             {
                 init_proc(cpu->proceso, desalojado->syscall);
+                program_counter = desalojado->program_counter;
                 continue;
             }
 
