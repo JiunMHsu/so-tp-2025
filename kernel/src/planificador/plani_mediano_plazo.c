@@ -177,8 +177,6 @@ static void *cronometrar(void *_cronometro)
         t_pcb *proceso = remove_proceso(q_blocked, cronometro->pid);
         if (proceso != NULL)
             suspender_proceso(proceso);
-        else
-            log_mensaje_error("No se encontró el proceso a suspender.");
 
         cronometro->esta_libre = 1;
     }
