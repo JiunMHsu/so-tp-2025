@@ -34,8 +34,9 @@ typedef struct
 typedef struct
 {
     int32_t fd_io;
-    t_peticion_consumo *peticion;
+    t_peticion_io *peticion;
     sem_t *hay_peticion;
+    t_pcb *proceso;
     pthread_t rutina_consumo;
 
     t_io *io; // referencia al IO al que pertenece esta instancia
