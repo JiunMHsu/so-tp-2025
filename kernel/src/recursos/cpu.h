@@ -13,6 +13,7 @@
 #include "config/config.h"
 #include "logger/logger.h"
 #include "pcb/pcb.h"
+#include "syscalls/syscalls.h"
 
 typedef struct
 {

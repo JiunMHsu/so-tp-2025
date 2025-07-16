@@ -1,6 +1,5 @@
 #include "syscalls.h"
 
-static void init_proc(t_pcb *proceso, char *pseudocodigo, u_int32_t tamanio_proceso);
 static void dump_memory(t_pcb *proceso);
 static void *_dump_memory(void *_pid);
 static void io(t_pcb *proceso, char *dispositivo, u_int32_t tiempo);
@@ -10,14 +9,7 @@ void manejar_syscall(t_pcb *proceso, char *syscall)
 {
     char **syscall_vec = string_split(syscall, " ");
     char *syscall_name = syscall_vec[0];
-
-    if (string_is_equal(syscall_name, "INIT_PROC"))
-    {
-        char *pseudocodigo = remove_new_line(syscall_vec[1]);
-        u_int32_t tamanio_proceso = atoi(syscall_vec[2]);
-
-        init_proc(proceso, pseudocodigo, tamanio_proceso);
-    }
+    log_syscall_recibida(proceso->pid, syscall_name);
 
     if (string_is_equal(syscall_name, "IO"))
     {
@@ -36,10 +28,22 @@ void manejar_syscall(t_pcb *proceso, char *syscall)
     string_array_destroy(syscall_vec); // TODO: ver si se debe destruir aca
 }
 
-static void init_proc(t_pcb *proceso, char *pseudocodigo, u_int32_t tamanio_proceso)
+u_int8_t is_init_proc(char *syscall)
 {
+    return string_starts_with(syscall, "INIT_PROC");
+}
+
+void init_proc(t_pcb *proceso, char *syscall)
+{
+    char **syscall_vec = string_split(syscall, " ");
+
+    log_syscall_recibida(proceso->pid, syscall_vec[0]);
+
+    char *pseudocodigo = remove_new_line(syscall_vec[1]);
+    u_int32_t tamanio_proceso = atoi(syscall_vec[2]);
+
     insertar_proceso_nuevo(pseudocodigo, tamanio_proceso);
-    insertar_en_ready(proceso);
+    string_array_destroy(syscall_vec);
 }
 
 static void dump_memory(t_pcb *proceso)

@@ -35,6 +35,7 @@ void inicializar_io()
     pthread_detach(rutina_manejo_finalizados);
 }
 
+// TODO: Modificar para manejar multi instancia de IO
 void conectar_io(char *nombre_io, int32_t fd_io)
 {
     t_io *io = crear_io(nombre_io, fd_io);
@@ -45,6 +46,7 @@ void conectar_io(char *nombre_io, int32_t fd_io)
     mlist_add(ios, io);
 }
 
+// TODO: Modificar para manejar multi instancia de IO
 int32_t bloquear_para_io(char *nombre_io, t_pcb *proceso, u_int32_t tiempo)
 {
     t_io *io = buscar_por_nombre(nombre_io);
@@ -53,6 +55,7 @@ int32_t bloquear_para_io(char *nombre_io, t_pcb *proceso, u_int32_t tiempo)
 
     t_peticion_consumo *peticion = crear_peticion_consumo(proceso, tiempo);
     mlist_push_as_queue(io->peticiones, peticion);
+    log_motivo_bloqueo(proceso->pid, nombre_io);
     sem_post(io->hay_peticion);
     return 0;
 }
@@ -100,6 +103,7 @@ static void destruir_io(t_io *io)
     io = NULL;
 }
 
+// TODO: Modificar para manejar multi instancia de IO
 static t_io *buscar_por_nombre(char *nombre_io)
 {
     int32_t _tiene_nombre(void *_io)
@@ -144,6 +148,7 @@ static void *consumir_io(void *dispositivo_io)
         u_int32_t tiempo = peticion->tiempo;
         destruir_peticion_consumo(peticion);
 
+        // TODO: Modificar para manejar multi instancia de IO
         t_peticion_io *peticion_io = crear_peticion_io(proceso->pid, tiempo);
         enviar_peticion_io(fd_io, peticion_io);
         destruir_peticion_io(peticion_io);
@@ -154,6 +159,7 @@ static void *consumir_io(void *dispositivo_io)
             finalizar_consumo_para(proceso, EXECUTED);
         else // caso -1 (o cualquier otra respuesta que no sea EXECUTED)
         {
+            // TODO: Modificar para manejar multi instancia de IO
             finalizar_consumo_para(proceso, DISCONNECTED);
             desconectar_io(io->nombre);
         }
