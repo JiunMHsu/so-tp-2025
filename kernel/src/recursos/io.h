@@ -22,9 +22,12 @@ typedef struct
     char *nombre;
 
     t_mutex_list *instancias;
-    t_mutex_list *peticiones;
+    t_mutex_list *instancias_libres;
+    sem_t *hay_instancia_libre;
 
+    t_mutex_list *peticiones;
     sem_t *hay_peticion;
+
     pthread_t rutina_consumo;
 } t_io;
 

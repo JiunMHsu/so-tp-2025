@@ -10,9 +10,11 @@ static void desconectar_io(char *nombre_io);
 static void destruir_io(t_io *io);
 static t_io *buscar_por_nombre(char *nombre_io);
 
+static void desconectar_instancia_io(t_io *io, int32_t fd_io);
+
 static t_instancia_io *crear_instancia_io(int32_t fd_io);
 static void conectar_instancia_io(t_io *io, t_instancia_io *instancia_io);
-static void desconectar_instancia_io(t_io *io, int32_t fd_io);
+static void _cerrar_conexion_instancia_io(void *instancia_io);
 static void destruir_instancia_io(t_instancia_io *instancia_io);
 
 static t_peticion_consumo *crear_peticion_consumo(t_pcb *proceso, u_int32_t tiempo);
@@ -45,12 +47,12 @@ void conectar_io(char *nombre_io, int32_t fd_io)
     t_io *io = buscar_por_nombre(nombre_io);
     if (io != NULL) // TODO: verificar que buscar_por_nombre retorne NULL si no existe
     {
-        mlist_add(io->instancias, instancia);
+        conectar_instancia_io(io, instancia);
         return;
     }
 
     io = crear_io(nombre_io);
-    mlist_add(io->instancias, instancia);
+    conectar_instancia_io(io, instancia);
 
     pthread_create(&(io->rutina_consumo), NULL, &consumir_io, io);
     pthread_detach(io->rutina_consumo);
@@ -97,7 +99,10 @@ static void desconectar_io(char *nombre_io)
     if (io == NULL)
         return;
 
+    // igual no deberían haber instancias en la lista ya
+    mlist_iterate(io->instancias, &_cerrar_conexion_instancia_io);
     mlist_iterate(io->peticiones, &_encolar_a_finalizados);
+
     destruir_io(io);
 }
 
@@ -127,14 +132,17 @@ static t_io *buscar_por_nombre(char *nombre_io)
     return (t_io *)mlist_find(ios, &_tiene_nombre);
 }
 
+// TODO: implementar desconectar_instancia_io
+static void desconectar_instancia_io(t_io *io, int32_t fd_io) {}
+
 // TODO: implementar crear_instancia_io
 static t_instancia_io *crear_instancia_io(int32_t fd_io) {}
 
 // TODO: implementar conectar_instancia_io
 static void conectar_instancia_io(t_io *io, t_instancia_io *instancia_io) {}
 
-// TODO: implementar desconectar_instancia_io
-static void desconectar_instancia_io(t_io *io, int32_t fd_io) {}
+// TODO: implementar cerrar_conexion_instancia_io
+static void _cerrar_conexion_instancia_io(void *instancia_io) {}
 
 // TODO: implementar destruir_instancia_io
 static void destruir_instancia_io(t_instancia_io *instancia_io) {}
