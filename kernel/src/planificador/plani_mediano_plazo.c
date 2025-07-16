@@ -65,8 +65,10 @@ void insertar_en_blocked(t_pcb *proceso)
 
 void desbloquear_proceso(t_pcb *proceso, u_int8_t fallo)
 {
-    if (fallo)
-        return manejar_fallo(proceso);
+    if (fallo) {
+        manejar_fallo(proceso);
+        return;
+    }
 
     t_pcb *pcb = NULL;
     switch (get_estado_pcb(proceso))

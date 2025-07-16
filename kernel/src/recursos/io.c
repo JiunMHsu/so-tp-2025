@@ -214,8 +214,6 @@ static void destruir_instancia_io(t_instancia_io *instancia_io)
         return;
 
     sem_destroy(instancia_io->hay_peticion);
-    // free(instancia_io->hay_peticion); // TODO: ver si es necesario
-
     if (instancia_io->peticion != NULL)
         destruir_peticion_io(instancia_io->peticion);
 
@@ -260,12 +258,13 @@ static void *consumir_io(void *dispositivo_io)
 
         t_pcb *proceso = peticion->proceso;
         u_int32_t tiempo = peticion->tiempo;
-        destruir_peticion_consumo(peticion);
 
         t_peticion_io *peticion_io = crear_peticion_io(proceso->pid, tiempo);
         instancia->peticion = peticion_io;
         instancia->proceso = proceso;
+
         sem_post(instancia->hay_peticion);
+        destruir_peticion_consumo(peticion);
     }
 
     return NULL;
