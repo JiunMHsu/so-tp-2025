@@ -12,6 +12,7 @@ static entrada_cache crear_entrada(u_int32_t nro_pagina, u_int32_t marco);
 static entrada_cache *get_entrada(u_int32_t indice);
 static u_int32_t obtener_victima(void);
 static void destruir_entrada_cache(entrada_cache *entrada);
+static u_int32_t get_indice_pagina(u_int32_t nro_pagina);
 
 void inicializar_cache()
 {
@@ -58,7 +59,7 @@ void cachear_pagina(u_int32_t nro_pagina, u_int32_t marco)
                 exit(EXIT_FAILURE);
                 return;
             }
-            
+
             log_pagina_actualizada_cache_memoria(get_pid(), victima->pagina, victima->marco);
         }
 
@@ -132,6 +133,8 @@ void escribir_cache(u_int32_t nro_pagina, u_int32_t offset, void *datos, u_int32
     entrada_cache *entrada = get_entrada(nro_pagina);
     entrada->bit_modificado = 1;
 
+    printf("Escribi en cache \n");
+
     memcpy(entrada->contenido + offset, datos, buffer_size);
 }
 
@@ -164,12 +167,26 @@ static entrada_cache crear_entrada(u_int32_t nro_pagina, u_int32_t marco)
     return nueva_entrada;
 }
 
-static entrada_cache *get_entrada(u_int32_t indice)
+static entrada_cache *get_entrada(u_int32_t nro_pagina)
 {
-    return &memoria_cache[indice];
+    return &memoria_cache[get_indice_pagina(nro_pagina)];
 }
 
 u_int32_t existe_pagina_cache(u_int32_t nro_pagina)
+{
+    if (get_indice_pagina(nro_pagina) == 0)
+    {
+        log_cache_miss(get_pid(), nro_pagina);
+
+        return 0;
+    }
+
+    log_cache_hit(get_pid(), nro_pagina);
+
+    return 1;
+}
+
+u_int32_t get_indice_pagina(u_int32_t nro_pagina)
 {
     for (u_int32_t i = 0; i < entrada_libre; i++)
     {
@@ -177,12 +194,9 @@ u_int32_t existe_pagina_cache(u_int32_t nro_pagina)
 
         if (entrada.pagina == nro_pagina)
         {
-            log_cache_hit(get_pid(), nro_pagina);
-            return 1;
+            return i;
         }
     }
-
-    log_cache_miss(get_pid(), nro_pagina);
 
     return 0;
 }
