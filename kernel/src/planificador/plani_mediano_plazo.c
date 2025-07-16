@@ -110,14 +110,16 @@ static void insertar_en_suspended_ready(t_pcb *proceso)
     {
     case FIFO:
         push_proceso(q_susp_ready, proceso);
-        return;
+        break;
     case PMCP:
         ordered_insert_proceso(q_susp_ready, proceso, &es_de_menor_tamanio_que);
-        return;
+        break;
     default: // caso SJF, SRT, no debería ocurrir nunca
         log_mensaje_error("Algoritmo de desuspención no soportado.");
         return;
     }
+
+    puede_admitir_proceso_nuevo();
 }
 
 t_pcb *desuspender_proceso_ready()
