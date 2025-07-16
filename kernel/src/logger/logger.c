@@ -61,7 +61,6 @@ void log_finalizacion_proceso(u_int32_t pid)
     log_info(kernel_logger, "## (%d) - Finaliza el proceso", pid);
 }
 
-// TODO: Revisar si la salida es correcta, y si hay memory leaks
 void log_metricas_proceso(u_int32_t pid, t_dictionary *metricas_estado, t_dictionary *metricas_tiempo)
 {
     int8_t cantidad_estados = 7;

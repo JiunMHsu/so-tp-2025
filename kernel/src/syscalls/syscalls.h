@@ -14,4 +14,7 @@
 
 void manejar_syscall(t_pcb *proceso, char *syscall);
 
+u_int8_t is_init_proc(char *syscall);
+void init_proc(t_pcb *proceso, char *syscall);
+
 #endif // KERNEL_SYSCALLS_H

@@ -81,17 +81,37 @@ static void *_ejecutar(void *_cpu)
         u_int32_t program_counter = cpu->proceso->program_counter;
         pthread_mutex_unlock(&(cpu->mutex_proceso));
 
-        t_peticion_ejecucion *peticion = crear_peticion_ejecucion(pid, program_counter);
-        enviar_peticion_ejecucion(fd_dispatch, peticion);
-        destruir_peticion_ejecucion(peticion);
+        t_desalojo *desalojado = NULL;
 
-        t_desalojo *desalojado = recibir_desalojo(fd_dispatch);
+        while (1)
+        {
+            destruir_desalojo(desalojado); // NULL safe
+
+            t_peticion_ejecucion *peticion = crear_peticion_ejecucion(pid, program_counter);
+            enviar_peticion_ejecucion(fd_dispatch, peticion);
+            destruir_peticion_ejecucion(peticion);
+
+            desalojado = recibir_desalojo(fd_dispatch);
+            if (desalojado == NULL)
+            {
+                log_mensaje_error("Error al recibir desalojo");
+                exit(EXIT_FAILURE);
+            }
+
+            if (is_init_proc(desalojado->syscall))
+            {
+                init_proc(cpu->proceso, desalojado->syscall);
+                continue;
+            }
+
+            break;
+        }
 
         // si se recibe un desalojo, se marca inmediatamente el proceso como NULL
         // es para evitar que se envíe una interrupción a la CPU.
         // igualmente va a pasar que se envíe interrupciones cuando el proceso ya está desalojado,
         // es responsabilidad de la CPU ignorar esas señales.
-        pthread_mutex_lock(&(cpu->mutex_proceso)); 
+        pthread_mutex_lock(&(cpu->mutex_proceso));
         cpu->proceso = NULL;
         pthread_mutex_unlock(&(cpu->mutex_proceso));
 
