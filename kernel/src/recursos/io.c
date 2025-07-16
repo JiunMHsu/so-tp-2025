@@ -5,17 +5,21 @@ static t_mutex_list *ios;
 static sem_t *hay_finalizado;
 static t_mutex_queue *finalizados;
 
-static t_io *crear_io(char *nombre_io, int32_t fd_io);
+static t_io *crear_io(char *nombre_io);
+static void desconectar_io(char *nombre_io);
 static void destruir_io(t_io *io);
 static t_io *buscar_por_nombre(char *nombre_io);
+
+static t_instancia_io *crear_instancia_io(int32_t fd_io);
+static void conectar_instancia_io(t_io *io, t_instancia_io *instancia_io);
+static void desconectar_instancia_io(t_io *io, int32_t fd_io);
+static void destruir_instancia_io(t_instancia_io *instancia_io);
 
 static t_peticion_consumo *crear_peticion_consumo(t_pcb *proceso, u_int32_t tiempo);
 static void destruir_peticion_consumo(t_peticion_consumo *peticion_consumo);
 
 static void *consumir_io(void *dispositivo_io);
 static void finalizar_consumo_para(t_pcb *proceso, motivo_fin_io motivo);
-
-static void desconectar_io(char *nombre_io);
 static void _encolar_a_finalizados(void *_peticion_consumo);
 
 static t_fin_de_io *get_finalizado(void);
@@ -35,10 +39,18 @@ void inicializar_io()
     pthread_detach(rutina_manejo_finalizados);
 }
 
-// TODO: Modificar para manejar multi instancia de IO
 void conectar_io(char *nombre_io, int32_t fd_io)
 {
-    t_io *io = crear_io(nombre_io, fd_io);
+    t_instancia_io *instancia = crear_instancia_io(fd_io);
+    t_io *io = buscar_por_nombre(nombre_io);
+    if (io != NULL) // TODO: verificar que buscar_por_nombre retorne NULL si no existe
+    {
+        mlist_add(io->instancias, instancia);
+        return;
+    }
+
+    io = crear_io(nombre_io);
+    mlist_add(io->instancias, instancia);
 
     pthread_create(&(io->rutina_consumo), NULL, &consumir_io, io);
     pthread_detach(io->rutina_consumo);
@@ -60,32 +72,33 @@ int32_t bloquear_para_io(char *nombre_io, t_pcb *proceso, u_int32_t tiempo)
     return 0;
 }
 
-static t_fin_de_io *get_finalizado()
-{
-    sem_wait(hay_finalizado);
-    return (t_fin_de_io *)mqueue_pop(finalizados);
-}
-
-static void destruir_fin_de_io(t_fin_de_io *fin_de_io)
-{
-    if (fin_de_io == NULL)
-        return;
-
-    free(fin_de_io);
-    fin_de_io = NULL;
-}
-
-static t_io *crear_io(char *nombre_io, int32_t fd_io)
+static t_io *crear_io(char *nombre_io)
 {
     t_io *io = malloc(sizeof(t_io));
-    io->fd_io = fd_io;
     io->nombre = strdup(nombre_io);
+    io->instancias = mlist_create();
     io->peticiones = mlist_create();
     io->hay_peticion = malloc(sizeof(sem_t));
     sem_init(io->hay_peticion, 0, 0);
     io->rutina_consumo = 0;
 
     return io;
+}
+
+static void desconectar_io(char *nombre_io)
+{
+    int32_t _tiene_nombre(void *_io)
+    {
+        t_io *io = (t_io *)_io;
+        return strcmp(io->nombre, nombre_io) == 0;
+    };
+
+    t_io *io = mlist_remove_by_condition(ios, &_tiene_nombre);
+    if (io == NULL)
+        return;
+
+    mlist_iterate(io->peticiones, &_encolar_a_finalizados);
+    destruir_io(io);
 }
 
 static void destruir_io(t_io *io)
@@ -103,7 +116,6 @@ static void destruir_io(t_io *io)
     io = NULL;
 }
 
-// TODO: Modificar para manejar multi instancia de IO
 static t_io *buscar_por_nombre(char *nombre_io)
 {
     int32_t _tiene_nombre(void *_io)
@@ -114,6 +126,18 @@ static t_io *buscar_por_nombre(char *nombre_io)
 
     return (t_io *)mlist_find(ios, &_tiene_nombre);
 }
+
+// TODO: implementar crear_instancia_io
+static t_instancia_io *crear_instancia_io(int32_t fd_io) {}
+
+// TODO: implementar conectar_instancia_io
+static void conectar_instancia_io(t_io *io, t_instancia_io *instancia_io) {}
+
+// TODO: implementar desconectar_instancia_io
+static void desconectar_instancia_io(t_io *io, int32_t fd_io) {}
+
+// TODO: implementar destruir_instancia_io
+static void destruir_instancia_io(t_instancia_io *instancia_io) {}
 
 static t_peticion_consumo *crear_peticion_consumo(t_pcb *proceso, u_int32_t tiempo)
 {
@@ -178,27 +202,26 @@ static void finalizar_consumo_para(t_pcb *proceso, motivo_fin_io motivo)
     sem_post(hay_finalizado);
 }
 
-static void desconectar_io(char *nombre_io)
-{
-    int32_t _tiene_nombre(void *_io)
-    {
-        t_io *io = (t_io *)_io;
-        return strcmp(io->nombre, nombre_io) == 0;
-    };
-
-    t_io *io = mlist_remove_by_condition(ios, &_tiene_nombre);
-    if (io == NULL)
-        return;
-
-    mlist_iterate(io->peticiones, &_encolar_a_finalizados);
-    destruir_io(io);
-}
-
 static void _encolar_a_finalizados(void *_peticion_consumo)
 {
     t_peticion_consumo *peticion_consumo = (t_peticion_consumo *)_peticion_consumo;
     finalizar_consumo_para(peticion_consumo->proceso, DISCONNECTED);
     destruir_peticion_consumo(peticion_consumo);
+}
+
+static t_fin_de_io *get_finalizado()
+{
+    sem_wait(hay_finalizado);
+    return (t_fin_de_io *)mqueue_pop(finalizados);
+}
+
+static void destruir_fin_de_io(t_fin_de_io *fin_de_io)
+{
+    if (fin_de_io == NULL)
+        return;
+
+    free(fin_de_io);
+    fin_de_io = NULL;
 }
 
 static void *manejar_finalizados(void *_)

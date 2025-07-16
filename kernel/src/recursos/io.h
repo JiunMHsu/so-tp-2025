@@ -20,11 +20,21 @@
 typedef struct
 {
     char *nombre;
-    int32_t fd_io;
+
+    t_mutex_list *instancias;
     t_mutex_list *peticiones;
+
     sem_t *hay_peticion;
     pthread_t rutina_consumo;
 } t_io;
+
+typedef struct
+{
+    int32_t fd_io;
+    t_peticion_consumo *peticion;
+    sem_t *hay_peticion;
+    pthread_t rutina_consumo;
+} t_instancia_io;
 
 typedef struct
 {
