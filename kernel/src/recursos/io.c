@@ -14,6 +14,8 @@ static void desconectar_instancia_io(t_io *io, int32_t fd_io);
 
 static t_instancia_io *crear_instancia_io(int32_t fd_io);
 static void conectar_instancia_io(t_io *io, t_instancia_io *instancia_io);
+static t_instancia_io *get_instancia_libre(t_io *io);
+static void set_instancia_libre(t_io *io, t_instancia_io *instancia_io);
 static void _cerrar_conexion_instancia_io(void *instancia_io);
 static void destruir_instancia_io(t_instancia_io *instancia_io);
 
@@ -21,6 +23,7 @@ static t_peticion_consumo *crear_peticion_consumo(t_pcb *proceso, u_int32_t tiem
 static void destruir_peticion_consumo(t_peticion_consumo *peticion_consumo);
 
 static void *consumir_io(void *dispositivo_io);
+static void *consumir_instancia_io(void *instancia_io);
 static void finalizar_consumo_para(t_pcb *proceso, motivo_fin_io motivo);
 static void _encolar_a_finalizados(void *_peticion_consumo);
 
@@ -135,13 +138,46 @@ static t_io *buscar_por_nombre(char *nombre_io)
 // TODO: implementar desconectar_instancia_io
 static void desconectar_instancia_io(t_io *io, int32_t fd_io) {}
 
-// TODO: implementar crear_instancia_io
-static t_instancia_io *crear_instancia_io(int32_t fd_io) {}
+static t_instancia_io *crear_instancia_io(int32_t fd_io)
+{
+    t_instancia_io *instancia = malloc(sizeof(t_instancia_io));
 
-// TODO: implementar conectar_instancia_io
-static void conectar_instancia_io(t_io *io, t_instancia_io *instancia_io) {}
+    instancia->fd_io = fd_io;
+    instancia->peticion = NULL;
+    instancia->hay_peticion = malloc(sizeof(sem_t));
+    sem_init(instancia->hay_peticion, 0, 0);
+    instancia->rutina_consumo = 0;
+    instancia->io = NULL; // Inicializar referencia al IO
 
-// TODO: implementar cerrar_conexion_instancia_io
+    return instancia;
+}
+
+static void conectar_instancia_io(t_io *io, t_instancia_io *instancia_io)
+{
+    instancia_io->io = io; // Asignar referencia al IO
+
+    mlist_add(io->instancias, instancia_io);
+    mlist_push_as_queue(io->instancias_libres, instancia_io);
+
+    pthread_create(&(instancia_io->rutina_consumo), NULL, &consumir_instancia_io, instancia_io);
+    pthread_detach(instancia_io->rutina_consumo);
+
+    sem_post(io->hay_instancia_libre);
+}
+
+static t_instancia_io *get_instancia_libre(t_io *io)
+{
+    sem_wait(io->hay_instancia_libre);
+    return (t_instancia_io *)mlist_pop_as_queue(io->instancias_libres);
+}
+
+static void set_instancia_libre(t_io *io, t_instancia_io *instancia_io)
+{
+    mlist_push_as_queue(io->instancias_libres, instancia_io);
+    sem_post(io->hay_instancia_libre);
+}
+
+// TODO: implementar _cerrar_conexion_instancia_io
 static void _cerrar_conexion_instancia_io(void *instancia_io) {}
 
 // TODO: implementar destruir_instancia_io
@@ -168,7 +204,6 @@ static void destruir_peticion_consumo(t_peticion_consumo *peticion_consumo)
 static void *consumir_io(void *dispositivo_io)
 {
     t_io *io = (t_io *)dispositivo_io;
-    int32_t fd_io = io->fd_io;
 
     while (1)
     {
@@ -180,8 +215,27 @@ static void *consumir_io(void *dispositivo_io)
         u_int32_t tiempo = peticion->tiempo;
         destruir_peticion_consumo(peticion);
 
-        // TODO: Modificar para manejar multi instancia de IO
+        t_instancia_io *instancia = get_instancia_libre(io); // bloqueante si no hay instancias libres
         t_peticion_io *peticion_io = crear_peticion_io(proceso->pid, tiempo);
+
+        instancia->peticion = peticion_io;
+        sem_post(instancia->hay_peticion);
+    }
+
+    return NULL;
+}
+
+// TODO: implementar consumir_instancia_io
+static void *consumir_instancia_io(void *instancia_io)
+{
+    t_instancia_io *instancia = (t_instancia_io *)instancia_io;
+    int32_t fd_io = instancia->fd_io;
+
+    while (1)
+    {
+        sem_wait(instancia->hay_peticion);
+
+        t_peticion_io *peticion_io = instancia->peticion;
         enviar_peticion_io(fd_io, peticion_io);
         destruir_peticion_io(peticion_io);
 
@@ -196,8 +250,6 @@ static void *consumir_io(void *dispositivo_io)
             desconectar_io(io->nombre);
         }
     }
-
-    return NULL;
 }
 
 static void finalizar_consumo_para(t_pcb *proceso, motivo_fin_io motivo)

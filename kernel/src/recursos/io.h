@@ -37,6 +37,8 @@ typedef struct
     t_peticion_consumo *peticion;
     sem_t *hay_peticion;
     pthread_t rutina_consumo;
+
+    t_io *io; // referencia al IO al que pertenece esta instancia
 } t_instancia_io;
 
 typedef struct
