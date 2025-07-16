@@ -94,10 +94,10 @@ t_list *recuperar_de_swap(u_int32_t pid)
     char *_pid = string_itoa(pid);
     pthread_mutex_lock(&mutex_swap);
 
-    if (!dictionary_has_key(swapped, _pid) == false)
+    if (!dictionary_has_key(swapped, _pid))
     {
         pthread_mutex_unlock(&mutex_swap);
-        log_mensaje_error("Se intento recuperar un proceso que no esta en swap.");
+        log_mensaje_error("Se intento recuperar un proceso que no esta en el diccionario swap.");
         free(_pid);
         return NULL;
     }
@@ -106,7 +106,7 @@ t_list *recuperar_de_swap(u_int32_t pid)
     if (proceso->en_disco == 0)
     {
         pthread_mutex_unlock(&mutex_swap);
-        log_mensaje_error("Se intento recuperar un proceso que no esta en swap.");
+        log_mensaje_error("Se intento recuperar un proceso que no esta en el disco.");
         free(_pid);
         return NULL;
     }
