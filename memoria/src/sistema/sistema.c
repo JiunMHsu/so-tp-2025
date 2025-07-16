@@ -78,6 +78,7 @@ u_int8_t finalizar_proceso(u_int32_t pid)
 
     liberar_frames(marcos_asignados);
 
+    list_destroy_and_destroy_elements(marcos_asignados, &free);
     t_list *instrucciones = dictionary_remove(procesos_instrucciones, key_pid);
     list_destroy_and_destroy_elements(instrucciones, free);
 
@@ -170,9 +171,9 @@ u_int8_t dump_proceso(u_int32_t pid)
         generar_dump(pid, NULL);
         return 1;
     }
-
+    
     t_list *paginas = leer_paginas_por_marcos(marcos_asignados);
     generar_dump(pid, paginas);
-
+    
     return 1;
 }
