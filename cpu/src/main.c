@@ -10,16 +10,15 @@
 
 int main(int argc, char *argv[])
 {
-    if (argc != 3)
+    if (argc != 2)
     {
         log_mensaje_error("Se debe especificar el id de la CPU.");
         return EXIT_FAILURE;
     }
 
     char *id_cpu = argv[1];
-    char *config = argv[2];
 
-    iniciar_config(config);
+    iniciar_config(id_cpu);
     iniciar_logger(id_cpu);
 
     if (conectar_kernel(id_cpu))
