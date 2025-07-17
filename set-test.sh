@@ -12,6 +12,8 @@ clean_configs() {
 
   cd ../io
   rm -rf *.config
+
+  cd ..
 }
 
 # Ensure at least one argument is provided
@@ -26,7 +28,7 @@ third_arg="$3"
 
 clean_configs
 
-ln -s ./config/io.config ./io/io.config
+cp ./config/io.config ./io/io.config
 
 case "$main_cmd" in
   plani)
@@ -35,22 +37,22 @@ case "$main_cmd" in
         case "$third_arg" in
           fifo)
             echo "configurando para plani corto FIFO"
-            ln -s ./config/plani_corto/memoria.config ./memoria/memoria.config
-            ln -s ./config/plani_corto/kernel_fifo.config ./kernel/kernel.config
-            ln -s ./config/plani_corto/cpu.config ./cpu/cpu1.config
-            ln -s ./config/plani_corto/cpu.config ./cpu/cpu2.config
+            cp ./config/plani_corto/memoria.config ./memoria/memoria.config
+            cp ./config/plani_corto/kernel_fifo.config ./kernel/kernel.config
+            cp ./config/plani_corto/cpu.config ./cpu/cpu1.config
+            cp ./config/plani_corto/cpu.config ./cpu/cpu2.config
             ;;
           sjf)
             echo "configurando para plani corto SJF"
-            ln -s ./config/plani_corto/memoria.config ./memoria/memoria.config
-            ln -s ./config/plani_corto/kernel_sjf.config ./kernel/kernel.config
-            ln -s ./config/plani_corto/cpu.config ./cpu/cpu1.config
+            cp ./config/plani_corto/memoria.config ./memoria/memoria.config
+            cp ./config/plani_corto/kernel_sjf.config ./kernel/kernel.config
+            cp ./config/plani_corto/cpu.config ./cpu/cpu1.config
             ;;
           srt)
             echo "configurando para plani corto SRT"
-            ln -s ./config/plani_corto/memoria.config ./memoria/memoria.config
-            ln -s ./config/plani_corto/kernel_srt.config ./kernel/kernel.config
-            ln -s ./config/plani_corto/cpu.config ./cpu/cpu1.config
+            cp ./config/plani_corto/memoria.config ./memoria/memoria.config
+            cp ./config/plani_corto/kernel_srt.config ./kernel/kernel.config
+            cp ./config/plani_corto/cpu.config ./cpu/cpu1.config
             ;;
           *)
             echo "algoritmo desconocido para plani corto: $third_arg"
@@ -62,15 +64,15 @@ case "$main_cmd" in
         case "$third_arg" in
           fifo)
             echo "configurando para plani largo/mediano plazo FIFO"
-            ln -s ./config/plani_lym/memoria.config ./memoria/memoria.config
-            ln -s ./config/plani_lym/kernel_fifo.config ./kernel/kernel.config
-            ln -s ./config/plani_lym/cpu.config ./cpu/cpu1.config
+            cp ./config/plani_lym/memoria.config ./memoria/memoria.config
+            cp ./config/plani_lym/kernel_fifo.config ./kernel/kernel.config
+            cp ./config/plani_lym/cpu.config ./cpu/cpu1.config
             ;;
           pmcp)
             echo "configurando para plani largo/mediano plazo PMCP"
-            ln -s ./config/plani_lym/memoria.config ./memoria/memoria.config
-            ln -s ./config/plani_lym/kernel_pmcp.config ./kernel/kernel.config
-            ln -s ./config/plani_lym/cpu.config ./cpu/cpu1.config
+            cp ./config/plani_lym/memoria.config ./memoria/memoria.config
+            cp ./config/plani_lym/kernel_pmcp.config ./kernel/kernel.config
+            cp ./config/plani_lym/cpu.config ./cpu/cpu1.config
             ;;
           *)
             echo "algoritmo desconocido para plani lym: $third_arg"
@@ -87,24 +89,24 @@ case "$main_cmd" in
 
   swap)
     echo "configurando para swap"
-    ln -s ./config/swap/memoria.config ./memoria/memoria.config
-    ln -s ./config/swap/kernel.config ./kernel/kernel.config
-    ln -s ./config/swap/cpu.config ./cpu/cpu1.config
+    cp ./config/swap/memoria.config ./memoria/memoria.config
+    cp ./config/swap/kernel.config ./kernel/kernel.config
+    cp ./config/swap/cpu.config ./cpu/cpu1.config
     ;;
 
   cache)
     case "$sub_cmd" in
       clock)
         echo "configurando para cache CLOCK"
-        ln -s ./config/cache/memoria.config ./memoria/memoria.config
-        ln -s ./config/cache/kernel.config ./kernel/kernel.config
-        ln -s ./config/cache/cpu_clock.config ./cpu/cpu1.config
+        cp ./config/cache/memoria.config ./memoria/memoria.config
+        cp ./config/cache/kernel.config ./kernel/kernel.config
+        cp ./config/cache/cpu_clock.config ./cpu/cpu1.config
         ;;
       clockm)
         echo "configurando para cache CLOCK-M"
-        ln -s ./config/cache/memoria.config ./memoria/memoria.config
-        ln -s ./config/cache/kernel.config ./kernel/kernel.config
-        ln -s ./config/cache/cpu_clockm.config ./cpu/cpu1.config
+        cp ./config/cache/memoria.config ./memoria/memoria.config
+        cp ./config/cache/kernel.config ./kernel/kernel.config
+        cp ./config/cache/cpu_clockm.config ./cpu/cpu1.config
         ;;
       *)
         echo "algoritmo cache desconocido: $sub_cmd"
@@ -117,15 +119,15 @@ case "$main_cmd" in
     case "$sub_cmd" in
       fifo)
         echo "configurando para TLB FIFO"
-        ln -s ./config/tlb/memoria.config ./memoria/memoria.config
-        ln -s ./config/tlb/kernel.config ./kernel/kernel.config
-        ln -s ./config/tlb/cpu_fifo.config ./cpu/cpu1.config
+        cp ./config/tlb/memoria.config ./memoria/memoria.config
+        cp ./config/tlb/kernel.config ./kernel/kernel.config
+        cp ./config/tlb/cpu_fifo.config ./cpu/cpu1.config
         ;;
       lru)
         echo "configurando para TLB LRU"
-        ln -s ./config/tlb/memoria.config ./memoria/memoria.config
-        ln -s ./config/tlb/kernel.config ./kernel/kernel.config
-        ln -s ./config/tlb/cpu_lru.config ./cpu/cpu1.config
+        cp ./config/tlb/memoria.config ./memoria/memoria.config
+        cp ./config/tlb/kernel.config ./kernel/kernel.config
+        cp ./config/tlb/cpu_lru.config ./cpu/cpu1.config
         ;;
       *)
         echo "algoritmo TLB desconocido: $sub_cmd"
@@ -136,12 +138,12 @@ case "$main_cmd" in
 
   estabilidad)
     echo "configurando para estabilidad general"
-    ln -s ./config/estabilidad_general/memoria.config ./memoria/memoria.config
-    ln -s ./config/estabilidad_general/kernel.config ./kernel/kernel.config
-    ln -s ./config/estabilidad_general/cpu1.config ./cpu/cpu1.config
-    ln -s ./config/estabilidad_general/cpu2.config ./cpu/cpu2.config
-    ln -s ./config/estabilidad_general/cpu3.config ./cpu/cpu3.config
-    ln -s ./config/estabilidad_general/cpu4.config ./cpu/cpu4.config
+    cp ./config/estabilidad_general/memoria.config ./memoria/memoria.config
+    cp ./config/estabilidad_general/kernel.config ./kernel/kernel.config
+    cp ./config/estabilidad_general/cpu1.config ./cpu/cpu1.config
+    cp ./config/estabilidad_general/cpu2.config ./cpu/cpu2.config
+    cp ./config/estabilidad_general/cpu3.config ./cpu/cpu3.config
+    cp ./config/estabilidad_general/cpu4.config ./cpu/cpu4.config
     ;;
 
   *)
