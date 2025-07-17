@@ -65,10 +65,10 @@ void insertar_en_blocked(t_pcb *proceso)
 
 void desbloquear_proceso(t_pcb *proceso, u_int8_t fallo)
 {
-    if (fallo) {
-        manejar_fallo(proceso);
-        return;
-    }
+    if (fallo)
+        return manejar_fallo(proceso);
+
+    printf("[+] proceso %u completo io\n", proceso->pid);
 
     t_pcb *pcb = NULL;
     switch (get_estado_pcb(proceso))
@@ -89,6 +89,8 @@ void desbloquear_proceso(t_pcb *proceso, u_int8_t fallo)
 
 static void manejar_fallo(t_pcb *proceso)
 {
+    printf("[+] proceso %u fallo para io\n", proceso->pid);
+
     t_pcb *pcb = NULL;
     switch (get_estado_pcb(proceso))
     {
