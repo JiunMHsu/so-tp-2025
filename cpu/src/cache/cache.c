@@ -63,8 +63,8 @@ void cachear_pagina(u_int32_t nro_pagina, u_int32_t marco)
             log_pagina_actualizada_cache_memoria(get_pid(), victima->pagina, victima->marco);
         }
 
-        memoria_cache[indice_victima] = nueva_entrada;
         destruir_entrada_cache(victima);
+        memoria_cache[indice_victima] = nueva_entrada;
     }
 
     log_pagina_ingresada_cache(get_pid(), nro_pagina);
@@ -133,9 +133,9 @@ void escribir_cache(u_int32_t nro_pagina, u_int32_t offset, void *datos, u_int32
     entrada_cache *entrada = get_entrada(nro_pagina);
     entrada->bit_modificado = 1;
 
-    printf("Escribi en cache \n");
-
     memcpy(entrada->contenido + offset, datos, buffer_size);
+
+    printf("Escribi en cache: %s \n", (char *)entrada->contenido);
 }
 
 void *leer_cache(u_int32_t nro_pagina, u_int32_t offset, u_int32_t bytes_tamanio)
