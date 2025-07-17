@@ -20,11 +20,27 @@
 typedef struct
 {
     char *nombre;
-    int32_t fd_io;
+
+    t_mutex_list *instancias;
+    t_mutex_list *instancias_libres;
+    sem_t *hay_instancia_libre;
+
     t_mutex_list *peticiones;
     sem_t *hay_peticion;
+
     pthread_t rutina_consumo;
 } t_io;
+
+typedef struct
+{
+    int32_t fd_io;
+    t_peticion_io *peticion;
+    sem_t *hay_peticion;
+    t_pcb *proceso;
+    pthread_t rutina_consumo;
+
+    t_io *io; // referencia al IO al que pertenece esta instancia
+} t_instancia_io;
 
 typedef struct
 {
