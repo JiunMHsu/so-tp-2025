@@ -79,6 +79,11 @@ static void *admitir_proceso(void *_)
             continue;
         }
 
+        // así consume el semáforo y lo deja bloqueado como debe
+        // puede que cuente como una mínima "espera activa"
+        if (!hay_proceso(q_new))
+            continue;
+
         pcb = peek_proceso(q_new);
         int32_t solicitud = solicitar_creacion_proceso(pcb->pid, pcb->tamanio, pcb->ejecutable);
 
