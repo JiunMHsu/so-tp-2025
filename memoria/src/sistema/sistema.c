@@ -71,6 +71,14 @@ u_int8_t finalizar_proceso(u_int32_t pid)
         return 0;
     }
 
+    t_list *marcos_asignados = obtener_marcos_asignados(pid);
+
+    if (marcos_asignados == NULL)
+        return 1; // no hay marcos asignados, no hay nada que hacer
+
+    liberar_frames(marcos_asignados);
+
+    list_destroy_and_destroy_elements(marcos_asignados, &free);
     t_list *instrucciones = dictionary_remove(procesos_instrucciones, key_pid);
     list_destroy_and_destroy_elements(instrucciones, free);
 
@@ -126,14 +134,20 @@ u_int8_t swap_in_proceso(u_int32_t pid)
 {
     int32_t cantidad_paginas = get_cantidad_paginas(pid);
     if (cantidad_paginas < 0)
+    {
+        log_evento("Error al obtener cantidad de paginas para swap in");
         return 0; // error al obtener cantidad de paginas
+    }
 
     if (cantidad_paginas == 0)
         return 1; // no estoy seguro si debería validar este caso
 
     t_list *marcos_asignados = ocupar_frames(cantidad_paginas);
     if (marcos_asignados == NULL)
+    {
+        log_evento("No hay suficientes frames libres para swap in");
         return 0; // no hay suficientes frames libres
+    }
 
     t_list *paginas_recuperadas = recuperar_de_swap(pid);
     for (int i = 0; i < cantidad_paginas; i++)
@@ -152,6 +166,7 @@ u_int8_t swap_in_proceso(u_int32_t pid)
     list_clean_and_destroy_elements(marcos_asignados, &free);
     list_destroy_and_destroy_elements(paginas_recuperadas, &free);
 
+    log_evento("Swap in del proceso completado");
     return 1;
 }
 

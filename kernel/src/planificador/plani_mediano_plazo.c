@@ -16,7 +16,7 @@ static void suspender_proceso(t_pcb *proceso);
 static void manejar_fallo(t_pcb *proceso);
 static void insertar_en_suspended_ready(t_pcb *proceso);
 
-static t_cronometro *crear_cronometro(u_int64_t tiempo_espera);
+static t_cronometro *crear_cronometro();
 static bool _cronometro_libre(void *_cronometro);
 static void *cronometrar(void *_cronometro);
 
@@ -50,7 +50,7 @@ void insertar_en_blocked(t_pcb *proceso)
 
     if (cronometro == NULL)
     {
-        cronometro = crear_cronometro(tiempo_espera);
+        cronometro = crear_cronometro();
         pthread_create(&(cronometro->rutina_consumo), NULL, &cronometrar, cronometro);
         pthread_detach(cronometro->rutina_consumo);
 
@@ -112,14 +112,16 @@ static void insertar_en_suspended_ready(t_pcb *proceso)
     {
     case FIFO:
         push_proceso(q_susp_ready, proceso);
-        return;
+        break;
     case PMCP:
         ordered_insert_proceso(q_susp_ready, proceso, &es_de_menor_tamanio_que);
-        return;
+        break;
     default: // caso SJF, SRT, no debería ocurrir nunca
         log_mensaje_error("Algoritmo de desuspención no soportado.");
         return;
     }
+
+    puede_admitir_proceso_nuevo();
 }
 
 t_pcb *desuspender_proceso_ready()
@@ -143,14 +145,18 @@ int8_t hay_proceso_susp_ready()
 
 static void suspender_proceso(t_pcb *proceso)
 {
-    push_proceso(q_susp_blocked, proceso);
+    int32_t resultado = solicitar_swap_out(proceso->pid);
+    if (!resultado)
+    {
+        log_mensaje_error("Error al solicitar swap out del proceso.");
+        exit(1);
+    }
 
-    // TODO: Capaz pasar a exit si no se pudo suspender
-    solicitar_swap_out(proceso->pid);
+    push_proceso(q_susp_blocked, proceso);
     puede_admitir_proceso_nuevo();
 }
 
-static t_cronometro *crear_cronometro(u_int64_t tiempo_espera)
+static t_cronometro *crear_cronometro()
 {
     t_cronometro *cronometro = malloc(sizeof(t_cronometro));
     cronometro->hay_proceso = malloc(sizeof(sem_t));

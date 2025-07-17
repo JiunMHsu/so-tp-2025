@@ -33,7 +33,7 @@ int main(int argc, char *argv[])
         }
 
         log_inicio_io(peticion->pid, peticion->tiempo);
-        usleep(peticion->tiempo);
+        usleep(peticion->tiempo * 1000);
         log_finalizacion_io(peticion->pid);
         destruir_peticion_io(peticion);
 
