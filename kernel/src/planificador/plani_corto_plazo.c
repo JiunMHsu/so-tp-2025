@@ -78,7 +78,7 @@ static double estimar_rafaga(double anterior_estimado, u_int64_t real_anterior)
 
 static t_pcb *_es_de_menor_rafaga(t_pcb *proceso_a, t_pcb *proceso_b)
 {
-    if (get_estimacion_rafaga_pcb(proceso_a) < get_estimacion_rafaga_pcb(proceso_b))
+    if (get_estimacion_rafaga_pcb(proceso_a) <= get_estimacion_rafaga_pcb(proceso_b))
         return proceso_a;
 
     return proceso_b;
