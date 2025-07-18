@@ -44,8 +44,8 @@ t_pcb *crear_pcb(u_int32_t pid, u_int32_t tamanio, char *ejecutable, double est_
     for (int i = 0; i < 7; i++)
     {
         char *estado_string = get_estado_string(estados[i]);
-        dictionary_put(pcb->metricas_estado, strdup(estado_string), calloc(1, sizeof(u_int32_t)));
-        dictionary_put(pcb->metricas_tiempo, strdup(estado_string), list_create());
+        dictionary_put(pcb->metricas_estado, estado_string, calloc(1, sizeof(u_int32_t)));
+        dictionary_put(pcb->metricas_tiempo, estado_string, list_create());
     }
 
     pcb->temporal = NULL;
