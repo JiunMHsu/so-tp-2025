@@ -22,7 +22,7 @@ void log_fetch_instruccion(u_int32_t pid, u_int32_t pc);
 void log_interrupcion_recibida();
 void log_instruccion_ejecutada(u_int32_t pid, char *instruccion, char *parametros); // parametros podria cambiar
 void log_operacion_acceso_memoria(u_int32_t pid, t_operacion_acceso accion, u_int32_t direccion_fisica, char *valor);
-void log_obtener_marco(u_int32_t pid, u_int32_t numero_pagina, u_int32_t numero_marco);
+void log_obtener_marco(u_int32_t pid, u_int32_t numero_pagina, u_int32_t marco);
 void log_tlb_hit(u_int32_t pid, u_int32_t numero_pagina);
 void log_tlb_miss(u_int32_t pid, u_int32_t numero_pagina);
 void log_pagina_ingresada_tlb(u_int32_t pid, u_int32_t numero_pagina);
