@@ -21,7 +21,7 @@ void log_evento(char *evento)
 
 void log_mensaje_error(char *error)
 {
-    log_error(kernel_logger, "%s", error);
+    log_info(kernel_logger, "%s", error);
 }
 
 void log_syscall_recibida(u_int32_t pid, char *syscall)
