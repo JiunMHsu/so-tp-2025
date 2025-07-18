@@ -38,7 +38,7 @@ void crear_tablas_para(u_int32_t pid)
 
     t_tabla *tablas = crear_tabla_paginas(1, get_cantidad_niveles());
     dictionary_put(tablas_procesos, _pid, tablas);
-
+    free(_pid);
     pthread_mutex_unlock(&mutex_tablas_procesos);
 }
 
@@ -210,12 +210,8 @@ static void recorrer_tablas(t_list *lista_entradas, t_tabla *tabla, u_int32_t ni
     {
         t_entrada *entrada = list_get(tabla->entradas, i);
         if (entrada->siguiente == NULL)
-        {
             list_add(lista_entradas, entrada);
-        }
         else
-        {
             recorrer_tablas(lista_entradas, entrada->siguiente, nivel + 1);
-        }
     }
 }

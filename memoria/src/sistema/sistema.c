@@ -42,6 +42,8 @@ static t_list *leer_instrucciones(char *ejecutable)
 
     FILE *archivo = fopen(path_completo, "r");
 
+    free(path_completo);
+
     if (archivo == NULL)
     {
         log_mensaje_error("No se pudo abrir archivo de instrucciones.");
@@ -188,6 +190,8 @@ u_int8_t dump_proceso(u_int32_t pid)
 
     t_list *paginas = leer_paginas_por_marcos(marcos_asignados);
     generar_dump(pid, paginas);
+    list_destroy_and_destroy_elements(marcos_asignados, &free);
+    list_destroy_and_destroy_elements(paginas, &free);
     log_evento("Dump del proceso completado");
     return 1;
 }
