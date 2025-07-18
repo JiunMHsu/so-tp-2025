@@ -21,7 +21,10 @@ u_int8_t crear_proceso(u_int32_t pid, u_int32_t tamanio, char *ejecutable)
     if (frames_asignados == NULL)
         return 0; // no hay suficientes frames libres
 
-    dictionary_put(procesos_instrucciones, string_itoa(pid), leer_instrucciones(ejecutable));
+    char *_pid = string_itoa(pid);
+    dictionary_put(procesos_instrucciones, _pid, leer_instrucciones(ejecutable));
+    free(_pid);
+
     crear_metricas_para(pid);
     crear_tablas_para(pid);
     cargar_marcos_asignados(pid, frames_asignados);
@@ -40,6 +43,8 @@ static t_list *leer_instrucciones(char *ejecutable)
     string_append(&path_completo, ejecutable);
 
     FILE *archivo = fopen(path_completo, "r");
+
+    free(path_completo);
 
     if (archivo == NULL)
     {
@@ -169,7 +174,7 @@ u_int8_t swap_in_proceso(u_int32_t pid)
 
     incrementar_swap_in(pid);
 
-    list_clean_and_destroy_elements(marcos_asignados, &free);
+    list_destroy_and_destroy_elements(marcos_asignados, &free);
     list_destroy_and_destroy_elements(paginas_recuperadas, &free);
     log_swap_in(pid);
     return 1;
@@ -186,6 +191,8 @@ u_int8_t dump_proceso(u_int32_t pid)
 
     t_list *paginas = leer_paginas_por_marcos(marcos_asignados);
     generar_dump(pid, paginas);
+    list_destroy_and_destroy_elements(marcos_asignados, &free);
+    list_destroy_and_destroy_elements(paginas, &free);
     log_evento("Dump del proceso completado");
     return 1;
 }

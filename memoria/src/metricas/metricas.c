@@ -26,7 +26,7 @@ void crear_metricas_para(u_int32_t pid)
 
     t_metricas *metricas = crear_metricas();
     dictionary_put(metricas_procesos, _pid, metricas);
-
+    free(_pid);
     pthread_mutex_unlock(&mutex_metricas);
 }
 

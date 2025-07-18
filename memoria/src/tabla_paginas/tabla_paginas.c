@@ -38,7 +38,7 @@ void crear_tablas_para(u_int32_t pid)
 
     t_tabla *tablas = crear_tabla_paginas(1, get_cantidad_niveles());
     dictionary_put(tablas_procesos, _pid, tablas);
-
+    free(_pid);
     pthread_mutex_unlock(&mutex_tablas_procesos);
 }
 
