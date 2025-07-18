@@ -6,6 +6,7 @@ void iniciar_logger(char *id_cpu)
 {
     char *log_file = string_from_format("cpu_%s.log", id_cpu);
     cpu_logger = log_create(log_file, "CPU", true, get_log_level());
+    free(log_file);
 }
 
 void destruir_logger()
