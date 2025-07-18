@@ -64,6 +64,7 @@ static void *_dump_memory(void *_proceso)
 
     int8_t respuesta = solicitar_dump_proceso(proceso->pid);
     u_int8_t fallo = respuesta ? 0 : 1;
+    log_evento("a desbloquear por fin de dump");
     desbloquear_proceso(proceso, fallo);
 
     return NULL;

@@ -109,3 +109,13 @@ static void *u_int64_t_sum(void *a, void *b)
     *(u_int64_t *)a += *(u_int64_t *)b;
     return a;
 }
+
+void log_arranca_cronometro(u_int32_t pid, u_int64_t tiempo)
+{
+    log_info(kernel_logger, "## (%d) - Cronómetro arrancado por %lu ms", pid, tiempo);
+}
+
+void log_suspension_proceso(u_int32_t pid, u_int64_t tiempo)
+{
+    log_info(kernel_logger, "## (%d) - Proceso suspendido por %lu ms", pid, tiempo);
+}
