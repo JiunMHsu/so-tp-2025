@@ -69,9 +69,7 @@ void agregar_entrada_tlb(u_int32_t pagina, u_int32_t marco)
     if (entrada_libre == cantidad_entradas)
         remover_entrada(0);
 
-    tlb[entrada_libre] = entrada;
-
-    entrada_libre++;
+    insertar_entrada(entrada);
 }
 
 static entrada_tlb remover_entrada(u_int32_t indice_pagina)
@@ -93,7 +91,7 @@ static int32_t obtener_indice(u_int32_t pagina)
 {
     entrada_tlb entrada;
 
-    for (u_int32_t i = 0; i <= cantidad_entradas; i++)
+    for (u_int32_t i = 0; i < entrada_libre; i++)
     {
         entrada = tlb[i];
 
