@@ -23,6 +23,8 @@ static void *planificar_por_srt();
 
 static void *manejar_desalojado();
 
+static void _insertar_en_ready(t_pcb *pcb);
+
 void inicializar_planificador_corto_plazo()
 {
     q_ready = crear_estado(READY);
@@ -59,16 +61,21 @@ void inicializar_planificador_corto_plazo()
     pthread_detach(rutinas[1]);
 }
 
-void insertar_en_ready(t_pcb *proceso)
+static void _insertar_en_ready(t_pcb *proceso)
 {
     double rafaga_estimacion = estimar_rafaga(get_estimacion_rafaga_pcb(proceso),
                                               get_rafaga_ejecutada_pcb(proceso));
     set_estimacion_rafaga_pcb(proceso, rafaga_estimacion);
 
     push_proceso(q_ready, proceso);
+}
 
+void insertar_en_ready(t_pcb *proceso)
+{
+    _insertar_en_ready(proceso);
+    
     if (algoritmo_en_uso == SRT)
-        sem_wait(puede_replanificar);
+        sem_post(puede_replanificar);
 }
 
 static double estimar_rafaga(double anterior_estimado, u_int64_t real_anterior)
@@ -78,7 +85,7 @@ static double estimar_rafaga(double anterior_estimado, u_int64_t real_anterior)
 
 static t_pcb *_es_de_menor_rafaga(t_pcb *proceso_a, t_pcb *proceso_b)
 {
-    if (get_estimacion_rafaga_pcb(proceso_a) < get_estimacion_rafaga_pcb(proceso_b))
+    if (get_estimacion_rafaga_pcb(proceso_a) <= get_estimacion_rafaga_pcb(proceso_b))
         return proceso_a;
 
     return proceso_b;
@@ -168,13 +175,14 @@ static void *manejar_desalojado()
     {
         t_desalojo *desalojado = get_desalojado(); // bloquante si no hay finalizados
 
+        t_pcb *proceso = remove_proceso(q_executing, desalojado->pid);
+
         if (algoritmo_en_uso == SJF)
             sem_post(hay_cpu_libre);
 
-        if (algoritmo_en_uso == SRT)
+        if (algoritmo_en_uso == SRT && desalojado->motivo != SCHEDULER_INT)
             sem_post(puede_replanificar);
 
-        t_pcb *proceso = remove_proceso(q_executing, desalojado->pid);
 
         set_program_counter_pcb(proceso, desalojado->program_counter);
         set_rafaga_ejecutada_pcb(proceso, get_tiempo_estado_actual_pcb(proceso));
@@ -182,7 +190,7 @@ static void *manejar_desalojado()
         switch (desalojado->motivo)
         {
         case SCHEDULER_INT:
-            insertar_en_ready(proceso);
+            _insertar_en_ready(proceso);
             break;
         case SYSCALL:
             manejar_syscall(proceso, desalojado->syscall);
