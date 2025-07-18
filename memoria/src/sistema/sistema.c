@@ -23,14 +23,12 @@ u_int8_t crear_proceso(u_int32_t pid, u_int32_t tamanio, char *ejecutable)
 
     char *_pid = string_itoa(pid);
     dictionary_put(procesos_instrucciones, _pid, leer_instrucciones(ejecutable));
-    free(_pid);
-
     crear_metricas_para(pid);
     crear_tablas_para(pid);
     cargar_marcos_asignados(pid, frames_asignados);
 
     list_destroy_and_destroy_elements(frames_asignados, &free);
-
+    free(_pid);
     log_creacion_proceso(pid, tamanio);
     return 1;
 }
@@ -62,6 +60,7 @@ static t_list *leer_instrucciones(char *ejecutable)
 
     free(linea);
     fclose(archivo);
+    free(path_completo);
     return instrucciones;
 }
 
@@ -161,7 +160,7 @@ u_int8_t swap_in_proceso(u_int32_t pid)
     if (list_size(paginas_recuperadas) != cantidad_paginas)
     {
         log_evento("Error al recuperar paginas de swap");
-        list_clean_and_destroy_elements(marcos_asignados, &free);
+        list_destroy_and_destroy_elements(marcos_asignados, &free);
         list_destroy_and_destroy_elements(paginas_recuperadas, &free);
         return 0; // error al recuperar paginas
     }

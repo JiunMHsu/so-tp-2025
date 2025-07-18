@@ -210,12 +210,8 @@ static void recorrer_tablas(t_list *lista_entradas, t_tabla *tabla, u_int32_t ni
     {
         t_entrada *entrada = list_get(tabla->entradas, i);
         if (entrada->siguiente == NULL)
-        {
             list_add(lista_entradas, entrada);
-        }
         else
-        {
             recorrer_tablas(lista_entradas, entrada->siguiente, nivel + 1);
-        }
     }
 }

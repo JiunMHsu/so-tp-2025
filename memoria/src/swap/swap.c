@@ -58,9 +58,7 @@ void guardar_en_swap(u_int32_t pid, t_list *paginas)
         fseek(archivo_swap, 0, SEEK_END);
         u_int32_t posicion = ftell(archivo_swap) / tam_pagina;
         t_swapped *nuevo_swapped = crear_swapped(cantidad_paginas, posicion);
-        char *__pid = strdup(_pid);
-        dictionary_put(swapped, __pid, nuevo_swapped);
-        free(__pid);
+        dictionary_put(swapped, _pid, nuevo_swapped);
     }
 
     t_swapped *proceso = dictionary_get(swapped, _pid);
