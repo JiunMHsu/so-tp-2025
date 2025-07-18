@@ -16,7 +16,7 @@ void destruir_logger()
 
 void log_mensaje_error(char *error)
 {
-    log_error(cpu_logger, "%s", error);
+    log_info(cpu_logger, "%s", error);
 }
 
 void log_fetch_instruccion(u_int32_t pid, u_int32_t pc)

@@ -19,12 +19,12 @@ void log_evento(char *evento)
 
 void log_mensaje_error(char *error)
 {
-    log_error(memoria_logger, "%s", error);
+    log_info(memoria_logger, "%s", error);
 }
 
 void log_mensaje_advertencia(char *advertencia)
 {
-    log_warning(memoria_logger, "%s", advertencia);
+    log_info(memoria_logger, "%s", advertencia);
 }
 
 void log_conexion_kernel(int32_t socket_kernel)
