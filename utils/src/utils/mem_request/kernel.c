@@ -48,6 +48,7 @@ t_kernel_mem_req *recibir_kernel_mem_request(int32_t fd_kernel)
 
 void destruir_kernel_mem_request(t_kernel_mem_req *mem_request)
 {
-    free(mem_request->path);
+    if (mem_request->path != NULL)
+        free(mem_request->path);
     free(mem_request);
 }

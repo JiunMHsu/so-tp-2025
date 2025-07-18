@@ -19,7 +19,7 @@ void destruir_desalojo(t_desalojo *desalojo)
     if (desalojo == NULL)
         return;
 
-    if (desalojo->syscall)
+    if (desalojo->syscall != NULL)
         free(desalojo->syscall);
 
     free(desalojo);
