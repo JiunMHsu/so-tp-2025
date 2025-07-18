@@ -17,13 +17,13 @@ static int64_t get_rafaga_restante_estimado(t_pcb *pcb);
 static t_pcb *_es_de_menor_rafaga(t_pcb *proceso_a, t_pcb *proceso_b);
 static t_pcb *_mayor_rafaga_restante(t_pcb *a, t_pcb *b);
 
+static void _insertar_en_ready(t_pcb *pcb);
+
 static void *planificar_por_fifo();
 static void *planificar_por_sjf();
 static void *planificar_por_srt();
 
 static void *manejar_desalojado();
-
-static void _insertar_en_ready(t_pcb *pcb);
 
 void inicializar_planificador_corto_plazo()
 {
@@ -73,7 +73,7 @@ static void _insertar_en_ready(t_pcb *proceso)
 void insertar_en_ready(t_pcb *proceso)
 {
     _insertar_en_ready(proceso);
-    
+
     if (algoritmo_en_uso == SRT)
         sem_post(puede_replanificar);
 }
@@ -182,7 +182,6 @@ static void *manejar_desalojado()
 
         if (algoritmo_en_uso == SRT && desalojado->motivo != SCHEDULER_INT)
             sem_post(puede_replanificar);
-
 
         set_program_counter_pcb(proceso, desalojado->program_counter);
         set_rafaga_ejecutada_pcb(proceso, get_tiempo_estado_actual_pcb(proceso));
