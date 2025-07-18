@@ -62,7 +62,7 @@ void *recibir_datos_lectura()
     if (respuesta_memoria->resultado == OPERATION_FAILED)
         return NULL;
 
-    void *datos_leidos = calloc(respuesta_memoria->tamanio_buffer, sizeof(char));
+    void *datos_leidos = calloc(respuesta_memoria->tamanio_buffer + 1, sizeof(char));
     memcpy(datos_leidos, respuesta_memoria->buffer, respuesta_memoria->tamanio_buffer);
     destruir_buffer_response(respuesta_memoria);
     return datos_leidos;

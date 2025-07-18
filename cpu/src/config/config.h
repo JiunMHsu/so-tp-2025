@@ -3,6 +3,7 @@
 
 #include <errno.h>
 #include <string.h>
+#include <stdlib.h>
 #include <commons/string.h>
 #include <commons/config.h>
 #include <commons/log.h>
@@ -28,7 +29,7 @@ typedef enum
     CLOCK_M
 } algoritmo_sustitucion;
 
-void iniciar_config(char* id);
+void iniciar_config(char *id);
 void destruir_config(void);
 u_int32_t get_entradas_tlb(void);
 u_int32_t get_entradas_cache(void);
