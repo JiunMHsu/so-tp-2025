@@ -30,6 +30,9 @@ void manejar_syscall(t_pcb *proceso, char *syscall)
 
 u_int8_t is_init_proc(char *syscall)
 {
+    if (syscall == NULL)
+        return 0;
+
     return string_starts_with(syscall, "INIT_PROC");
 }
 
