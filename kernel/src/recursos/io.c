@@ -122,10 +122,14 @@ static void destruir_io(t_io *io)
 
     free(io->nombre);
 
+    mlist_iterate(io->instancias, (void (*)(void *))destruir_instancia_io);
     mlist_destroy(io->instancias);
+
+    mlist_iterate(io->instancias_libres, (void (*)(void *))destruir_instancia_io);
     mlist_destroy(io->instancias_libres);
     sem_destroy(io->hay_instancia_libre);
 
+    mlist_iterate(io->peticiones, (void (*)(void *))destruir_peticion_consumo);
     mlist_destroy(io->peticiones);
     sem_destroy(io->hay_peticion);
 
@@ -213,6 +217,7 @@ static void destruir_instancia_io(t_instancia_io *instancia_io)
     if (instancia_io == NULL)
         return;
 
+    destruir_peticion_io(instancia_io->peticion); // TODO: remover si causa problemas
     sem_destroy(instancia_io->hay_peticion);
     free(instancia_io);
     instancia_io = NULL;
