@@ -38,7 +38,7 @@ t_mem_datos_paginacion *recibir_mem_datos_paginacion(u_int32_t fd_conexion)
     mem_datos_paginacion->cantidad_niveles = *(u_int32_t *)list_get(paquete, 1);
     mem_datos_paginacion->tamanio_pagina = *(u_int32_t *)list_get(paquete, 2);
 
-    list_destroy(paquete);
+    list_destroy_and_destroy_elements(paquete, &free);
     return mem_datos_paginacion;
 }
 

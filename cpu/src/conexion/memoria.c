@@ -62,7 +62,7 @@ void *recibir_datos_lectura()
     if (respuesta_memoria->resultado == OPERATION_FAILED)
         return NULL;
 
-    void *datos_leidos = calloc(respuesta_memoria->tamanio_buffer, sizeof(char));
+    void *datos_leidos = calloc(respuesta_memoria->tamanio_buffer + 1, sizeof(char));
     memcpy(datos_leidos, respuesta_memoria->buffer, respuesta_memoria->tamanio_buffer);
     destruir_buffer_response(respuesta_memoria);
     return datos_leidos;
@@ -121,7 +121,7 @@ void enviar_peticion_escritura(u_int32_t pid, u_int32_t direccion_fisica, void *
 
 void enviar_peticion_lectura(u_int32_t pid, u_int32_t direccion_fisica, u_int32_t tamanio_bytes)
 {
-    t_peticion_cpu *peticion_lectura = crear_peticion_lectura(pid, direccion_fisica, tamanio_bytes);
+    t_peticion_cpu *peticion_lectura = crear_peticion_lectura(pid, direccion_fisica, tamanio_bytes + 1);
     enviar_peticion_cpu(fd_memoria, peticion_lectura);
     destruir_peticion_cpu(peticion_lectura);
 }

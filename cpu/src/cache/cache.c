@@ -160,7 +160,7 @@ void *leer_cache(u_int32_t nro_pagina, u_int32_t offset, u_int32_t bytes_tamanio
     u_int32_t indice_pagina = get_indice_pagina(nro_pagina);
     entrada_cache *entrada = get_entrada(indice_pagina);
     entrada->bit_uso = 1;
-    void *datos_leidos = calloc(bytes_tamanio, sizeof(char));
+    void *datos_leidos = calloc(bytes_tamanio + 1, sizeof(char));
 
     memcpy(datos_leidos, entrada->contenido + offset, bytes_tamanio);
 

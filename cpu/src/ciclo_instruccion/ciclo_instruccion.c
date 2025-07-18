@@ -31,7 +31,6 @@ fin_ejecucion ejecutar_ciclo_instruccion(u_int32_t pid, u_int32_t program_counte
         instruccion = decode(instruccion_str);
 
         execute(instruccion);
-        log_instruccion_ejecutada(pid, instruccion.cod_instruccion, array_to_string(instruccion.parametros));
 
         if (hay_syscall)
         {
@@ -83,6 +82,9 @@ static instruccion_ejecutable decode(char *instruccion_recibida)
 static void execute(instruccion_ejecutable instruccion)
 {
     global_program_counter++;
+    char *parametros = array_to_string(instruccion.parametros);
+    log_instruccion_ejecutada(get_pid(), instruccion.cod_instruccion, parametros);
+    free(parametros);
     instruccion.funcion_instruccion(instruccion.parametros);
 }
 
