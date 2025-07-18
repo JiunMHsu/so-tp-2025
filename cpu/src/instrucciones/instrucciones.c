@@ -85,12 +85,12 @@ static void _read(char **parametros)
             cachear_pagina(nro_pagina, marco_pagina);
         }
 
-        datos_leidos = leer_cache(nro_pagina, get_offset(direccion_logica), tamanio_lectura + 1);
+        datos_leidos = leer_cache(nro_pagina, get_offset(direccion_logica), tamanio_lectura);
     }
     else
     {
         u_int32_t direccion_fisica = get_direccion_fisica(direccion_logica);
-        enviar_peticion_lectura(get_pid(), direccion_fisica, tamanio_lectura + 1);
+        enviar_peticion_lectura(get_pid(), direccion_fisica, tamanio_lectura);
         datos_leidos = recibir_datos_lectura();
         log_operacion_acceso_memoria(get_pid(), LECTURA, direccion_fisica, (char *)datos_leidos);
     }
