@@ -17,7 +17,7 @@
 typedef struct
 {
     sem_t *hay_proceso;
-    u_int32_t pid;       // PID del proceso asociado
+    t_pcb *proceso;      // Proceso asociado al cronómetro
     u_int8_t esta_libre; // 1 si está libre, 0 si está ocupado
     u_int64_t tiempo;    // Tiempo de espera en milisegundos
     pthread_t rutina_consumo;

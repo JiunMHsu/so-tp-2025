@@ -57,7 +57,7 @@ void insertar_en_blocked(t_pcb *proceso)
         list_add(timer_pool, cronometro);
     }
 
-    cronometro->pid = proceso->pid;
+    cronometro->proceso = proceso;
     cronometro->esta_libre = 0;
     sem_post(cronometro->hay_proceso);
     pthread_mutex_unlock(&timer_pool_mutex);
@@ -68,16 +68,15 @@ void desbloquear_proceso(t_pcb *proceso, u_int8_t fallo)
     if (fallo)
         return manejar_fallo(proceso);
 
-    t_pcb *pcb = NULL;
     switch (get_estado_pcb(proceso))
     {
     case BLOCKED:
-        pcb = remove_proceso(q_blocked, proceso->pid);
-        insertar_en_ready(pcb);
+        insertar_en_ready(proceso);
+        remove_proceso(q_blocked, proceso->pid);
         return;
     case SUSPENDED_BLOCKED:
-        pcb = remove_proceso(q_susp_blocked, proceso->pid);
-        insertar_en_suspended_ready(pcb);
+        insertar_en_suspended_ready(proceso);
+        remove_proceso(q_susp_blocked, proceso->pid);
         return;
     default:
         log_mensaje_error("proceso no bloqueado, ni bloqueado suspendido.");
@@ -87,21 +86,21 @@ void desbloquear_proceso(t_pcb *proceso, u_int8_t fallo)
 
 static void manejar_fallo(t_pcb *proceso)
 {
-    t_pcb *pcb = NULL;
-    switch (get_estado_pcb(proceso))
+    t_state estado = get_estado_pcb(proceso);
+    insertar_en_exit(proceso);
+
+    switch (estado)
     {
     case BLOCKED:
-        pcb = remove_proceso(q_blocked, proceso->pid);
+        remove_proceso(q_blocked, proceso->pid);
         break;
     case SUSPENDED_BLOCKED:
-        pcb = remove_proceso(q_susp_blocked, proceso->pid);
+        remove_proceso(q_susp_blocked, proceso->pid);
         break;
     default:
         log_mensaje_error("proceso no bloqueado, ni bloqueado suspendido.");
         return;
     }
-
-    insertar_en_exit(pcb);
 }
 
 static void insertar_en_suspended_ready(t_pcb *proceso)
@@ -143,7 +142,11 @@ int8_t hay_proceso_susp_ready()
 
 static void suspender_proceso(t_pcb *proceso)
 {
+    if (get_estado_pcb(proceso) != BLOCKED)
+        return;
+
     push_proceso(q_susp_blocked, proceso);
+    remove_proceso(q_blocked, proceso->pid);
     int32_t resultado = solicitar_swap_out(proceso->pid);
     if (!resultado)
     {
@@ -159,7 +162,7 @@ static t_cronometro *crear_cronometro()
     t_cronometro *cronometro = malloc(sizeof(t_cronometro));
     cronometro->hay_proceso = malloc(sizeof(sem_t));
     sem_init(cronometro->hay_proceso, 0, 0);
-    cronometro->pid = 0;
+    cronometro->proceso = NULL;
     cronometro->tiempo = tiempo_espera;
     cronometro->esta_libre = 1;
     cronometro->rutina_consumo = 0;
@@ -174,16 +177,11 @@ static void *cronometrar(void *_cronometro)
     while (1)
     {
         sem_wait(cronometro->hay_proceso);
-        log_arranca_cronometro(cronometro->pid, cronometro->tiempo);
+        log_arranca_cronometro(cronometro->proceso->pid, cronometro->tiempo);
         usleep(cronometro->tiempo * 1000); // Convertir a microsegundos
 
-        t_pcb *proceso = remove_proceso(q_blocked, cronometro->pid);
-        if (proceso != NULL)
-        {
-            log_suspension_proceso(proceso->pid, cronometro->tiempo);
-            suspender_proceso(proceso);
-        }
-
+        suspender_proceso(cronometro->proceso);
+        cronometro->proceso = NULL;
         cronometro->esta_libre = 1;
     }
 
