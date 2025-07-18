@@ -95,7 +95,7 @@ static void _read(char **parametros)
         log_operacion_acceso_memoria(get_pid(), LECTURA, direccion_fisica, (char *)datos_leidos);
     }
 
-    printf("Datos leidos: %s", (char *)datos_leidos);
+    printf("Datos leidos: %s \n", (char *)datos_leidos);
     free(datos_leidos);
 }
 

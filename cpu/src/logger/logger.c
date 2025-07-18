@@ -20,7 +20,7 @@ void log_mensaje_error(char *error)
 
 void log_fetch_instruccion(u_int32_t pid, u_int32_t pc)
 {
-    log_info(cpu_logger, "##PID : %d - FETCH - Program Counter : %d", pid, pc);
+    log_info(cpu_logger, "## PID: %d - FETCH - Program Counter : %d", pid, pc);
 }
 
 void log_interrupcion_recibida()
@@ -47,45 +47,45 @@ void log_operacion_acceso_memoria(u_int32_t pid, t_operacion_acceso accion, u_in
         break;
     }
 
-    log_info(cpu_logger, "PID : %d - Acción : %s - Dirección Física : %d - Valor : %s", pid, accion_str, direccion_fisica, valor);
+    log_info(cpu_logger, "## PID : %d - Acción : %s - Dirección Física : %d - Valor : %s", pid, accion_str, direccion_fisica, valor);
 }
 
-void log_obtener_marco(u_int32_t pid, u_int32_t numero_pagina, u_int32_t numero_marco) // revisar parametros
+void log_obtener_marco(u_int32_t pid, u_int32_t numero_pagina, u_int32_t marco) // revisar parametros
 {
-    log_info(cpu_logger, "PID: %d - OBTENER MARCO - Página: %d- Marco: %d", pid, numero_pagina, numero_pagina);
+    log_info(cpu_logger, "## PID: %d - OBTENER MARCO - Página: %d - Frame: %d", pid, numero_pagina, marco);
 }
 
 void log_tlb_hit(u_int32_t pid, u_int32_t numero_pagina) // revisar parametros
 {
-    log_info(cpu_logger, "PID: %d - TLB HIT - Pagina: %d", pid, numero_pagina);
+    log_info(cpu_logger, "## PID: %d - TLB HIT - Pagina: %d", pid, numero_pagina);
 }
 
 void log_tlb_miss(u_int32_t pid, u_int32_t numero_pagina)
 {
-    log_info(cpu_logger, "PID: %d - TLB MISS - Pagina: %d", pid, numero_pagina);
+    log_info(cpu_logger, "## PID: %d - TLB MISS - Pagina: %d", pid, numero_pagina);
 }
 
 void log_pagina_ingresada_tlb(u_int32_t pid, u_int32_t numero_pagina)
 {
-    log_info(cpu_logger, "PID: %d - TLB ADD - Pagina: %d", pid, numero_pagina);
+    log_info(cpu_logger, "## PID: %d - TLB ADD - Pagina: %d", pid, numero_pagina);
 }
 
 void log_cache_hit(u_int32_t pid, u_int32_t numero_pagina)
 {
-    log_info(cpu_logger, "PID: %d - Cache Hit - Pagina: %d", pid, numero_pagina);
+    log_info(cpu_logger, "## PID: %d - Cache Hit - Pagina: %d", pid, numero_pagina);
 }
 
 void log_cache_miss(u_int32_t pid, u_int32_t numero_pagina)
 {
-    log_info(cpu_logger, "PID: %d - Cache Miss - Pagina: %d", pid, numero_pagina);
+    log_info(cpu_logger, "## PID: %d - Cache Miss - Pagina: %d", pid, numero_pagina);
 }
 
 void log_pagina_ingresada_cache(u_int32_t pid, u_int32_t numero_pagina)
 {
-    log_info(cpu_logger, "PID: %d - Cache Add - Pagina: %d", pid, numero_pagina);
+    log_info(cpu_logger, "## PID: %d - Cache Add - Pagina: %d", pid, numero_pagina);
 }
 
 void log_pagina_actualizada_cache_memoria(u_int32_t pid, u_int32_t numero_pagina, u_int32_t frame_memoria_principal)
 {
-    log_info(cpu_logger, "PID: %d - Memory Update - Página: %d - Frame: %d", pid, numero_pagina, frame_memoria_principal);
+    log_info(cpu_logger, "## PID: %d - Memory Update - Página: %d - Frame: %d", pid, numero_pagina, frame_memoria_principal);
 }

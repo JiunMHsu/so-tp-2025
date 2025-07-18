@@ -37,11 +37,13 @@ u_int32_t get_marco(u_int32_t direccion_logica)
         {
             log_tlb_miss(pid, numero_pagina);
             agregar_entrada_tlb(numero_pagina, marco);
-            log_pagina_ingresada_tlb(numero_pagina, marco);
+            log_pagina_ingresada_tlb(pid, numero_pagina);
         }
     }
     else
+    {
         log_tlb_hit(pid, numero_pagina);
+    }
 
     log_obtener_marco(pid, numero_pagina, marco);
     return marco;
@@ -64,7 +66,7 @@ static u_int32_t obtener_marco_de_memoria(u_int32_t pid, u_int32_t cantidad_nive
 
     for (u_int32_t nivel = 1; nivel <= cantidad_niveles; nivel++)
     {
-        entrada_nivel_x = (int)floor(numero_pagina / potencia(cantidad_entradas_tp, (cantidad_niveles - nivel))) % cantidad_entradas_tp;
+        entrada_nivel_x = (u_int32_t)floor(numero_pagina / potencia(cantidad_entradas_tp, (cantidad_niveles - nivel))) % cantidad_entradas_tp;
 
         string_append_with_format(&entradas_por_nivel, "%d", entrada_nivel_x);
 
@@ -91,7 +93,9 @@ static u_int32_t potencia(u_int32_t base, u_int32_t exponente)
 
 u_int32_t get_nro_pagina(u_int32_t direccion_logica)
 {
-    return (u_int32_t)floor(direccion_logica / tamanio_pagina);
+    u_int32_t pagina = (u_int32_t)floor(direccion_logica / tamanio_pagina);
+
+    return pagina;
 }
 
 u_int32_t get_offset(u_int32_t direccion_logica)

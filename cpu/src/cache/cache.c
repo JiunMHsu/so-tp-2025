@@ -10,9 +10,10 @@ static u_int32_t puntero_clock;
 
 static entrada_cache crear_entrada(u_int32_t nro_pagina, u_int32_t marco);
 static entrada_cache *get_entrada(u_int32_t indice);
-static u_int32_t obtener_victima(void);
+static entrada_cache *obtener_victima(void);
 static void destruir_entrada_cache(entrada_cache *entrada);
-static u_int32_t get_indice_pagina(u_int32_t nro_pagina);
+static int32_t get_indice_pagina(u_int32_t nro_pagina);
+static void avanzar_puntero(void);
 
 void inicializar_cache()
 {
@@ -46,8 +47,8 @@ void cachear_pagina(u_int32_t nro_pagina, u_int32_t marco)
     }
     else
     {
-        u_int32_t indice_victima = obtener_victima();
-        entrada_cache *victima = get_entrada(indice_victima);
+        entrada_cache *victima = obtener_victima();
+        u_int32_t indice_victima = get_indice_pagina(victima->pagina);
 
         if (victima->bit_modificado)
         {
@@ -70,29 +71,30 @@ void cachear_pagina(u_int32_t nro_pagina, u_int32_t marco)
     log_pagina_ingresada_cache(get_pid(), nro_pagina);
 }
 
-static u_int32_t obtener_victima()
+static entrada_cache *obtener_victima()
 {
-    u_int32_t indice_victima = 0;
-
     switch (algoritmo)
     {
     case CLOCK:
         while (1)
         {
-            if (memoria_cache[puntero_clock].bit_uso == 0)
+            entrada_cache *posible_victima = get_entrada(puntero_clock);
+
+            if (posible_victima->bit_uso == 0)
             {
-                indice_victima = puntero_clock;
-                puntero_clock = (puntero_clock + 1) % cantidad_entradas; // permite avanzar al siguiente de manera CIRCULAR
-                return indice_victima;
+                avanzar_puntero();
+                return posible_victima;
             }
             else
             {
-                memoria_cache[puntero_clock].bit_uso = 0;
-                puntero_clock = (puntero_clock + 1) % cantidad_entradas;
+                posible_victima->bit_uso = 0;
+                avanzar_puntero();
             }
         }
         break;
     case CLOCK_M:
+        entrada_cache *posible_victima = get_entrada(puntero_clock);
+
         for (u_int32_t paso = 1; paso <= 4; paso++)
         {
             for (u_int32_t i = 0; i < cantidad_entradas; i++)
@@ -101,20 +103,20 @@ static u_int32_t obtener_victima()
                 // Si es el 1er o 3er paso del clock => se busca la pareja (uso = 0, modificado = 0) y no se modifica nada de la entrada si no es
                 // Si es el 2do o 4to paso del clock => se busca la pareja (uso = 0, modificado = 1) y se modifica uso a 0 si no se encuentra esa pareja
 
-                if (memoria_cache[puntero_clock].bit_uso == 0 &&
-                    (((paso == 1 || paso == 3) && memoria_cache[puntero_clock].bit_modificado == 0) ||
-                     ((paso == 2 || paso == 4) && memoria_cache[puntero_clock].bit_modificado == 1)))
+                if (posible_victima->bit_uso == 0 &&
+                    (((paso == 1 || paso == 3) && posible_victima->bit_modificado == 0) ||
+                     ((paso == 2 || paso == 4) && posible_victima->bit_modificado == 1)))
                 {
-                    indice_victima = puntero_clock;
-                    puntero_clock = (puntero_clock + 1) % cantidad_entradas;
-                    return indice_victima;
+                    avanzar_puntero();
+
+                    return posible_victima;
                 }
                 else
                 {
                     if (paso == 2 || paso == 4)
-                        memoria_cache[puntero_clock].bit_uso = 0;
+                        posible_victima->bit_uso = 0;
 
-                    puntero_clock = (puntero_clock + 1) % cantidad_entradas;
+                    avanzar_puntero();
                 }
             }
         }
@@ -123,27 +125,42 @@ static u_int32_t obtener_victima()
         break;
     }
 
-    return indice_victima;
+    return NULL;
+}
+
+void avanzar_puntero()
+{
+    if (puntero_clock + 1 == cantidad_entradas)
+    {
+        puntero_clock = 0;
+        return;
+    }
+
+    puntero_clock++;
 }
 
 void escribir_cache(u_int32_t nro_pagina, u_int32_t offset, void *datos, u_int32_t buffer_size)
 {
     usleep(retardo_milisegundos * 1000);
 
-    entrada_cache *entrada = get_entrada(nro_pagina);
+    u_int32_t indice_pagina = get_indice_pagina(nro_pagina);
+    entrada_cache *entrada = get_entrada(indice_pagina);
+    entrada->bit_uso = 1;
     entrada->bit_modificado = 1;
 
     memcpy(entrada->contenido + offset, datos, buffer_size);
 
-    printf("Escribi en cache: %s \n", (char *)entrada->contenido);
+    // printf("Escribi en cache: %s \n", (char *)entrada->contenido);
 }
 
 void *leer_cache(u_int32_t nro_pagina, u_int32_t offset, u_int32_t bytes_tamanio)
 {
     usleep(retardo_milisegundos * 1000);
 
-    entrada_cache *entrada = get_entrada(nro_pagina);
-    void *datos_leidos = malloc(bytes_tamanio);
+    u_int32_t indice_pagina = get_indice_pagina(nro_pagina);
+    entrada_cache *entrada = get_entrada(indice_pagina);
+    entrada->bit_uso = 1;
+    void *datos_leidos = calloc(bytes_tamanio, sizeof(char));
 
     memcpy(datos_leidos, entrada->contenido + offset, bytes_tamanio);
 
@@ -153,13 +170,11 @@ void *leer_cache(u_int32_t nro_pagina, u_int32_t offset, u_int32_t bytes_tamanio
 static entrada_cache crear_entrada(u_int32_t nro_pagina, u_int32_t marco)
 {
     entrada_cache nueva_entrada;
-    nueva_entrada.contenido = malloc(get_tamanio_pagina());
+    enviar_peticion_lectura_pagina(get_pid(), get_direccion_fisica_por_marco(marco));
+    nueva_entrada.contenido = recibir_contenido_pagina();
 
     nueva_entrada.pagina = nro_pagina;
     nueva_entrada.marco = marco;
-
-    enviar_peticion_lectura_pagina(get_pid(), get_direccion_fisica_por_marco(marco));
-    nueva_entrada.contenido = recibir_contenido_pagina();
 
     nueva_entrada.bit_uso = 1;
     nueva_entrada.bit_modificado = 0;
@@ -167,14 +182,14 @@ static entrada_cache crear_entrada(u_int32_t nro_pagina, u_int32_t marco)
     return nueva_entrada;
 }
 
-static entrada_cache *get_entrada(u_int32_t nro_pagina)
+static entrada_cache *get_entrada(u_int32_t indice)
 {
-    return &memoria_cache[get_indice_pagina(nro_pagina)];
+    return &memoria_cache[indice];
 }
 
 u_int32_t existe_pagina_cache(u_int32_t nro_pagina)
 {
-    if (get_indice_pagina(nro_pagina) == 0)
+    if (get_indice_pagina(nro_pagina) == -1)
     {
         log_cache_miss(get_pid(), nro_pagina);
 
@@ -186,7 +201,7 @@ u_int32_t existe_pagina_cache(u_int32_t nro_pagina)
     return 1;
 }
 
-u_int32_t get_indice_pagina(u_int32_t nro_pagina)
+int32_t get_indice_pagina(u_int32_t nro_pagina)
 {
     for (u_int32_t i = 0; i < entrada_libre; i++)
     {
@@ -198,7 +213,7 @@ u_int32_t get_indice_pagina(u_int32_t nro_pagina)
         }
     }
 
-    return 0;
+    return -1;
 }
 
 u_int32_t cache_habilitada()

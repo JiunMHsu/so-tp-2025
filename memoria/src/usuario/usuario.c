@@ -7,7 +7,7 @@ static u_int32_t get_numero_de_frame(u_int32_t direccion_fisica);
 
 void inicializar_espacio_usuario()
 {
-    memoria_usuario = malloc(get_tam_memoria());
+    memoria_usuario = calloc(1, get_tam_memoria());
     pthread_mutex_init(&memoria_usuario_mutex, NULL);
 }
 
