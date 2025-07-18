@@ -31,5 +31,9 @@ void log_destruccion_proceso(u_int32_t pid, t_metricas *metricas);
 void log_obtencion_instruccion(u_int32_t pid, u_int32_t program_counter, char *instruccion);
 void log_acceso_espacio_usuario(u_int32_t pid, t_accion accion, u_int32_t direccion_fisica, u_int32_t tamanio);
 void log_memory_dump(u_int32_t pid);
+void log_swap_out_solicitado(u_int32_t pid);
+void log_swap_in_solicitado(u_int32_t pid);
+void log_swap_out(u_int32_t pid);
+void log_swap_in(u_int32_t pid);
 
 #endif // MEMORIA_LOGGER_H

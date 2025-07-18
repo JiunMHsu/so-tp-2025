@@ -111,6 +111,7 @@ char *obtener_instruccion(u_int32_t pid, u_int32_t program_counter)
 
 u_int8_t swap_out_proceso(u_int32_t pid)
 {
+    log_swap_out_solicitado(pid);
     t_list *marcos_asignados = obtener_marcos_asignados(pid);
     if (marcos_asignados == NULL)
     {
@@ -127,11 +128,13 @@ u_int8_t swap_out_proceso(u_int32_t pid)
 
     list_destroy_and_destroy_elements(marcos_asignados, &free);
     list_destroy_and_destroy_elements(paginas, &free);
+    log_swap_out(pid);
     return 1;
 }
 
 u_int8_t swap_in_proceso(u_int32_t pid)
 {
+    log_swap_in_solicitado(pid);
     int32_t cantidad_paginas = get_cantidad_paginas(pid);
     if (cantidad_paginas < 0)
     {
@@ -150,12 +153,15 @@ u_int8_t swap_in_proceso(u_int32_t pid)
     }
 
     t_list *paginas_recuperadas = recuperar_de_swap(pid);
-    for (int i = 0; i < cantidad_paginas; i++)
+    if (list_size(paginas_recuperadas) != cantidad_paginas)
     {
-        void *pagina = list_get(paginas_recuperadas, i);
-        u_int32_t marco = *(u_int32_t *)list_get(marcos_asignados, i);
-        escribir_marco_entero(marco, pagina);
+        log_evento("Error al recuperar paginas de swap");
+        list_clean_and_destroy_elements(marcos_asignados, &free);
+        list_destroy_and_destroy_elements(paginas_recuperadas, &free);
+        return 0; // error al recuperar paginas
     }
+
+    escribir_marcos_enteros(marcos_asignados, paginas_recuperadas);
 
     // se asume que la cantidad de paginas no cambia, es decir, se reemplazan
     // justo los marcos que se habían asignado antes del swap out
@@ -165,8 +171,7 @@ u_int8_t swap_in_proceso(u_int32_t pid)
 
     list_clean_and_destroy_elements(marcos_asignados, &free);
     list_destroy_and_destroy_elements(paginas_recuperadas, &free);
-
-    log_evento("Swap in del proceso completado");
+    log_swap_in(pid);
     return 1;
 }
 
@@ -181,6 +186,6 @@ u_int8_t dump_proceso(u_int32_t pid)
 
     t_list *paginas = leer_paginas_por_marcos(marcos_asignados);
     generar_dump(pid, paginas);
-
+    log_evento("Dump del proceso completado");
     return 1;
 }

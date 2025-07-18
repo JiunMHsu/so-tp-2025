@@ -79,3 +79,23 @@ void log_memory_dump(u_int32_t pid)
 {
     log_info(memoria_logger, "## PID: %d - Memory Dump solicitado", pid);
 }
+
+void log_swap_out_solicitado(u_int32_t pid)
+{
+    log_info(memoria_logger, "## PID: %d - Swap Out solicitado", pid);
+}
+
+void log_swap_in_solicitado(u_int32_t pid)
+{
+    log_info(memoria_logger, "## PID: %d - Swap In solicitado", pid);
+}
+
+void log_swap_out(u_int32_t pid)
+{
+    log_info(memoria_logger, "## PID: %d - Swap Out completado", pid);
+}
+
+void log_swap_in(u_int32_t pid)
+{
+    log_info(memoria_logger, "## PID: %d - Swap In completado", pid);
+}

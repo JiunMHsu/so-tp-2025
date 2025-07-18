@@ -7,7 +7,7 @@ static u_int32_t get_numero_de_frame(u_int32_t direccion_fisica);
 
 void inicializar_espacio_usuario()
 {
-    memoria_usuario = calloc(1, get_tam_memoria());
+    memoria_usuario = calloc(get_tam_memoria(), sizeof(char));
     pthread_mutex_init(&memoria_usuario_mutex, NULL);
 }
 
@@ -98,6 +98,28 @@ void *leer_pagina_por_marco(u_int32_t marco)
     return pagina;
 }
 
+t_list *leer_paginas_por_marcos(t_list *marcos)
+{
+    t_list *paginas = list_create();
+    t_list_iterator *iterador_marcos = list_iterator_create(marcos);
+
+    pthread_mutex_lock(&memoria_usuario_mutex);
+    while (list_iterator_has_next(iterador_marcos))
+    {
+        u_int32_t marco = *(u_int32_t *)list_iterator_next(iterador_marcos);
+        u_int32_t _dir = marco * get_tam_pagina();
+        void *pagina = malloc(get_tam_pagina());
+
+        memcpy(pagina, memoria_usuario + _dir, get_tam_pagina());
+
+        list_add(paginas, pagina);
+    }
+    pthread_mutex_unlock(&memoria_usuario_mutex);
+
+    list_iterator_destroy(iterador_marcos);
+    return paginas;
+}
+
 void escribir_marco_entero(u_int32_t marco, void *contenido)
 {
     u_int32_t _dir = marco * get_tam_pagina();
@@ -107,18 +129,16 @@ void escribir_marco_entero(u_int32_t marco, void *contenido)
     pthread_mutex_unlock(&memoria_usuario_mutex);
 }
 
-t_list *leer_paginas_por_marcos(t_list *marcos)
+void escribir_marcos_enteros(t_list *marcos, t_list *contenidos)
 {
-    t_list *paginas = list_create();
-
-    t_list_iterator *iterador_marcos = list_iterator_create(marcos);
-    while (list_iterator_has_next(iterador_marcos))
+    pthread_mutex_lock(&memoria_usuario_mutex);
+    for (int i = 0; i < list_size(contenidos); i++)
     {
-        u_int32_t marco = *(u_int32_t *)list_iterator_next(iterador_marcos);
-        void *pagina = leer_pagina_por_marco(marco);
-        list_add(paginas, pagina);
-    }
-    list_iterator_destroy(iterador_marcos);
+        void *pagina = list_get(contenidos, i);
+        u_int32_t marco = *(u_int32_t *)list_get(marcos, i);
+        u_int32_t _dir = marco * get_tam_pagina();
 
-    return paginas;
+        memcpy(memoria_usuario + _dir, pagina, get_tam_pagina());
+    }
+    pthread_mutex_unlock(&memoria_usuario_mutex);
 }

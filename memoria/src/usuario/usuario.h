@@ -13,7 +13,6 @@ u_int8_t escribir_memoria_usuario(u_int32_t pid, u_int32_t direccion_fisica, voi
 void *leer_memoria_usuario(u_int32_t pid, u_int32_t direccion_fisica, u_int32_t tamanio_buffer);
 
 void *leer_pagina_por_marco(u_int32_t marco);
-void escribir_marco_entero(u_int32_t marco, void *contenido);
 
 /**
  * @brief
@@ -24,5 +23,9 @@ void escribir_marco_entero(u_int32_t marco, void *contenido);
  * @note La lista debe ser destruida por el llamador.
  */
 t_list *leer_paginas_por_marcos(t_list *marcos);
+
+void escribir_marco_entero(u_int32_t marco, void *contenido);
+
+void escribir_marcos_enteros(t_list *marcos, t_list *contenido);
 
 #endif // MEMORIA_USUARIO_H
