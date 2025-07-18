@@ -23,5 +23,7 @@ void log_fin_de_io(u_int32_t pid);
 void log_desalojo_srt(u_int32_t pid);
 void log_finalizacion_proceso(u_int32_t pid);
 void log_metricas_proceso(u_int32_t pid, t_dictionary *metricas_estado, t_dictionary *metricas_tiempo);
+void log_arranca_cronometro(u_int32_t pid, u_int64_t tiempo);
+void log_suspension_proceso(u_int32_t pid, u_int64_t tiempo);
 
 #endif // KERNEL_LOGGER_H

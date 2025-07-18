@@ -143,6 +143,7 @@ int8_t hay_proceso_susp_ready()
 
 static void suspender_proceso(t_pcb *proceso)
 {
+    push_proceso(q_susp_blocked, proceso);
     int32_t resultado = solicitar_swap_out(proceso->pid);
     if (!resultado)
     {
@@ -150,7 +151,6 @@ static void suspender_proceso(t_pcb *proceso)
         exit(1);
     }
 
-    push_proceso(q_susp_blocked, proceso);
     puede_admitir_proceso_nuevo();
 }
 
@@ -174,11 +174,15 @@ static void *cronometrar(void *_cronometro)
     while (1)
     {
         sem_wait(cronometro->hay_proceso);
+        log_arranca_cronometro(cronometro->pid, cronometro->tiempo);
         usleep(cronometro->tiempo * 1000); // Convertir a microsegundos
 
         t_pcb *proceso = remove_proceso(q_blocked, cronometro->pid);
         if (proceso != NULL)
+        {
+            log_suspension_proceso(proceso->pid, cronometro->tiempo);
             suspender_proceso(proceso);
+        }
 
         cronometro->esta_libre = 1;
     }
