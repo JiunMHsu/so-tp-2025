@@ -217,7 +217,6 @@ static void destruir_instancia_io(t_instancia_io *instancia_io)
     if (instancia_io == NULL)
         return;
 
-    destruir_peticion_io(instancia_io->peticion); // TODO: remover si causa problemas
     sem_destroy(instancia_io->hay_peticion);
     free(instancia_io);
     instancia_io = NULL;
