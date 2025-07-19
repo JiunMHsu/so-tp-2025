@@ -42,8 +42,6 @@ static t_list *leer_instrucciones(char *ejecutable)
 
     FILE *archivo = fopen(path_completo, "r");
 
-    free(path_completo);
-
     if (archivo == NULL)
     {
         log_mensaje_error("No se pudo abrir archivo de instrucciones.");
