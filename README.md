@@ -1,6 +1,6 @@
 # Episode III - Revenge of the Cth
 
-Éste es el Trabajo Práctico de Sistemas Operativos de la UTN FRBA, 2025 Primer Cuatrimestre.
+Este es el Trabajo Práctico de Sistemas Operativos de la UTN FRBA, 2025 Primer Cuatrimestre.
 
 Los lineamientos, criterios de evaluación y requerimientos del sistema están especificados en el
 documento principal del Trabajo Práctico, véase [Episode III - Revenge of the Cth](./doc/main.pdf).
@@ -27,7 +27,7 @@ Cada módulo del proyecto se compila de forma independiente a través de un
 archivo `makefile`. Para compilar un módulo, es necesario ejecutar el comando
 `make` desde la carpeta correspondiente.
 
-Como alternativa, se puede ejecutar el script `makeall.sh` ubicado en el directorio de shell-scripts.
+Como alternativa, se puede ejecutar el script `makeall.sh`.
 Éste compilará todos los módulos incluyendo utils.
 
 ```bash
@@ -55,7 +55,8 @@ code tp.code-workspace
 
 ## Deploy
 
-Para desplegar el proyecto , usar el script `deploy.sh`.
+Para desplegar el proyecto, ejecutar el script `deploy.sh` especificando la ip tanto del kernel como
+la de memoria en los argumentos.
 El mismo modificará los valores de las configs y compilará todos los módulos.
 
 ```bash
@@ -71,7 +72,7 @@ bash deploy.sh --kernel=192.168.1.37 --memoria=192.168.1.38
 ```
 
 > [!NOTE]
-> Si se omite alguna flag (IP), el valor por defecto será 127.0.0.1
+> Si se omite alguna flag (IP), se tomará el valor por defecto que es `127.0.0.1`.
 
 ## Prueba
 
