@@ -1,12 +1,14 @@
-# tp-scaffold
+# Episode III - Revenge of the Cth
 
-Esta es una plantilla de proyecto diseñada para generar un TP de Sistemas
-Operativos de la UTN FRBA.
+Éste es el Trabajo Práctico de Sistemas Operativos de la UTN FRBA, 2025 Primer Cuatrimestre.
+
+Los lineamientos, criterios de evaluación y requerimientos del sistema están especificados en el
+documento principal del Trabajo Práctico, véase [Episode III - Revenge of the Cth](./doc/main.pdf).
 
 ## Dependencias
 
 Para poder compilar y ejecutar el proyecto, es necesario tener instalada la
-biblioteca [so-commons-library] de la cátedra:
+biblioteca [so-commons-library] de la cátedra y readline:
 
 ```bash
 git clone https://github.com/sisoputnfrba/so-commons-library
@@ -15,14 +17,25 @@ make debug
 make install
 ```
 
+```bash
+sudo apt install libreadline8 libreadline-dev
+```
+
 ## Compilación y ejecución
 
 Cada módulo del proyecto se compila de forma independiente a través de un
 archivo `makefile`. Para compilar un módulo, es necesario ejecutar el comando
 `make` desde la carpeta correspondiente.
 
-El ejecutable resultante de la compilación se guardará en la carpeta `bin` del
-módulo. Ejemplo:
+Como alternativa, se puede ejecutar el script `makeall.sh` ubicado en el directorio de shell-scripts.
+Éste compilará todos los módulos incluyendo utils.
+
+```bash
+bash makeall.sh
+```
+
+Los ejecutables resultantes de la compilación se guardarán en la carpeta `bin` de
+cada módulo. Ejemplo:
 
 ```sh
 cd kernel
@@ -30,9 +43,9 @@ make
 ./bin/kernel
 ```
 
-## Importar desde Visual Studio Code
+## Desarrollo por Visual Studio Code
 
-Para importar el workspace, debemos abrir el archivo `tp.code-workspace` desde
+Para importar el workspace, se debe abrir el archivo `tp.code-workspace` desde
 la interfaz o ejecutando el siguiente comando desde la carpeta raíz del
 repositorio:
 
@@ -40,53 +53,55 @@ repositorio:
 code tp.code-workspace
 ```
 
-## Checkpoint
+## Deploy
 
-Para cada checkpoint de control obligatorio, se debe crear un tag en el
-repositorio con el siguiente formato:
-
-```
-checkpoint-{número}
-```
-
-Donde `{número}` es el número del checkpoint, ejemplo: `checkpoint-1`.
-
-Para crear un tag y subirlo al repositorio, podemos utilizar los siguientes
-comandos:
+Para desplegar el proyecto , usar el script `deploy.sh`.
+El mismo modificará los valores de las configs y compilará todos los módulos.
 
 ```bash
-git tag -a checkpoint-{número} -m "Checkpoint {número}"
-git push origin checkpoint-{número}
+git clone https://github.com/JiunMHsu/so-tp-2025.git
+cd so-tp-2025
+bash deploy.sh --kernel=<ip máquina kernel> --memoria=<ip máquina memoria>
 ```
 
-> [!WARNING]
-> Asegúrense de que el código compila y cumple con los requisitos del checkpoint
-> antes de subir el tag.
-
-## Entrega
-
-Para desplegar el proyecto en una máquina Ubuntu Server, podemos utilizar el
-script [so-deploy] de la cátedra:
+Ejemplo:
 
 ```bash
-git clone https://github.com/sisoputnfrba/so-deploy.git
-cd so-deploy
-./deploy.sh -r=release -p=utils -p=kernel -p=cpu -p=memoria -p=io "tp-{año}-{cuatri}-{grupo}"
+bash deploy.sh --kernel=192.168.1.37 --memoria=192.168.1.38
 ```
-
-El mismo se encargará de instalar las Commons, clonar el repositorio del grupo
-y compilar el proyecto en la máquina remota.
 
 > [!NOTE]
-> Ante cualquier duda, pueden consultar la documentación en el repositorio de
-> [so-deploy], o utilizar el comando `./deploy.sh --help`.
+> Si se omite alguna flag (IP), el valor por defecto será 127.0.0.1
 
-## Guías útiles
+## Prueba
 
-- [Cómo interpretar errores de compilación](https://docs.utnso.com.ar/primeros-pasos/primer-proyecto-c#errores-de-compilacion)
-- [Cómo utilizar el debugger](https://docs.utnso.com.ar/guias/herramientas/debugger)
-- [Cómo configuramos Visual Studio Code](https://docs.utnso.com.ar/guias/herramientas/code)
-- **[Guía de despliegue de TP](https://docs.utnso.com.ar/guías/herramientas/deploy)**
+Las pruebas de este TP consisten en seis (véase el documento de [pruebas](/doc/pruebas-finales.pdf)):
+
+```bash
+plani corto fifo
+plani corto sjf
+plani corto srt
+plani lym fifo
+plani lym pmcp
+swap
+cache clock
+cache clockm
+tlb fifo
+tlb lru
+estabilidad
+```
+
+Cada caso requiere su configuración específica, por lo que previo a cada prueba,
+se debe ejecutar el script `set-test.sh`.
+
+```bash
+bash set-test.sh <prueba>
+```
+
+Ejemplo:
+
+```bash
+bash set-test.sh plani corto srt
+```
 
 [so-commons-library]: https://github.com/sisoputnfrba/so-commons-library
-[so-deploy]: https://github.com/sisoputnfrba/so-deploy

@@ -38,6 +38,8 @@ done
 change_config "IP_KERNEL" "$KERNEL"
 change_config "IP_MEMORIA" "$MEMORIA"
 
+bash makeall.sh
+
 echo ""
 echo "Kernel IP: $KERNEL"
 echo "Memoria IP: $MEMORIA"
