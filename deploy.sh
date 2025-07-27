@@ -4,7 +4,8 @@ rm -rf /home/utnso/scripts/
 rm -rf /home/utnso/swapfile.bin
 rm -rf /home/utnso/dump_files/
 
-git clone https://github.com/sisoputnfrba/revenge-of-the-cth-pruebas.git /home/utnso/scripts
+# git clone https://github.com/sisoputnfrba/revenge-of-the-cth-pruebas.git /home/utnso/scripts
+cp -r ./pruebas /home/utnso/scripts
 touch /home/utnso/swapfile.bin
 mkdir /home/utnso/dump_files
 
