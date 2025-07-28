@@ -76,7 +76,8 @@ bash deploy.sh --kernel=192.168.1.37 --memoria=192.168.1.38
 
 ## Prueba
 
-Las pruebas de este TP consisten en seis (véase el documento de [pruebas](/doc/pruebas-finales.pdf)):
+Las pruebas de este TP consisten en cinco partes, once casos en total 
+(véase el documento de [pruebas](/doc/pruebas-finales.pdf)):
 
 ```bash
 plani corto fifo
